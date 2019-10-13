@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -12,6 +14,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ParkingZoneLevel {
-    private String name;
-    private List<ParkingZoneSection> parkingZoneSections;
+    @Id
+    private String idLevel;
+    private String parkingZoneName;
+    private String levelName;
+    private List<ParkingZoneSection> parkingZoneSections = new ArrayList<>();
 }

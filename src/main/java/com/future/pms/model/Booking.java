@@ -18,6 +18,6 @@ public class Booking {
     private String idUser;
     private String idParkingZone;
     private String qrDetails;
-    private Date dateIn;
-    private Date dateOut;
+    private Long dateIn;
+    private Long dateOut;
 }

@@ -1,6 +1,7 @@
 package com.future.pms.controller;
 
 import com.future.pms.model.ParkingZone;
+import com.future.pms.model.list.ParkingZoneLevel;
 import com.future.pms.service.ParkingZoneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -23,6 +24,11 @@ public class ParkingZoneController {
     @PostMapping
     public ResponseEntity createParkingZone(@RequestBody ParkingZone parkingZone) {
         return parkingZoneService.createParkingZone(parkingZone);
+    }
+
+    @PostMapping("/add-level")
+    public ResponseEntity addParkingLevel(ParkingZoneLevel parkingZoneLevel){
+        return parkingZoneService.addParkingLevel(parkingZoneLevel);
     }
 
     @PutMapping("/{id}")

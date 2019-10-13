@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 
 import java.util.List;
 
@@ -12,6 +13,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 class ParkingZoneSection {
-    private String name;
+    @Id
+    private String idSection;
+    private String parkingZoneName;
+    private String levelName;
+    private String sectionName;
     private List<ParkingZoneSlot> parkingZoneSlots;
 }
