@@ -1,4 +1,4 @@
-package com.future.pms.model.list;
+package com.future.pms.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,9 +10,7 @@ import org.springframework.data.annotation.Id;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-class ParkingZoneSlot {
-    @Id
-    private String slotId;
-    private String name;
-    private String status;
+public class QR {
+    private String idBooking;
+    private String randomTestSlot;
 }

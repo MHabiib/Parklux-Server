@@ -8,19 +8,14 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class ParkingZone {
+@AllArgsConstructor
+public class ParkingSlot {
     @Id
-    private String idParkingZone;
     private String idParkingSlot;
-    private String name;
-    private String address = "";
-    private Double price = 0.0;
-    private String openHour = "--:-- / --:--";
+    private List<ParkingZoneLevel> parkingZoneLevels = new ArrayList<>();
 }

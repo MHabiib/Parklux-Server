@@ -64,6 +64,13 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+<!--		QRGen uses Zebra Crossing (ZXing) under the hood. ZXing is a liberal open source library,
+which can generate/parse almost all barcodes, including QR Codes.-->
+		<dependency>
+			<groupId>net.glxn.qrgen</groupId>
+			<artifactId>javase</artifactId>
+			<version>2.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

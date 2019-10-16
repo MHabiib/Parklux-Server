@@ -38,7 +38,7 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
 
         level.setLevelName(parkingZoneLevel.getLevelName());
         parkingZoneLevels.add(level);
-        parkingZone.setParkingZoneLevels(parkingZoneLevels);
+       // parkingZone.setParkingZoneLevels(parkingZoneLevels);
         parkingZoneRepository.save(parkingZone);
         return new ResponseEntity(HttpStatus.OK);
     }
