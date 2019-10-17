@@ -1,12 +1,12 @@
+/*
 package com.future.pms.service.impl;
 
-import com.future.pms.model.ParkingZone;
+import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.model.User;
 import com.future.pms.repository.ParkingZoneRepository;
 import com.future.pms.repository.UserRepository;
 import com.future.pms.service.ParkingZoneService;
 import com.future.pms.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -69,3 +69,4 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 }
+*/

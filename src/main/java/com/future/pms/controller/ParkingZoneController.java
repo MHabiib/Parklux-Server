@@ -1,7 +1,10 @@
+/*
 package com.future.pms.controller;
 
-import com.future.pms.model.ParkingZone;
-import com.future.pms.model.list.ParkingZoneLevel;
+import com.future.pms.model.parking.ParkingSlot;
+import com.future.pms.model.parking.ParkingZone;
+import com.future.pms.model.parking.ParkingLevel;
+import com.future.pms.model.parking.ParkingSection;
 import com.future.pms.service.ParkingZoneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -27,8 +30,18 @@ public class ParkingZoneController {
     }
 
     @PostMapping("/add-level")
-    public ResponseEntity addParkingLevel(ParkingZoneLevel parkingZoneLevel){
-        return parkingZoneService.addParkingLevel(parkingZoneLevel);
+    public ResponseEntity addParkingLevel(@RequestBody ParkingLevel parkingLevel){
+        return parkingZoneService.addParkingLevel(parkingLevel);
+    }
+
+    @PostMapping("/add-section")
+    public ResponseEntity addParkingSection(@RequestBody ParkingSection parkingSection){
+        return parkingZoneService.addParkingSection(parkingSection);
+    }
+
+    @PostMapping("/add-slot")
+    public ResponseEntity addParkingSlot(@RequestBody ParkingSlot parkingSlot){
+        return parkingZoneService.addParkingSlot(parkingSlot);
     }
 
     @PutMapping("/{id}")
@@ -42,3 +55,4 @@ public class ParkingZoneController {
         return parkingZoneService.deleteParkingZone(id);
     }
 }
+*/

@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -20,4 +23,5 @@ public class User {
     private String password;
     private String role = "";
     private String imageUrl = "";
+    private List<String>listHistory = new ArrayList<>();
 }
