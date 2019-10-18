@@ -1,3 +1,4 @@
+/*
 package com.future.pms.config;
 
 import com.future.pms.service.impl.UserDetailServiceImpl;
@@ -41,3 +42,4 @@ class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package com.future.pms.service.impl;
 
 
@@ -29,3 +30,4 @@ public class UserDetailServiceImpl implements UserDetailsService {
         return new User(user.getEmail(), user.getPassword(), authorities);
     }
 }
+*/

@@ -1,4 +1,4 @@
-package com.future.pms.model.list;
+package com.future.pms.model.parking;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,17 +6,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-class ParkingZoneSection {
+public class ParkingSlot {
     @Id
+    private String idSlot;
     private String idSection;
     private String parkingZoneName;
-    private String levelName;
-    private String sectionName;
-    private List<ParkingZoneSlot> parkingZoneSlots;
+    private String name;
+    private String status;
 }

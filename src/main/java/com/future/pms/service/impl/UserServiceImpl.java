@@ -1,15 +1,14 @@
 package com.future.pms.service.impl;
 
-import com.future.pms.model.ParkingZone;
+import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.model.User;
 import com.future.pms.repository.ParkingZoneRepository;
 import com.future.pms.repository.UserRepository;
 import com.future.pms.service.ParkingZoneService;
 import com.future.pms.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,14 +23,19 @@ public class UserServiceImpl implements UserService {
     private final
     ParkingZoneRepository parkingZoneRepository;
 
-    private final PasswordEncoder passwordEncoder;
+   // private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, ParkingZoneRepository parkingZoneRepository, PasswordEncoder passwordEncoder, ParkingZoneService parkingZoneService) {
+/*    public UserServiceImpl(UserRepository userRepository, ParkingZoneRepository parkingZoneRepository, PasswordEncoder passwordEncoder, ParkingZoneService parkingZoneService) {
         this.userRepository = userRepository;
         this.parkingZoneRepository = parkingZoneRepository;
         this.passwordEncoder = passwordEncoder;
         this.parkingZoneService = parkingZoneService;
-    }
+    }*/
+public UserServiceImpl(UserRepository userRepository, ParkingZoneRepository parkingZoneRepository, ParkingZoneService parkingZoneService) {
+    this.userRepository = userRepository;
+    this.parkingZoneRepository = parkingZoneRepository;
+    this.parkingZoneService = parkingZoneService;
+}
 
     @Override
     public ResponseEntity loadAll() {
@@ -54,7 +58,7 @@ public class UserServiceImpl implements UserService {
         else
             user.setRole("CUSTOMER");
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+       // user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         return new ResponseEntity<>("Create user successful !",HttpStatus.OK);
     }

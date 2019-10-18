@@ -1,6 +1,5 @@
-package com.future.pms.model;
+package com.future.pms.model.parking;
 
-import com.future.pms.model.list.ParkingZoneLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,10 +11,12 @@ import java.util.List;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class ParkingSlot {
+@NoArgsConstructor
+public class ParkingLevel {
     @Id
-    private String idParkingSlot;
-    private List<ParkingZoneLevel> parkingZoneLevels = new ArrayList<>();
+    private String idLevel;
+    private String parkingZoneName;
+    private String levelName;
+    private String status;
 }
