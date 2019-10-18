@@ -1,3 +1,4 @@
+/*
 package com.future.pms.controller;
 
 import com.future.pms.model.parking.ParkingSlot;
@@ -54,3 +55,4 @@ public class ParkingZoneController {
         return parkingZoneService.deleteParkingZone(id);
     }
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package com.future.pms.controller;
 
 import com.future.pms.model.User;
@@ -39,3 +40,4 @@ public class UserController {
         return userService.deleteUser(id);
     }
 }
+*/

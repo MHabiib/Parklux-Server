@@ -1,3 +1,4 @@
+/*
 package com.future.pms.service.impl;
 
 import com.future.pms.model.parking.ParkingZone;
@@ -73,3 +74,4 @@ public UserServiceImpl(UserRepository userRepository, ParkingZoneRepository park
         return null;
     }
 }
+*/
