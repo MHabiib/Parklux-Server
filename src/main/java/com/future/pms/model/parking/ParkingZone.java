@@ -16,5 +16,5 @@ public class ParkingZone {
     private String name;
     private String address = "";
     private Double price = 0.0;
-    private String openHour = "--:-- / --:--";
+    private String openHour = "-- : -- / -- : --";
 }

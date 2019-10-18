@@ -16,7 +16,7 @@ import java.util.List;
 public class BookingController {
     
     @Autowired
-    BookingService bookingService;
+    private BookingService bookingService;
     
     @GetMapping
     public ResponseEntity loadAll() {

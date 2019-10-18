@@ -17,7 +17,7 @@ public class Booking {
     private String idBooking;
     private String idUser;
     private String idParkingZone;
-    private String qrDetails;
+    private String qrUrl;
     private Long dateIn;
     private Long dateOut;
 }

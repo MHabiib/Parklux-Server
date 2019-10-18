@@ -1,15 +1,20 @@
-package com.future.pms.controller;
+package com.future.pms.service.impl;
 
 import com.future.pms.model.QR;
+import com.future.pms.service.GenerateQRService;
 import net.glxn.qrgen.core.image.ImageType;
-import net.glxn.qrgen.core.vcard.VCard;
 import net.glxn.qrgen.javase.QRCode;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.Random;
 
-public class GenerateQrController {
-    public static void main(String... args){
+@Service
+public class GenerateQRServiceImpl implements GenerateQRService {
+    @Override
+    public ResponseEntity generateQR(String... args) {
         QR qr = new QR();
         Random rnd = new Random(12);
         qr.setIdBooking("idBooking");
@@ -26,10 +31,9 @@ public class GenerateQrController {
             out.flush();
             out.close();
 
-        } catch (FileNotFoundException e){
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (IOException e){
             e.printStackTrace();
         }
+        return new ResponseEntity<>("Generated", HttpStatus.OK);
     }
 }

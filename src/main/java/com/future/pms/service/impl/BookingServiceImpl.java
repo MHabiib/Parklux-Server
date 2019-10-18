@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -25,6 +26,7 @@ public class BookingServiceImpl implements BookingService{
 
     @Override
     public ResponseEntity createBooking(Booking booking) {
+        booking.setQrUrl("../tmpl/");
         bookingRepository.save(booking);
         return new ResponseEntity(HttpStatus.OK);
     }
