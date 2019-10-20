@@ -38,11 +38,6 @@ public class ParkingZoneController {
         return parkingZoneService.addParkingSection(parkingSection);
     }
 
-    @PostMapping("/add-slot")
-    public ResponseEntity addParkingSlot(@RequestBody ParkingSlot parkingSlot){
-        return parkingZoneService.addParkingSlot(parkingSlot);
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<ParkingZone> updateParkingZone(@PathVariable("id") String id,
                                                          @RequestBody ParkingZone parkingZone) {

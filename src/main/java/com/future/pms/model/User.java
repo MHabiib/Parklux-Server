@@ -1,5 +1,6 @@
 package com.future.pms.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 public class User {
     @Id
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String idUser;
     private String name;
     private String email;

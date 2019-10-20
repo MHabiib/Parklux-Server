@@ -1,5 +1,6 @@
 package com.future.pms.model.parking;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +18,7 @@ public class ParkingSection {
     @Id
     private String idSection;
     private String idLevel;
-    private String parkingZoneName;
+    private String idParkingZone;
     private String sectionName;
-    private String status;
+    private String status = "AVAILABLE";
 }

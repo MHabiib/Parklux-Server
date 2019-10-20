@@ -14,7 +14,7 @@ public class ParkingSlot {
     @Id
     private String idSlot;
     private String idSection;
-    private String parkingZoneName;
+    private String idParkingZone;
     private String name;
-    private String status;
+    private String status = "AVAILABLE";
 }

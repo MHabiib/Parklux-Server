@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ParkingSlotRepository extends MongoRepository<ParkingSlot, String> {
-
+    ParkingSlot findFirstByIdParkingZoneAndStatus(String idParkingZone, String status);
 }

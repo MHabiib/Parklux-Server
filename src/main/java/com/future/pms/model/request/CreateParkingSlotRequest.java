@@ -1,4 +1,3 @@
-/*
 package com.future.pms.model.request;
 
 import lombok.AllArgsConstructor;
@@ -7,13 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class CreateParkingZoneRequest {
-    private String name;
-    private String address;
-    private Double price;
-    private String openHour;
+public class CreateParkingSlotRequest {
+    private String idSection;
+    private String slotName;
+    private String idParkingZone;
 }
-*/

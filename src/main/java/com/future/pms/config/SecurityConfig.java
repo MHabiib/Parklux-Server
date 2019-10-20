@@ -23,7 +23,7 @@ class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.requestMatchers()//match the url
-                .antMatchers("/login", "/api/**")
+                .antMatchers("/login")
                 .and()
                 .authorizeRequests() //must login and authorize the request
                 .anyRequest()

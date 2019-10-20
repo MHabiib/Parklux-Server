@@ -13,7 +13,6 @@ public interface ParkingZoneService {
     ResponseEntity createParkingZone(@RequestBody ParkingZone parkingZone);
     ResponseEntity addParkingLevel(@RequestBody ParkingLevel parkingLevel);
     ResponseEntity addParkingSection(@RequestBody ParkingSection parkingSection);
-    ResponseEntity addParkingSlot(@RequestBody ParkingSlot parkingSlot);
     ResponseEntity <ParkingZone> updateParkingZone(@PathVariable("id") String id, @RequestBody ParkingZone parkingZone);
     ResponseEntity deleteParkingZone(@PathVariable("id") String id);
 }

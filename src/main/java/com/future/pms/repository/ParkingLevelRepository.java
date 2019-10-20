@@ -7,5 +7,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @Repository
 public interface ParkingLevelRepository extends MongoRepository<ParkingLevel, String> {
-
+    ParkingLevel findByIdLevel(String idLevel);
 }

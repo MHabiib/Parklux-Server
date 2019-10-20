@@ -11,6 +11,6 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QR {
-    private String idBooking;
-    private String randomTestSlot;
+    private String slotName;
+    private String idParkingZone;
 }
