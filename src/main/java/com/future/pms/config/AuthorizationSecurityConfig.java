@@ -1,3 +1,4 @@
+/*
 package com.future.pms.config;
 
 import com.future.pms.service.impl.UserDetailServiceImpl;
@@ -39,3 +40,4 @@ public class AuthorizationSecurityConfig extends AuthorizationServerConfigurerAd
         endpoints.userDetailsService(userDetailService);
     }
 }
+*/

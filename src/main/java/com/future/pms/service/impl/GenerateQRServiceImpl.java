@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -29,10 +30,15 @@ public class GenerateQRServiceImpl implements GenerateQRService {
     public ResponseEntity generateQR(String idParkingZone) {
 
         ParkingZone parkingZoneExist = parkingZoneRepository.findParkingZoneByIdParkingZone(idParkingZone);
-        ParkingSlot parkingSlot = parkingSlotRepository
-                .findFirstByIdParkingZoneAndStatus(parkingZoneExist.getIdParkingZone(),"AVAILABLE");
-        parkingSlot.setStatus("SCAN_ME");
-        parkingSlotRepository.save(parkingSlot);
+        List<ParkingSlot> listParkingSlot = parkingSlotRepository
+                .findAllByIdParkingZoneAndStatus(parkingZoneExist.getIdParkingZone(), "AVAILABLE");
+        if (listParkingSlot == null)
+            return new ResponseEntity<>("Parking Zone on " + parkingZoneExist.getName() + "Full !", HttpStatus.OK);
+
+        else {
+            ParkingSlot parkingSlot = listParkingSlot.get((int) (Math.random() * listParkingSlot.size()));
+            parkingSlot.setStatus("SCAN_ME");
+            parkingSlotRepository.save(parkingSlot);
             QR qr = new QR();
             qr.setSlotName(parkingSlot.getName());
             qr.setIdParkingZone(parkingSlot.getIdParkingZone());
@@ -44,16 +50,17 @@ public class GenerateQRServiceImpl implements GenerateQRService {
             try {
                 OutputStream out = new FileOutputStream("../tmp/"
                         + parkingZoneExist.getName()
-                        + " - "+parkingSlot.getName()
+                        + " - " + parkingSlot.getName()
                         + ".png");
                 bout.writeTo(out);
                 out.flush();
                 out.close();
 
-            } catch (IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
-        return new ResponseEntity<>("Generated", HttpStatus.OK);
+            return new ResponseEntity<>("Parking Location " + parkingSlot.getName(), HttpStatus.OK);
+        }
     }
 
 }
