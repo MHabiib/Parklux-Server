@@ -41,6 +41,7 @@ public class GenerateQRServiceImpl implements GenerateQRService {
             parkingSlotRepository.save(parkingSlot);
             QR qr = new QR();
             qr.setSlotName(parkingSlot.getName());
+            qr.setParkingZoneName(parkingSlot.getName());
             qr.setIdParkingZone(parkingSlot.getIdParkingZone());
             ByteArrayOutputStream bout =
                     QRCode.from(String.valueOf(qr))

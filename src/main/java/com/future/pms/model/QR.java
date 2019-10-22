@@ -12,5 +12,6 @@ import org.springframework.data.annotation.Id;
 @NoArgsConstructor
 public class QR {
     private String slotName;
+    private String parkingZoneName;
     private String idParkingZone;
 }
