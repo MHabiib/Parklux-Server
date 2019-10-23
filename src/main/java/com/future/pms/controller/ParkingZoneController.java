@@ -1,6 +1,6 @@
 package com.future.pms.controller;
 
-import com.future.pms.model.ParkingZone;
+import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.model.parking.ParkingLevel;
 import com.future.pms.model.parking.ParkingSection;
 import com.future.pms.service.ParkingZoneService;

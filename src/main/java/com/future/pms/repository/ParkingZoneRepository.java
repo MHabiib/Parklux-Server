@@ -1,6 +1,6 @@
 package com.future.pms.repository;
 
-import com.future.pms.model.ParkingZone;
+import com.future.pms.model.parking.ParkingZone;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

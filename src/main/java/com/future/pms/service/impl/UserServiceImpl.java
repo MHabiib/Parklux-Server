@@ -1,7 +1,7 @@
 package com.future.pms.service.impl;
 
 import com.future.pms.model.Customer;
-import com.future.pms.model.ParkingZone;
+import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.model.User;
 import com.future.pms.repository.CustomerRepository;
 import com.future.pms.repository.ParkingZoneRepository;

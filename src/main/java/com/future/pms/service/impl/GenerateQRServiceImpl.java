@@ -2,7 +2,7 @@ package com.future.pms.service.impl;
 
 import com.future.pms.model.QR;
 import com.future.pms.model.parking.ParkingSlot;
-import com.future.pms.model.ParkingZone;
+import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.repository.ParkingSlotRepository;
 import com.future.pms.repository.ParkingZoneRepository;
 import com.future.pms.service.GenerateQRService;

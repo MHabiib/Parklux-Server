@@ -2,7 +2,7 @@ package com.future.pms.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.pms.model.parking.ParkingSlot;
-import com.future.pms.model.ParkingZone;
+import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.model.parking.ParkingLevel;
 import com.future.pms.model.parking.ParkingSection;
 import com.future.pms.model.request.CreateParkingSlotRequest;
