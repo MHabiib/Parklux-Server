@@ -16,14 +16,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
-    @Id
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String idUser;
-    private String name;
     private String email;
-    private String phoneNumber = "";
     private String password;
-    private String role = "";
-    private String imageUrl = "";
-    private List<String>listHistory = new ArrayList<>();
+    private String role;
+
 }

@@ -1,7 +1,9 @@
 package com.future.pms.service.impl;
 
-import com.future.pms.model.parking.ParkingZone;
+import com.future.pms.model.Customer;
+import com.future.pms.model.ParkingZone;
 import com.future.pms.model.User;
+import com.future.pms.repository.CustomerRepository;
 import com.future.pms.repository.ParkingZoneRepository;
 import com.future.pms.repository.UserRepository;
 import com.future.pms.service.ParkingZoneService;
@@ -21,15 +23,20 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
 
     private final
+    CustomerRepository customerRepository;
+
+    private final
     ParkingZoneRepository parkingZoneRepository;
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, ParkingZoneRepository parkingZoneRepository, PasswordEncoder passwordEncoder, ParkingZoneService parkingZoneService) {
+    public UserServiceImpl(UserRepository userRepository, ParkingZoneRepository parkingZoneRepository
+            , PasswordEncoder passwordEncoder, ParkingZoneService parkingZoneService, CustomerRepository customerRepository) {
         this.userRepository = userRepository;
         this.parkingZoneRepository = parkingZoneRepository;
         this.passwordEncoder = passwordEncoder;
         this.parkingZoneService = parkingZoneService;
+        this.customerRepository = customerRepository;
     }
 
     @Override
@@ -41,19 +48,17 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity createUser(User user) {
         if (userRepository.findByEmail(user.getEmail()) != null)
             return new ResponseEntity<>("Email already registered !",HttpStatus.BAD_REQUEST);
-
-        if (user.getRole().equals("ADMIN")){
-            if(parkingZoneRepository.findParkingZoneByName(user.getName())!=null)
-                return new ResponseEntity<>("Name already registered !",HttpStatus.BAD_REQUEST);
-
-            ParkingZone parkingZone = new ParkingZone();
-            parkingZone.setName(user.getName());
-            parkingZoneService.createParkingZone(parkingZone);
-        }
-        else
-            user.setRole("CUSTOMER");
-
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if(user.getRole().equals("ADMIN")) {
+            ParkingZone parkingZone = new ParkingZone();
+            parkingZone.setEmailParkingZone(user.getEmail());
+            parkingZoneRepository.save(parkingZone);
+        }
+        else if (user.getRole().equals("CUSTOMER")){
+            Customer customer = new Customer();
+            customer.setEmail(user.getEmail());
+            customerRepository.save(customer);
+        }
         userRepository.save(user);
         return new ResponseEntity<>("Create user successful !",HttpStatus.OK);
     }

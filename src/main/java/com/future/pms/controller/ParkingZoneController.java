@@ -1,14 +1,17 @@
 package com.future.pms.controller;
 
-import com.future.pms.model.parking.ParkingSlot;
-import com.future.pms.model.parking.ParkingZone;
+import com.future.pms.model.ParkingZone;
 import com.future.pms.model.parking.ParkingLevel;
 import com.future.pms.model.parking.ParkingSection;
 import com.future.pms.service.ParkingZoneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @CrossOrigin("**")
 @RestController
@@ -38,10 +41,17 @@ public class ParkingZoneController {
         return parkingZoneService.addParkingSection(parkingSection);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ParkingZone> updateParkingZone(@PathVariable("id") String id,
-                                                         @RequestBody ParkingZone parkingZone) {
-        return parkingZoneService.updateParkingZone(id,parkingZone);
+    @PostMapping("update-zone/{id}")
+    public ResponseEntity updateParkingSlot(@RequestBody String idParkingSlot, @RequestBody String status) {
+        return parkingZoneService.updateParkingSlot(idParkingSlot,status);
+    }
+
+    @PutMapping(value = "update-zone/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updateParkingZone(
+            @PathVariable("id") String emailParkingZone,
+            @Nullable @RequestPart("file") MultipartFile file,
+            @RequestPart("parkingZone") String parkingZoneJSON) throws IOException {
+        return parkingZoneService.updateParkingZone(emailParkingZone, file, parkingZoneJSON);
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

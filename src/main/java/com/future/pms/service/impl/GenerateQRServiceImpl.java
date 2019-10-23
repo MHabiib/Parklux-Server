@@ -2,7 +2,7 @@ package com.future.pms.service.impl;
 
 import com.future.pms.model.QR;
 import com.future.pms.model.parking.ParkingSlot;
-import com.future.pms.model.parking.ParkingZone;
+import com.future.pms.model.ParkingZone;
 import com.future.pms.repository.ParkingSlotRepository;
 import com.future.pms.repository.ParkingZoneRepository;
 import com.future.pms.service.GenerateQRService;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.List;
-import java.util.Random;
 
 @Service
 public class GenerateQRServiceImpl implements GenerateQRService {
@@ -27,38 +26,47 @@ public class GenerateQRServiceImpl implements GenerateQRService {
     ParkingSlotRepository parkingSlotRepository;
 
     @Override
-    public ResponseEntity generateQR(String idParkingZone) {
+    public ResponseEntity generateQR(String emailParkingZone) {
 
-        ParkingZone parkingZoneExist = parkingZoneRepository.findParkingZoneByIdParkingZone(idParkingZone);
+        ParkingZone parkingZoneExist = parkingZoneRepository.findParkingZoneByEmailParkingZone(emailParkingZone);
+
         List<ParkingSlot> listParkingSlot = parkingSlotRepository
-                .findAllByIdParkingZoneAndStatus(parkingZoneExist.getIdParkingZone(), "AVAILABLE");
+                .findAllByEmailParkingZoneAndStatus(parkingZoneExist.getEmailParkingZone(), "AVAILABLE");
         if (listParkingSlot == null)
             return new ResponseEntity<>("Parking Zone on " + parkingZoneExist.getName() + "Full !", HttpStatus.OK);
 
         else {
             ParkingSlot parkingSlot = listParkingSlot.get((int) (Math.random() * listParkingSlot.size()));
-            parkingSlot.setStatus("SCAN_ME");
-            parkingSlotRepository.save(parkingSlot);
-            QR qr = new QR();
-            qr.setSlotName(parkingSlot.getName());
-            qr.setParkingZoneName(parkingSlot.getName());
-            qr.setIdParkingZone(parkingSlot.getIdParkingZone());
-            ByteArrayOutputStream bout =
-                    QRCode.from(String.valueOf(qr))
-                            .withSize(250, 250)
-                            .to(ImageType.PNG)
-                            .stream();
-            try {
-                OutputStream out = new FileOutputStream("../tmp/"
-                        + parkingZoneExist.getName()
-                        + " - " + parkingSlot.getName()
-                        + ".png");
-                bout.writeTo(out);
-                out.flush();
-                out.close();
 
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (parkingSlot.getStatus().equals("AVAILABLE")){
+
+                parkingSlot.setStatus("SCAN_ME");
+                parkingSlotRepository.save(parkingSlot);
+                QR qr = new QR();
+                qr.setSlotName(parkingSlot.getName());
+                qr.setParkingZoneName(parkingSlot.getName());
+                qr.setEmailParkingZone(parkingSlot.getEmailParkingZone());
+                ByteArrayOutputStream bout =
+                        QRCode.from(String.valueOf(qr))
+                                .withSize(250, 250)
+                                .to(ImageType.PNG)
+                                .stream();
+                try {
+                    OutputStream out = new FileOutputStream("../tmp/"
+                            + parkingZoneExist.getName()
+                            + " - " + parkingSlot.getName()
+                            + ".png");
+                    bout.writeTo(out);
+                    out.flush();
+                    out.close();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            else {
+                return new ResponseEntity<> ("Slot taken !", HttpStatus.BAD_REQUEST);
             }
             return new ResponseEntity<>("Parking Location " + parkingSlot.getName(), HttpStatus.OK);
         }
