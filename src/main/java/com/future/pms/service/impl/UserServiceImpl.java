@@ -10,14 +10,18 @@ import com.future.pms.service.ParkingZoneService;
 import com.future.pms.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements UserService {
-
-    private final
-    ParkingZoneService parkingZoneService;
 
     private final
     UserRepository userRepository;
@@ -35,7 +39,6 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
         this.parkingZoneRepository = parkingZoneRepository;
         this.passwordEncoder = passwordEncoder;
-        this.parkingZoneService = parkingZoneService;
         this.customerRepository = customerRepository;
     }
 
