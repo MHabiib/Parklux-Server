@@ -18,7 +18,7 @@ public class ParkingSection {
     @Id
     private String idSection;
     private String idLevel;
-    private String idParkingZone;
+    private String emailParkingZone;
     private String sectionName;
     private String status = "AVAILABLE";
 }

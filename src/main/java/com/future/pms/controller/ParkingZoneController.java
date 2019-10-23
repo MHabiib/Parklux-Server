@@ -41,8 +41,8 @@ public class ParkingZoneController {
         return parkingZoneService.addParkingSection(parkingSection);
     }
 
-    @PostMapping("update-zone/{id}")
-    public ResponseEntity updateParkingSlot(@RequestBody String idParkingSlot, @RequestBody String status) {
+    @PostMapping("update-slot/{id}")
+    public ResponseEntity updateParkingSlot(@PathVariable("id")  String idParkingSlot, @RequestBody String status) {
         return parkingZoneService.updateParkingSlot(idParkingSlot,status);
     }
 

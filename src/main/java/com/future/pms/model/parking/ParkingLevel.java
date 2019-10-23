@@ -16,7 +16,7 @@ import java.util.List;
 public class ParkingLevel {
     @Id
     private String idLevel;
-    private String idParkingZone;
+    private String emailParkingZone;
     private String levelName;
     private String status = "AVAILABLE";
 }

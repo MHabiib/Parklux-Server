@@ -51,11 +51,13 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         if(user.getRole().equals("ADMIN")) {
             ParkingZone parkingZone = new ParkingZone();
+            parkingZone.setName("PARKING ZONE NAME");
             parkingZone.setEmailParkingZone(user.getEmail());
             parkingZoneRepository.save(parkingZone);
         }
         else if (user.getRole().equals("CUSTOMER")){
             Customer customer = new Customer();
+            customer.setName("CUSTOMER");
             customer.setEmail(user.getEmail());
             customerRepository.save(customer);
         }

@@ -104,7 +104,7 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
 
     @Override
     public ResponseEntity updateParkingSlot(String idParkingSlot, String status) {
-        ParkingSlot parkingSlot = parkingSlotRepository.findByEmailParkingZone(idParkingSlot);
+        ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(idParkingSlot);
         if (parkingSlot != null) {
             if (parkingSlot.getStatus().equals(AVAILABLE) ){
                 parkingSlot.setStatus(DISABLE);

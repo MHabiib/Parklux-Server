@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class CreateParkingSlotRequest {
     private String idSection;
     private String slotName;
-    private String idParkingZone;
+    private String emailParkingZone;
 }

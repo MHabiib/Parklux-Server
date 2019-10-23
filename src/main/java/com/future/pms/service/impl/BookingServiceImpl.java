@@ -33,7 +33,7 @@ public class BookingServiceImpl implements BookingService{
     @Override
     public ResponseEntity createBooking(Booking booking) {
         booking.setDateIn(Calendar.getInstance().getTimeInMillis());
-        ParkingSlot parkingSlot = parkingSlotRepository.findByIdParkingZone(booking.getIdParkingZone());
+        ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(booking.getIdSlot());
         parkingSlot.setStatus("BOOKED");
        // booking.setQrUrl("../tmpl/");
         bookingRepository.save(booking);

@@ -15,8 +15,9 @@ import java.util.Date;
 public class Booking {
     @Id
     private String idBooking;
+    private String idSlot;
     private String idUser;
-    private String idParkingZone;
+    private String emailParkingZone;
     private Long dateIn;
     private Long dateOut;
 }

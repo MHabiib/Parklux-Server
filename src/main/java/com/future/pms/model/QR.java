@@ -13,5 +13,5 @@ import org.springframework.data.annotation.Id;
 public class QR {
     private String slotName;
     private String parkingZoneName;
-    private String idParkingZone;
+    private String emailParkingZone;
 }
