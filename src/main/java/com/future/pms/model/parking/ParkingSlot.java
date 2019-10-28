@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
+import static com.future.pms.Constants.AVAILABLE;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -16,5 +18,5 @@ public class ParkingSlot {
     private String idSection;
     private String emailParkingZone;
     private String name;
-    private String status = "AVAILABLE";
+    private String status = AVAILABLE;
 }

@@ -6,41 +6,33 @@ import com.future.pms.model.User;
 import com.future.pms.repository.CustomerRepository;
 import com.future.pms.repository.ParkingZoneRepository;
 import com.future.pms.repository.UserRepository;
-import com.future.pms.service.ParkingZoneService;
 import com.future.pms.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static com.future.pms.Constants.ADMIN;
+import static com.future.pms.Constants.CUSTOMER;
+
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final
+    @Autowired
     UserRepository userRepository;
 
-    private final
+    @Autowired
     CustomerRepository customerRepository;
 
-    private final
+    @Autowired
     ParkingZoneRepository parkingZoneRepository;
 
-    private final PasswordEncoder passwordEncoder;
-
-    public UserServiceImpl(UserRepository userRepository, ParkingZoneRepository parkingZoneRepository
-            , PasswordEncoder passwordEncoder, ParkingZoneService parkingZoneService, CustomerRepository customerRepository) {
-        this.userRepository = userRepository;
-        this.parkingZoneRepository = parkingZoneRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.customerRepository = customerRepository;
-    }
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Override
     public ResponseEntity loadAll() {
@@ -50,22 +42,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity createUser(User user) {
         if (userRepository.findByEmail(user.getEmail()) != null)
-            return new ResponseEntity<>("Email already registered !",HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Email already registered !", HttpStatus.BAD_REQUEST);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        if(user.getRole().equals("ADMIN")) {
+        if (user.getRole().equals(ADMIN)) {
             ParkingZone parkingZone = new ParkingZone();
             parkingZone.setName("PARKING ZONE NAME");
             parkingZone.setEmailParkingZone(user.getEmail());
             parkingZoneRepository.save(parkingZone);
-        }
-        else if (user.getRole().equals("CUSTOMER")){
+        } else if (user.getRole().equals(CUSTOMER)) {
             Customer customer = new Customer();
-            customer.setName("CUSTOMER");
+            customer.setName(CUSTOMER);
             customer.setEmail(user.getEmail());
             customerRepository.save(customer);
         }
         userRepository.save(user);
-        return new ResponseEntity<>("Create user successful !",HttpStatus.OK);
+        return new ResponseEntity<>("Create user successful !", HttpStatus.OK);
     }
 
     @Override

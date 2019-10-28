@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.util.List;
 
+import static com.future.pms.Constants.*;
+
 @Service
 public class GenerateQRServiceImpl implements GenerateQRService {
 
@@ -27,20 +29,15 @@ public class GenerateQRServiceImpl implements GenerateQRService {
 
     @Override
     public ResponseEntity generateQR(String emailParkingZone) {
-
         ParkingZone parkingZoneExist = parkingZoneRepository.findParkingZoneByEmailParkingZone(emailParkingZone);
-
         List<ParkingSlot> listParkingSlot = parkingSlotRepository
                 .findAllByEmailParkingZoneAndStatus(parkingZoneExist.getEmailParkingZone(), "AVAILABLE");
         if (listParkingSlot == null)
             return new ResponseEntity<>("Parking Zone on " + parkingZoneExist.getName() + "Full !", HttpStatus.OK);
-
         else {
             ParkingSlot parkingSlot = listParkingSlot.get((int) (Math.random() * listParkingSlot.size()));
-
-            if (parkingSlot.getStatus().equals("AVAILABLE")){
-
-                parkingSlot.setStatus("SCAN_ME");
+            if (parkingSlot.getStatus().equals(AVAILABLE)) {
+                parkingSlot.setStatus(SCAN_ME);
                 parkingSlotRepository.save(parkingSlot);
                 QR qr = new QR();
                 qr.setSlotName(parkingSlot.getName());
@@ -52,7 +49,7 @@ public class GenerateQRServiceImpl implements GenerateQRService {
                                 .to(ImageType.PNG)
                                 .stream();
                 try {
-                    OutputStream out = new FileOutputStream("../tmp/"
+                    OutputStream out = new FileOutputStream(FILE_LOCATION
                             + parkingZoneExist.getName()
                             + " - " + parkingSlot.getName()
                             + ".png");
@@ -63,13 +60,10 @@ public class GenerateQRServiceImpl implements GenerateQRService {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
-
-            else {
-                return new ResponseEntity<> ("Slot taken !", HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<>("Slot taken !", HttpStatus.BAD_REQUEST);
             }
             return new ResponseEntity<>("Parking Location " + parkingSlot.getName(), HttpStatus.OK);
         }
     }
-
 }

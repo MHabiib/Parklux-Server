@@ -1,14 +1,11 @@
 package com.future.pms.controller;
 
 import com.future.pms.model.Booking;
-import com.future.pms.model.User;
 import com.future.pms.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @CrossOrigin("**")
 @RestController

@@ -6,8 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
-import java.util.ArrayList;
-import java.util.List;
+import static com.future.pms.Constants.AVAILABLE;
 
 @Data
 @Builder
@@ -18,5 +17,5 @@ public class ParkingLevel {
     private String idLevel;
     private String emailParkingZone;
     private String levelName;
-    private String status = "AVAILABLE";
+    private String status = AVAILABLE;
 }

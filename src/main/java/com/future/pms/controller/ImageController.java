@@ -2,7 +2,6 @@ package com.future.pms.controller;
 
 
 import com.future.pms.service.ParkingZoneService;
-import com.future.pms.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

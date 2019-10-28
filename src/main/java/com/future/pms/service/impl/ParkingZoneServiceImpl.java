@@ -28,15 +28,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static com.future.pms.Constants.*;
+
 
 @Service
 public class ParkingZoneServiceImpl implements ParkingZoneService {
-
-    public static final String AVAILABLE= "AVAILABLE";
-    public static final String SCAN_ME= "SCAN_ME";
-    public static final String DISABLE= "DISABLE";
-    public static final String BOOKED= "BOOKED";
-    public static final String UPLOADED_FOLDER="../assets/";
 
     @Autowired
     ParkingZoneRepository parkingZoneRepository;
@@ -63,71 +59,64 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
         return null;
     }
 
-/*    @Override
-    public ResponseEntity createParkingZone(@RequestBody ParkingZone parkingZone) {
-        if (parkingZoneRepository.findParkingZoneByEmail(parkingZone.getEmail()) != null)
-            return new ResponseEntity<>("Email already registered !",HttpStatus.BAD_REQUEST);
-        parkingZone.setPassword(passwordEncoder.encode(parkingZone.getPassword()));
-
-        return ResponseEntity.ok(parkingZoneRepository.save(parkingZone));
-    }*/
-
     @Override
-    public ResponseEntity addParkingLevel(@RequestBody ParkingLevel parkingLevel){
+    public ResponseEntity addParkingLevel(@RequestBody ParkingLevel parkingLevel) {
         ParkingZone parkingZoneExist = parkingZoneRepository
                 .findParkingZoneByEmailParkingZone(parkingLevel.getEmailParkingZone());
         if (parkingZoneExist != null) {
-            return ResponseEntity.ok(parkingLevelRepository.save(parkingLevel));
+            return new ResponseEntity<>(parkingLevelRepository.save(parkingLevel), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("Parking Zone Not Found", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(PARKING_ZONE_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
     }
 
     @Override
     public ResponseEntity addParkingSection(@RequestBody ParkingSection parkingSection) {
-        ParkingLevel parkingLevelExist = parkingLevelRepository.findByIdLevel(parkingSection.getIdLevel());
+        ParkingLevel parkingLevelExist =
+                parkingLevelRepository.findByIdLevel(parkingSection.getIdLevel());
         if (parkingLevelExist != null) {
             parkingSectionRepository.save(parkingSection);
             CreateParkingSlotRequest parkingSlotRequest = new CreateParkingSlotRequest();
             parkingSlotRequest.setEmailParkingZone(parkingLevelExist.getEmailParkingZone());
             parkingSlotRequest.setIdSection(parkingSection.getIdSection());
-
-            for (int i = 1 ; i<=20 ; i++){
+            for (int i = 1; i <= 20; i++) {
                 parkingSlotRequest.setSlotName(parkingSection.getSectionName() + " - " + i);
                 addSlot(parkingSlotRequest);
             }
-            return ResponseEntity.ok("Parking Section Created and Adds 20 Slot on " + parkingSection.getSectionName());
+            return new ResponseEntity<>(
+                    "Parking Section Created and Adds 20 Slot on " + parkingSection.getSectionName(),
+                    HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Parking Level Not Found", HttpStatus.BAD_REQUEST);
         }
     }
 
-    @Override
+       @Override
     public ResponseEntity updateParkingSlot(String idParkingSlot, String status) {
         ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(idParkingSlot);
         if (parkingSlot != null) {
-            if (parkingSlot.getStatus().equals(AVAILABLE) ){
-                parkingSlot.setStatus(DISABLE);
-                parkingSlotRepository.save(parkingSlot);
+            switch (parkingSlot.getStatus()) {
+                case AVAILABLE: {
+                    parkingSlot.setStatus(DISABLE);
+                    parkingSlotRepository.save(parkingSlot);
+                    return new ResponseEntity<>(SLOT_UPDATED, HttpStatus.OK);
+                }
+                case DISABLE: {
+                    parkingSlot.setStatus(AVAILABLE);
+                    parkingSlotRepository.save(parkingSlot);
+                    return new ResponseEntity<>(SLOT_UPDATED, HttpStatus.OK);
+                }
+                default: {
+                    return new ResponseEntity<>("Can't update slot, there are ongoing booking !",
+                            HttpStatus.BAD_REQUEST);
+                }
             }
-
-            else if (parkingSlot.getStatus().equals(DISABLE)){
-                parkingSlot.setStatus(AVAILABLE);
-                parkingSlotRepository.save(parkingSlot);
-            }
-
-            else {
-                return new ResponseEntity<> ("Can't update slot, there are ongoing booking !", HttpStatus.BAD_REQUEST);
-            }
-        }
-        else {
+        } else {
             return new ResponseEntity<>("Slot not found !", HttpStatus.BAD_REQUEST);
         }
-
-        return new ResponseEntity<>("Slot Updated", HttpStatus.OK);
     }
 
-    private void addSlot (CreateParkingSlotRequest slotRequest) {
+    private void addSlot(CreateParkingSlotRequest slotRequest) {
         ParkingSlot parkingSlot = new ParkingSlot();
         parkingSlot.setIdSection(slotRequest.getIdSection());
         parkingSlot.setEmailParkingZone(slotRequest.getEmailParkingZone());
@@ -141,27 +130,31 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
     }
 
     @Override
-    public ResponseEntity updateParkingZone(String emailParkingZone, MultipartFile file, String parkingZoneJSON) throws IOException {
-        ParkingZone parkingZone  = new ObjectMapper().readValue(parkingZoneJSON, ParkingZone.class);
-        ParkingZone parkingZoneExist = parkingZoneRepository.findParkingZoneByEmailParkingZone(emailParkingZone);
+    public ResponseEntity updateParkingZone(String emailParkingZone, MultipartFile file,
+                                            String parkingZoneJSON) throws IOException {
+        ParkingZone parkingZone = new ObjectMapper().readValue(parkingZoneJSON, ParkingZone.class);
+        ParkingZone parkingZoneExist =
+                parkingZoneRepository.findParkingZoneByEmailParkingZone(emailParkingZone);
         if (parkingZone == null) {
-            return new ResponseEntity <>("Parking zone not found !", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(PARKING_ZONE_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
-        if(checkImageFile(file)){
-            try{
-                if(parkingZoneExist.getImageUrl() != null) {
+        if (checkImageFile(file)) {
+            try {
+                if (parkingZoneExist.getImageUrl() != null) {
                     Path deletePath = Paths.get(UPLOADED_FOLDER + parkingZoneExist.getImageUrl());
                     Files.delete(deletePath);
                 }
-                String fileName="parkingZone/"+parkingZoneExist.getEmailParkingZone()+"_"+file.getOriginalFilename();
-                saveUploadedFile(file,fileName);
+                String fileName =
+                        "parkingZone/" + parkingZoneExist.getEmailParkingZone() + "_" + file
+                                .getOriginalFilename();
+                saveUploadedFile(file, fileName);
                 parkingZoneExist.setImageUrl(fileName);
-                parkingZoneExist.setImageUrl(UPLOADED_FOLDER+fileName);
-            }catch (IOException e){
-                return new ResponseEntity<>("Some error occured. Failed to add image", HttpStatus.BAD_REQUEST);
+                parkingZoneExist.setImageUrl(UPLOADED_FOLDER + fileName);
+            } catch (IOException e) {
+                return new ResponseEntity<>("Some error occured. Failed to add image",
+                        HttpStatus.BAD_REQUEST);
             }
         }
-
         parkingZoneRepository.save(parkingZoneExist);
         return new ResponseEntity<>("Parking Zone Updated", HttpStatus.OK);
     }
@@ -172,7 +165,9 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
             if (StringUtils.isEmpty(fileName)) {
                 return false;
             }
-            return file.getContentType().equals("image/png") || file.getContentType().equals("image/jpg") || file.getContentType().equals("image/jpeg") || file.getContentType().equals("image/bmp");
+            return file.getContentType().equals("image/png") || file.getContentType()
+                    .equals("image/jpg") || file.getContentType().equals("image/jpeg") || file
+                    .getContentType().equals("image/bmp");
         }
         return false;
     }
@@ -180,8 +175,8 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
     private static void saveUploadedFile(MultipartFile file, String name) throws IOException {
         if (!file.isEmpty()) {
             byte[] bytes = file.getBytes();
-            Path path = Paths.get(UPLOADED_FOLDER +name);
-            System.out.println(UPLOADED_FOLDER+name);
+            Path path = Paths.get(UPLOADED_FOLDER + name);
+            System.out.println(UPLOADED_FOLDER + name);
             Files.write(path, bytes);
         }
     }
@@ -191,9 +186,7 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
         Path path = Paths.get(UPLOADED_FOLDER + imageName);
         File img = new File(String.valueOf(path));
         String mimetype = FileTypeMap.getDefaultFileTypeMap().getContentType(img);
-        return ResponseEntity.ok()
-                .contentType(MediaType.valueOf(mimetype))
+        return ResponseEntity.ok().contentType(MediaType.valueOf(mimetype))
                 .body(Files.readAllBytes(img.toPath()));
     }
-
 }

@@ -1,14 +1,12 @@
 package com.future.pms.model.parking;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
-import java.util.ArrayList;
-import java.util.List;
+import static com.future.pms.Constants.AVAILABLE;
 
 @Data
 @Builder
@@ -20,5 +18,5 @@ public class ParkingSection {
     private String idLevel;
     private String emailParkingZone;
     private String sectionName;
-    private String status = "AVAILABLE";
+    private String status = AVAILABLE;
 }

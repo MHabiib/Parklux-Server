@@ -1,9 +1,7 @@
 package com.future.pms.service.impl;
 
 import com.future.pms.model.Booking;
-import com.future.pms.model.User;
 import com.future.pms.model.parking.ParkingSlot;
-import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.repository.BookingRepository;
 import com.future.pms.repository.ParkingSlotRepository;
 import com.future.pms.service.BookingService;
@@ -13,8 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+
+import static com.future.pms.Constants.BOOKED;
 
 @Service
 public class BookingServiceImpl implements BookingService{
@@ -34,8 +32,7 @@ public class BookingServiceImpl implements BookingService{
     public ResponseEntity createBooking(Booking booking) {
         booking.setDateIn(Calendar.getInstance().getTimeInMillis());
         ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(booking.getIdSlot());
-        parkingSlot.setStatus("BOOKED");
-       // booking.setQrUrl("../tmpl/");
+        parkingSlot.setStatus(BOOKED);
         bookingRepository.save(booking);
         return new ResponseEntity(HttpStatus.OK);
     }
