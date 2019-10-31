@@ -15,7 +15,7 @@ import java.util.Calendar;
 import static com.future.pms.Constants.BOOKED;
 
 @Service
-public class BookingServiceImpl implements BookingService{
+public class BookingServiceImpl implements BookingService {
 
     @Autowired
     ParkingSlotRepository parkingSlotRepository;

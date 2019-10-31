@@ -17,7 +17,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/parking-zone")
 public class ParkingZoneController {
-    
+
     @Autowired
     ParkingZoneService parkingZoneService;
 
@@ -32,30 +32,25 @@ public class ParkingZoneController {
     }
 
     @PostMapping("/add-level")
-    public ResponseEntity addParkingLevel(@RequestBody ParkingLevel parkingLevel){
+    public ResponseEntity addParkingLevel(@RequestBody ParkingLevel parkingLevel) {
         return parkingZoneService.addParkingLevel(parkingLevel);
     }
 
     @PostMapping("/add-section")
-    public ResponseEntity addParkingSection(@RequestBody ParkingSection parkingSection){
+    public ResponseEntity addParkingSection(@RequestBody ParkingSection parkingSection) {
         return parkingZoneService.addParkingSection(parkingSection);
     }
 
     @PostMapping("update-slot/{id}")
-    public ResponseEntity updateParkingSlot(@PathVariable("id")  String idParkingSlot, @RequestBody String status) {
-        return parkingZoneService.updateParkingSlot(idParkingSlot,status);
+    public ResponseEntity updateParkingSlot(@PathVariable("id") String idParkingSlot, @RequestBody String status) {
+        return parkingZoneService.updateParkingSlot(idParkingSlot, status);
     }
 
     @PutMapping(value = "update-zone/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateParkingZone(
-            @PathVariable("id") String emailParkingZone,
+            @PathVariable("id") String idParkingZone,
             @Nullable @RequestPart("file") MultipartFile file,
             @RequestPart("parkingZone") String parkingZoneJSON) throws IOException {
-        return parkingZoneService.updateParkingZone(emailParkingZone, file, parkingZoneJSON);
-    }
-
-    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity deleteParkingZone(@PathVariable("id") String id) {
-        return parkingZoneService.deleteParkingZone(id);
+        return parkingZoneService.updateParkingZone(idParkingZone, file, parkingZoneJSON);
     }
 }

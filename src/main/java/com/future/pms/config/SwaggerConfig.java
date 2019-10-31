@@ -34,7 +34,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public Docket Api(){
+    public Docket Api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
                 .apis(RequestHandlerSelectors.any())
@@ -43,6 +43,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
         /*.apiInfo(metaInfo());*/
 
     }
+
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addRedirectViewController("/api/v2/api-docs", "/v2/api-docs");

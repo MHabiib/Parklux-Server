@@ -20,10 +20,9 @@ public class ImageController {
     public ResponseEntity getOldImage(@PathVariable("imageName") String imageName) throws IOException {
         return parkingZoneService.getImage(imageName);
     }
+
     @GetMapping(value = "/{type}/{imageName:.+}")
-    public ResponseEntity getPaymentImage(@PathVariable("type") String type,@PathVariable("imageName") String imageName) throws IOException {
-        return parkingZoneService.getImage(type+"/"+imageName);
+    public ResponseEntity getPaymentImage(@PathVariable("type") String type, @PathVariable("imageName") String imageName) throws IOException {
+        return parkingZoneService.getImage(type + "/" + imageName);
     }
-
-
 }

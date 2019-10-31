@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ParkingSectionRepository extends MongoRepository<ParkingSection, String> {
-    // TODO: 10/28/2019
+    ParkingSection findParkingSectionByIdSection (String idSection);
 }

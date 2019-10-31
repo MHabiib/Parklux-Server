@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class QR {
     private String slotName;
     private String parkingZoneName;
-    private String emailParkingZone;
+    private String idParkingZone;
 }

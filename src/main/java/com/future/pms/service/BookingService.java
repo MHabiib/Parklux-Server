@@ -7,7 +7,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 public interface BookingService {
     ResponseEntity<Booking> loadAll();
+
     ResponseEntity createBooking(@RequestBody Booking booking);
-    ResponseEntity <Booking> updateBooking(@PathVariable("id") String id, @RequestBody Booking booking);
-    ResponseEntity deleteBooking(@PathVariable ("id") String id);
+
+    ResponseEntity<Booking> updateBooking(@PathVariable("id") String id, @RequestBody Booking booking);
+
+    ResponseEntity deleteBooking(@PathVariable("id") String id);
 }

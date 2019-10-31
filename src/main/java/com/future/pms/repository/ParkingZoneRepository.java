@@ -9,6 +9,5 @@ import java.util.List;
 @Repository
 public interface ParkingZoneRepository extends MongoRepository<ParkingZone, String> {
     List<ParkingZone> findAll();
-    ParkingZone findParkingZoneByEmailParkingZone(String emailParkingZone);
-    ParkingZone findParkingZoneByName(String name);
+    ParkingZone findParkingZoneByIdParkingZone(String idParkingZone);
 }

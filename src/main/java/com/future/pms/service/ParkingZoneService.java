@@ -12,12 +12,19 @@ import java.io.IOException;
 
 public interface ParkingZoneService {
     ResponseEntity<ParkingZone> loadAll();
+
     ResponseEntity createParkingZone(@RequestBody ParkingZone parkingZone);
+
     ResponseEntity addParkingLevel(@RequestBody ParkingLevel parkingLevel);
+
     ResponseEntity addParkingSection(@RequestBody ParkingSection parkingSection);
+
     ResponseEntity updateParkingSlot(@RequestBody String idParkingSlot, @RequestBody String status);
+
     ResponseEntity deleteParkingZone(@PathVariable("id") String id);
-    ResponseEntity updateParkingZone(String emailParkingZone, MultipartFile file
+
+    ResponseEntity updateParkingZone(String idParkingZone, MultipartFile file
             , String parkingZoneJSON) throws IOException;
+
     ResponseEntity getImage(String imageName) throws IOException;
 }

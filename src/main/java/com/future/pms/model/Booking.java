@@ -15,7 +15,7 @@ public class Booking {
     private String idBooking;
     private String idSlot;
     private String idUser;
-    private String emailParkingZone;
+    private String idParkingZone;
     private Long dateIn;
     private Long dateOut;
 }

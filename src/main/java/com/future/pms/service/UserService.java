@@ -7,7 +7,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 public interface UserService {
     ResponseEntity<User> loadAll();
+
     ResponseEntity createUser(@RequestBody User user);
+
     ResponseEntity<User> updateUser(@PathVariable("id") String id, @RequestBody User user);
+
     ResponseEntity deleteUser(@PathVariable("id") String id);
 }

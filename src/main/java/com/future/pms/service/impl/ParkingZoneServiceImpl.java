@@ -62,7 +62,7 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
     @Override
     public ResponseEntity addParkingLevel(@RequestBody ParkingLevel parkingLevel) {
         ParkingZone parkingZoneExist = parkingZoneRepository
-                .findParkingZoneByEmailParkingZone(parkingLevel.getEmailParkingZone());
+                .findParkingZoneByIdParkingZone(parkingLevel.getIdParkingZone());
         if (parkingZoneExist != null) {
             return new ResponseEntity<>(parkingLevelRepository.save(parkingLevel), HttpStatus.OK);
         } else {
@@ -77,7 +77,7 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
         if (parkingLevelExist != null) {
             parkingSectionRepository.save(parkingSection);
             CreateParkingSlotRequest parkingSlotRequest = new CreateParkingSlotRequest();
-            parkingSlotRequest.setEmailParkingZone(parkingLevelExist.getEmailParkingZone());
+            parkingSlotRequest.setIdParkingZone(parkingLevelExist.getIdParkingZone());
             parkingSlotRequest.setIdSection(parkingSection.getIdSection());
             for (int i = 1; i <= 20; i++) {
                 parkingSlotRequest.setSlotName(parkingSection.getSectionName() + " - " + i);
@@ -91,7 +91,7 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
         }
     }
 
-       @Override
+    @Override
     public ResponseEntity updateParkingSlot(String idParkingSlot, String status) {
         ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(idParkingSlot);
         if (parkingSlot != null) {
@@ -119,7 +119,7 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
     private void addSlot(CreateParkingSlotRequest slotRequest) {
         ParkingSlot parkingSlot = new ParkingSlot();
         parkingSlot.setIdSection(slotRequest.getIdSection());
-        parkingSlot.setEmailParkingZone(slotRequest.getEmailParkingZone());
+        parkingSlot.setIdParkingZone(slotRequest.getIdParkingZone());
         parkingSlot.setName(slotRequest.getSlotName());
         parkingSlotRepository.save(parkingSlot);
     }
@@ -130,12 +130,12 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
     }
 
     @Override
-    public ResponseEntity updateParkingZone(String emailParkingZone, MultipartFile file,
+    public ResponseEntity updateParkingZone(String idParkingZone, MultipartFile file,
                                             String parkingZoneJSON) throws IOException {
         ParkingZone parkingZone = new ObjectMapper().readValue(parkingZoneJSON, ParkingZone.class);
         ParkingZone parkingZoneExist =
-                parkingZoneRepository.findParkingZoneByEmailParkingZone(emailParkingZone);
-        if (parkingZone == null) {
+                parkingZoneRepository.findParkingZoneByIdParkingZone(idParkingZone);
+        if (parkingZoneExist == null) {
             return new ResponseEntity<>(PARKING_ZONE_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
         if (checkImageFile(file)) {
@@ -145,16 +145,16 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
                     Files.delete(deletePath);
                 }
                 String fileName =
-                        "parkingZone/" + parkingZoneExist.getEmailParkingZone() + "_" + file
+                        "parkingZone/" + parkingZoneExist.getIdParkingZone() + "_" + file
                                 .getOriginalFilename();
                 saveUploadedFile(file, fileName);
-                parkingZoneExist.setImageUrl(fileName);
-                parkingZoneExist.setImageUrl(UPLOADED_FOLDER + fileName);
+                parkingZone.setImageUrl(UPLOADED_FOLDER + fileName);
             } catch (IOException e) {
                 return new ResponseEntity<>("Some error occured. Failed to add image",
                         HttpStatus.BAD_REQUEST);
             }
         }
+        parkingZoneExist = parkingZone;
         parkingZoneRepository.save(parkingZoneExist);
         return new ResponseEntity<>("Parking Zone Updated", HttpStatus.OK);
     }

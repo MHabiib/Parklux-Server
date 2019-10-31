@@ -14,7 +14,7 @@ public class GenerateQRController {
     GenerateQRService generateQRService;
 
     @GetMapping
-    private ResponseEntity generateQr(String emailParkingZone) {
-        return generateQRService.generateQR(emailParkingZone);
+    private ResponseEntity generateQr(String idParkingZone) {
+        return generateQRService.generateQR(idParkingZone);
     }
 }

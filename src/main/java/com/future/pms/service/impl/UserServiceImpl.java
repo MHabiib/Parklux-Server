@@ -47,7 +47,6 @@ public class UserServiceImpl implements UserService {
         if (user.getRole().equals(ADMIN)) {
             ParkingZone parkingZone = new ParkingZone();
             parkingZone.setName("PARKING ZONE NAME");
-            parkingZone.setEmailParkingZone(user.getEmail());
             parkingZoneRepository.save(parkingZone);
         } else if (user.getRole().equals(CUSTOMER)) {
             Customer customer = new Customer();

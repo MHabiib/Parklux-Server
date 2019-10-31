@@ -28,10 +28,10 @@ public class GenerateQRServiceImpl implements GenerateQRService {
     ParkingSlotRepository parkingSlotRepository;
 
     @Override
-    public ResponseEntity generateQR(String emailParkingZone) {
-        ParkingZone parkingZoneExist = parkingZoneRepository.findParkingZoneByEmailParkingZone(emailParkingZone);
+    public ResponseEntity generateQR(String idParkingZone) {
+        ParkingZone parkingZoneExist = parkingZoneRepository.findParkingZoneByIdParkingZone(idParkingZone);
         List<ParkingSlot> listParkingSlot = parkingSlotRepository
-                .findAllByEmailParkingZoneAndStatus(parkingZoneExist.getEmailParkingZone(), "AVAILABLE");
+                .findAllByIdParkingZoneAndStatus(parkingZoneExist.getIdParkingZone(), "AVAILABLE");
         if (listParkingSlot == null)
             return new ResponseEntity<>("Parking Zone on " + parkingZoneExist.getName() + "Full !", HttpStatus.OK);
         else {
@@ -42,7 +42,7 @@ public class GenerateQRServiceImpl implements GenerateQRService {
                 QR qr = new QR();
                 qr.setSlotName(parkingSlot.getName());
                 qr.setParkingZoneName(parkingSlot.getName());
-                qr.setEmailParkingZone(parkingSlot.getEmailParkingZone());
+                qr.setIdParkingZone(parkingSlot.getIdParkingZone());
                 ByteArrayOutputStream bout =
                         QRCode.from(String.valueOf(qr))
                                 .withSize(250, 250)

@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/booking")
 public class BookingController {
-    
+
     @Autowired
     private BookingService bookingService;
-    
+
     @GetMapping
     public ResponseEntity loadAll() {
         return ResponseEntity.ok(bookingService.loadAll());
@@ -27,11 +27,6 @@ public class BookingController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Booking> updateBooking(@PathVariable("id") String id, @RequestBody Booking booking) {
-        return bookingService.updateBooking(id,booking);
-    }
-
-    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity deleteBooking(@PathVariable("id") String id) {
-        return bookingService.deleteBooking(id);
+        return bookingService.updateBooking(id, booking);
     }
 }

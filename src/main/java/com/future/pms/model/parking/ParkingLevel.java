@@ -15,7 +15,7 @@ import static com.future.pms.Constants.AVAILABLE;
 public class ParkingLevel {
     @Id
     private String idLevel;
-    private String emailParkingZone;
+    private String idParkingZone;
     private String levelName;
     private String status = AVAILABLE;
 }

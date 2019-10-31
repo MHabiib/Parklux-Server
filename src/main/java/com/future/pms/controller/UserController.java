@@ -28,11 +28,6 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable("id") String id,
                                            @RequestBody User user) {
-        return userService.updateUser(id,user);
-    }
-
-    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity deleteUser(@PathVariable("id") String id) {
-        return userService.deleteUser(id);
+        return userService.updateUser(id, user);
     }
 }
