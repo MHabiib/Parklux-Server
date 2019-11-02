@@ -1,6 +1,7 @@
 package com.future.pms.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.pms.Utils;
 import com.future.pms.model.parking.ParkingSlot;
 import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.model.parking.ParkingLevel;
@@ -29,6 +30,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static com.future.pms.Constants.*;
+import static com.future.pms.Utils.checkImageFile;
+import static com.future.pms.Utils.saveUploadedFile;
 
 
 @Service
@@ -63,7 +66,7 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
     public ResponseEntity addParkingLevel(@RequestBody ParkingLevel parkingLevel) {
         ParkingZone parkingZoneExist = parkingZoneRepository
                 .findParkingZoneByIdParkingZone(parkingLevel.getIdParkingZone());
-        if (parkingZoneExist != null) {
+        if (null != parkingZoneExist) {
             return new ResponseEntity<>(parkingLevelRepository.save(parkingLevel), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(PARKING_ZONE_NOT_FOUND, HttpStatus.BAD_REQUEST);
@@ -74,13 +77,13 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
     public ResponseEntity addParkingSection(@RequestBody ParkingSection parkingSection) {
         ParkingLevel parkingLevelExist =
                 parkingLevelRepository.findByIdLevel(parkingSection.getIdLevel());
-        if (parkingLevelExist != null) {
+        if (null != parkingLevelExist) {
             parkingSectionRepository.save(parkingSection);
             CreateParkingSlotRequest parkingSlotRequest = new CreateParkingSlotRequest();
             parkingSlotRequest.setIdParkingZone(parkingLevelExist.getIdParkingZone());
             parkingSlotRequest.setIdSection(parkingSection.getIdSection());
-            for (int i = 1; i <= 20; i++) {
-                parkingSlotRequest.setSlotName(parkingSection.getSectionName() + " - " + i);
+            for (int i = 1; i <= NUMBER_OF_SLOT; i++) {
+                parkingSlotRequest.setSlotName(String.format("%s - %s", parkingSection.getSectionName(), i));
                 addSlot(parkingSlotRequest);
             }
             return new ResponseEntity<>(
@@ -94,7 +97,7 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
     @Override
     public ResponseEntity updateParkingSlot(String idParkingSlot, String status) {
         ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(idParkingSlot);
-        if (parkingSlot != null) {
+        if (null != parkingSlot) {
             switch (parkingSlot.getStatus()) {
                 case AVAILABLE: {
                     parkingSlot.setStatus(DISABLE);
@@ -144,9 +147,8 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
                     Path deletePath = Paths.get(UPLOADED_FOLDER + parkingZoneExist.getImageUrl());
                     Files.delete(deletePath);
                 }
-                String fileName =
-                        "parkingZone/" + parkingZoneExist.getIdParkingZone() + "_" + file
-                                .getOriginalFilename();
+                String fileName = String.format("parkingZone/%s_%s", parkingZoneExist.getIdParkingZone(), file
+                        .getOriginalFilename());
                 saveUploadedFile(file, fileName);
                 parkingZone.setImageUrl(UPLOADED_FOLDER + fileName);
             } catch (IOException e) {
@@ -157,28 +159,6 @@ public class ParkingZoneServiceImpl implements ParkingZoneService {
         parkingZoneExist = parkingZone;
         parkingZoneRepository.save(parkingZoneExist);
         return new ResponseEntity<>("Parking Zone Updated", HttpStatus.OK);
-    }
-
-    private static boolean checkImageFile(MultipartFile file) {
-        if (file != null) {
-            String fileName = file.getOriginalFilename();
-            if (StringUtils.isEmpty(fileName)) {
-                return false;
-            }
-            return file.getContentType().equals("image/png") || file.getContentType()
-                    .equals("image/jpg") || file.getContentType().equals("image/jpeg") || file
-                    .getContentType().equals("image/bmp");
-        }
-        return false;
-    }
-
-    private static void saveUploadedFile(MultipartFile file, String name) throws IOException {
-        if (!file.isEmpty()) {
-            byte[] bytes = file.getBytes();
-            Path path = Paths.get(UPLOADED_FOLDER + name);
-            System.out.println(UPLOADED_FOLDER + name);
-            Files.write(path, bytes);
-        }
     }
 
     @Override

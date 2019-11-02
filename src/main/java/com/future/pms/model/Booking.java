@@ -16,6 +16,10 @@ public class Booking {
     private String idSlot;
     private String idUser;
     private String idParkingZone;
+    private String parkingZoneName;
+    private Double price;
+    private String slotName;
+    private String totalTime;
     private Long dateIn;
     private Long dateOut;
 }

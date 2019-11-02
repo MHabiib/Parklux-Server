@@ -32,17 +32,15 @@ public class GenerateQRServiceImpl implements GenerateQRService {
         ParkingZone parkingZoneExist = parkingZoneRepository.findParkingZoneByIdParkingZone(idParkingZone);
         List<ParkingSlot> listParkingSlot = parkingSlotRepository
                 .findAllByIdParkingZoneAndStatus(parkingZoneExist.getIdParkingZone(), "AVAILABLE");
-        if (listParkingSlot == null)
+        if (null == listParkingSlot)
             return new ResponseEntity<>("Parking Zone on " + parkingZoneExist.getName() + "Full !", HttpStatus.OK);
         else {
             ParkingSlot parkingSlot = listParkingSlot.get((int) (Math.random() * listParkingSlot.size()));
-            if (parkingSlot.getStatus().equals(AVAILABLE)) {
+            if (AVAILABLE.equals(parkingSlot.getStatus())) {
                 parkingSlot.setStatus(SCAN_ME);
                 parkingSlotRepository.save(parkingSlot);
                 QR qr = new QR();
-                qr.setSlotName(parkingSlot.getName());
-                qr.setParkingZoneName(parkingSlot.getName());
-                qr.setIdParkingZone(parkingSlot.getIdParkingZone());
+                qr.setIdSlot(parkingSlot.getIdSlot());
                 ByteArrayOutputStream bout =
                         QRCode.from(String.valueOf(qr))
                                 .withSize(250, 250)

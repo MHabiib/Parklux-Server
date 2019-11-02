@@ -41,14 +41,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity createUser(User user) {
-        if (userRepository.findByEmail(user.getEmail()) != null)
+        if (null != userRepository.findByEmail(user.getEmail()))
             return new ResponseEntity<>("Email already registered !", HttpStatus.BAD_REQUEST);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        if (user.getRole().equals(ADMIN)) {
+        if (ADMIN.equals(user.getRole())) {
             ParkingZone parkingZone = new ParkingZone();
             parkingZone.setName("PARKING ZONE NAME");
             parkingZoneRepository.save(parkingZone);
-        } else if (user.getRole().equals(CUSTOMER)) {
+        } else if (CUSTOMER.equals(user.getRole())) {
             Customer customer = new Customer();
             customer.setName(CUSTOMER);
             customer.setEmail(user.getEmail());

@@ -10,7 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QR {
-    private String slotName;
-    private String parkingZoneName;
-    private String idParkingZone;
+    private String idSlot;
 }

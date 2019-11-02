@@ -15,8 +15,8 @@ public class Constants {
     public static final String SCOPE_READ = "read";
     public static final String SCOPE_WRITE = "write";
     public static final String TRUST = "trust";
-    public static final int ACCESS_TOKEN_VALIDITY_SECONDS = 1 * 60 * 60;
-    public static final int REFRESH_TOKEN_VALIDITY_SECONDS = 6 * 60 * 60;
+    public static final Integer ACCESS_TOKEN_VALIDITY_SECONDS = 1 * 60 * 60;
+    public static final Integer REFRESH_TOKEN_VALIDITY_SECONDS = 6 * 60 * 60;
 
     //Parking zone service
     public static final String AVAILABLE = "AVAILABLE";
@@ -31,5 +31,7 @@ public class Constants {
     public static final String BOOKED = "BOOKED";
     public static final String SLOT_UPDATED = "Slot Updated";
     public static final String PARKING_ZONE_NOT_FOUND = "Parking zone not found !";
+
+    public static final Integer NUMBER_OF_SLOT = 20;
 
 }

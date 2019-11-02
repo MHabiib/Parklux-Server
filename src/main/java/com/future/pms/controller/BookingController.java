@@ -25,6 +25,11 @@ public class BookingController {
         return bookingService.createBooking(booking);
     }
 
+    @PostMapping("/checkout")
+    public ResponseEntity checkoutBooking(@RequestBody String idBooking) {
+        return bookingService.checkoutBooking(idBooking);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Booking> updateBooking(@PathVariable("id") String id, @RequestBody Booking booking) {
         return bookingService.updateBooking(id, booking);
