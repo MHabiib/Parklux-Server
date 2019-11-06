@@ -5,11 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class CreateParkingSlotRequest {
+@Data @AllArgsConstructor @NoArgsConstructor @Builder public class CreateParkingSlotRequest {
     private String idSection;
     private String slotName;
     private String idParkingZone;

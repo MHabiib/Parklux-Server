@@ -14,38 +14,28 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 
 import static com.future.pms.Constants.*;
 
-@Configuration
-@EnableAuthorizationServer
-public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+@Configuration @EnableAuthorizationServer public class AuthorizationServerConfig
+    extends AuthorizationServerConfigurerAdapter {
 
-    @Autowired
-    private TokenStore tokenStore;
+    @Autowired private TokenStore tokenStore;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    @Autowired private AuthenticationManager authenticationManager;
 
-    @Primary
-    @Bean
-    public BCryptPasswordEncoder encoder() {
+    @Primary @Bean public BCryptPasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Override
-    public void configure(ClientDetailsServiceConfigurer configurer) throws Exception {
+    @Override public void configure(ClientDetailsServiceConfigurer configurer) throws Exception {
 
-        configurer
-                .inMemory()
-                .withClient(CLIEN_ID)
-                .secret(encoder().encode(CLIENT_SECRET))
-                .authorizedGrantTypes(GRANT_TYPE_PASSWORD, AUTHORIZATION_CODE, REFRESH_TOKEN, IMPLICIT)
-                .scopes(SCOPE_READ, SCOPE_WRITE, TRUST)
-                .accessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS).
-                refreshTokenValiditySeconds(REFRESH_TOKEN_VALIDITY_SECONDS);
+        configurer.inMemory().withClient(CLIEN_ID).secret(encoder().encode(CLIENT_SECRET))
+            .authorizedGrantTypes(GRANT_TYPE_PASSWORD, AUTHORIZATION_CODE, REFRESH_TOKEN, IMPLICIT)
+            .scopes(SCOPE_READ, SCOPE_WRITE, TRUST)
+            .accessTokenValiditySeconds(ACCESS_TOKEN_VALIDITY_SECONDS).
+            refreshTokenValiditySeconds(REFRESH_TOKEN_VALIDITY_SECONDS);
     }
 
-    @Override
-    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        endpoints.tokenStore(tokenStore)
-                .authenticationManager(authenticationManager);
+    @Override public void configure(AuthorizationServerEndpointsConfigurer endpoints)
+        throws Exception {
+        endpoints.tokenStore(tokenStore).authenticationManager(authenticationManager);
     }
 }

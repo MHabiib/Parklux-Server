@@ -6,8 +6,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
-public interface BookingRepository extends MongoRepository<Booking, String> {
+@Repository public interface BookingRepository extends MongoRepository<Booking, String> {
     List<Booking> findAll();
-    Booking findBookingByIdBooking (String idBooking);
+
+    Booking findBookingByIdBooking(String idBooking);
 }

@@ -19,28 +19,21 @@ import java.util.List;
 import static com.future.pms.Constants.ADMIN;
 import static com.future.pms.Constants.CUSTOMER;
 
-@Service
-public class UserServiceImpl implements UserService {
+@Service public class UserServiceImpl implements UserService {
 
-    @Autowired
-    UserRepository userRepository;
+    @Autowired UserRepository userRepository;
 
-    @Autowired
-    CustomerRepository customerRepository;
+    @Autowired CustomerRepository customerRepository;
 
-    @Autowired
-    ParkingZoneRepository parkingZoneRepository;
+    @Autowired ParkingZoneRepository parkingZoneRepository;
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    @Autowired PasswordEncoder passwordEncoder;
 
-    @Override
-    public ResponseEntity loadAll() {
+    @Override public ResponseEntity loadAll() {
         return ResponseEntity.ok(userRepository.findAll());
     }
 
-    @Override
-    public ResponseEntity createUser(User user) {
+    @Override public ResponseEntity createUser(User user) {
         if (null != userRepository.findByEmail(user.getEmail()))
             return new ResponseEntity<>("Email already registered !", HttpStatus.BAD_REQUEST);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -59,13 +52,11 @@ public class UserServiceImpl implements UserService {
         return new ResponseEntity<>("Create user successful !", HttpStatus.OK);
     }
 
-    @Override
-    public ResponseEntity<User> updateUser(String id, User user) {
+    @Override public ResponseEntity<User> updateUser(String id, User user) {
         return null;
     }
 
-    @Override
-    public ResponseEntity deleteUser(String id) {
+    @Override public ResponseEntity deleteUser(String id) {
         return null;
     }
 }

@@ -18,25 +18,19 @@ import java.util.Calendar;
 import static com.future.pms.Constants.*;
 import static com.future.pms.Utils.getTotalTime;
 
-@Service
-public class BookingServiceImpl implements BookingService {
+@Service public class BookingServiceImpl implements BookingService {
 
-    @Autowired
-    ParkingSlotRepository parkingSlotRepository;
+    @Autowired ParkingSlotRepository parkingSlotRepository;
 
-    @Autowired
-    BookingRepository bookingRepository;
+    @Autowired BookingRepository bookingRepository;
 
-    @Autowired
-    ParkingZoneRepository parkingZoneRepository;
+    @Autowired ParkingZoneRepository parkingZoneRepository;
 
-    @Override
-    public ResponseEntity loadAll() {
+    @Override public ResponseEntity loadAll() {
         return ResponseEntity.ok(bookingRepository.findAll());
     }
 
-    @Override
-    public ResponseEntity createBooking(Booking booking) {
+    @Override public ResponseEntity createBooking(Booking booking) {
         ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(booking.getIdSlot());
         if (SCAN_ME.equals(parkingSlot.getStatus())) {
             parkingSlot.setStatus(BOOKED);
@@ -53,18 +47,20 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    @Override
-    public ResponseEntity checkoutBooking(String idBooking) {
+    @Override public ResponseEntity checkoutBooking(String idBooking) {
         Booking bookingExist = bookingRepository.findBookingByIdBooking(idBooking);
         if (null != bookingExist) {
             ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(bookingExist.getIdSlot());
             if (BOOKED.equals(parkingSlot.getStatus())) {
-                bookingExist.setParkingZoneName(parkingZoneRepository.findParkingZoneByIdParkingZone(parkingSlot.getIdParkingZone()).getName());
-                bookingExist.setPrice(parkingZoneRepository.findParkingZoneByIdParkingZone(parkingSlot.getIdParkingZone()).getPrice());
+                bookingExist.setParkingZoneName(parkingZoneRepository
+                    .findParkingZoneByIdParkingZone(parkingSlot.getIdParkingZone()).getName());
+                bookingExist.setPrice(parkingZoneRepository
+                    .findParkingZoneByIdParkingZone(parkingSlot.getIdParkingZone()).getPrice());
                 bookingExist.setDateOut(Calendar.getInstance().getTimeInMillis());
                 bookingExist.setIdParkingZone(parkingSlot.getIdParkingZone());
                 bookingExist.setSlotName(parkingSlot.getName());
-                bookingExist.setTotalTime(Long.toString(getTotalTime(bookingExist.getDateIn(),bookingExist.getDateOut())));
+                bookingExist.setTotalTime(Long.toString(
+                    getTotalTime(bookingExist.getDateIn(), bookingExist.getDateOut())));
                 parkingSlot.setStatus(AVAILABLE);
                 parkingSlotRepository.save(parkingSlot);
                 bookingRepository.save(bookingExist);
@@ -74,13 +70,11 @@ public class BookingServiceImpl implements BookingService {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @Override
-    public ResponseEntity<Booking> updateBooking(String id, Booking booking) {
+    @Override public ResponseEntity<Booking> updateBooking(String id, Booking booking) {
         return null;
     }
 
-    @Override
-    public ResponseEntity deleteBooking(String id) {
+    @Override public ResponseEntity deleteBooking(String id) {
         return null;
     }
 

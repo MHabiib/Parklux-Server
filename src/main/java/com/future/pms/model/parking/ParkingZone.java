@@ -8,13 +8,8 @@ import org.springframework.data.annotation.Id;
 
 import static com.future.pms.Constants.OPEN_HOUR;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class ParkingZone {
-    @Id
-    private String idParkingZone;
+@Data @Builder @AllArgsConstructor @NoArgsConstructor public class ParkingZone {
+    @Id private String idParkingZone;
     private String emailAdmin;
     private String name = "";
     private String emailParkingZone;

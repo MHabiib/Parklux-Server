@@ -13,9 +13,7 @@ import java.util.Date;
 
 import static com.future.pms.Constants.UPLOADED_FOLDER;
 
-
-@Service
-public final class Utils {
+@Service public final class Utils {
 
     public static Long getTotalTime(Long dateIn, Long dateOut) {
         Date dateInConv = new Date(dateIn);
@@ -30,8 +28,8 @@ public final class Utils {
                 return false;
             }
             return file.getContentType().equals("image/png") || file.getContentType()
-                    .equals("image/jpg") || file.getContentType().equals("image/jpeg") || file
-                    .getContentType().equals("image/bmp");
+                .equals("image/jpg") || file.getContentType().equals("image/jpeg") || file
+                .getContentType().equals("image/bmp");
         }
         return false;
     }

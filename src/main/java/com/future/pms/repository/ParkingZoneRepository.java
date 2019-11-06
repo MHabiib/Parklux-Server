@@ -6,8 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
-public interface ParkingZoneRepository extends MongoRepository<ParkingZone, String> {
+@Repository public interface ParkingZoneRepository extends MongoRepository<ParkingZone, String> {
     List<ParkingZone> findAll();
 
     ParkingZone findParkingZoneByIdParkingZone(String idParkingZone);

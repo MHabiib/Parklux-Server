@@ -18,42 +18,31 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.List;
 
-@Configuration
-@EnableSwagger2
-public class SwaggerConfig implements WebMvcConfigurer {
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+@Configuration @EnableSwagger2 public class SwaggerConfig implements WebMvcConfigurer {
+    @Override public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
-        registry
-                .addResourceHandler("swagger-ui.html")
-                .addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("swagger-ui.html")
+            .addResourceLocations("classpath:/META-INF/resources/");
 
-        registry
-                .addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler("/webjars/**")
+            .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
-    @Bean
-    public Docket Api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.any())
-                .build();
-        /*.apiInfo(metaInfo());*/
-
+    @Bean public Docket Api() {
+        return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.any())
+            .paths(PathSelectors.any()).build();
     }
 
-    @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
+    @Override public void addViewControllers(ViewControllerRegistry registry) {
         registry.addRedirectViewController("/api/v2/api-docs", "/v2/api-docs");
-        registry.addRedirectViewController("/api/swagger-resources/configuration/ui", "/swagger-resources/configuration/ui");
-        registry.addRedirectViewController("/api/swagger-resources/configuration/security", "/swagger-resources/configuration/security");
+        registry.addRedirectViewController("/api/swagger-resources/configuration/ui",
+            "/swagger-resources/configuration/ui");
+        registry.addRedirectViewController("/api/swagger-resources/configuration/security",
+            "/swagger-resources/configuration/security");
         registry.addRedirectViewController("/api/swagger-resources", "/swagger-resources");
     }
 
-    @Override
-    public void configureViewResolvers(ViewResolverRegistry registry) {
+    @Override public void configureViewResolvers(ViewResolverRegistry registry) {
 
     }
 
@@ -67,18 +56,16 @@ public class SwaggerConfig implements WebMvcConfigurer {
 
     }
 
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+    @Override public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
 
     }
 
-    @Override
-    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+    @Override public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
 
     }
 
-    @Override
-    public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
+    @Override public void configureHandlerExceptionResolvers(
+        List<HandlerExceptionResolver> exceptionResolvers) {
 
     }
 
@@ -87,28 +74,23 @@ public class SwaggerConfig implements WebMvcConfigurer {
 
     }
 
-    @Override
-    public Validator getValidator() {
+    @Override public Validator getValidator() {
         return null;
     }
 
-    @Override
-    public MessageCodesResolver getMessageCodesResolver() {
+    @Override public MessageCodesResolver getMessageCodesResolver() {
         return null;
     }
 
-    @Override
-    public void configurePathMatch(PathMatchConfigurer configurer) {
+    @Override public void configurePathMatch(PathMatchConfigurer configurer) {
 
     }
 
-    @Override
-    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+    @Override public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
 
     }
 
-    @Override
-    public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
+    @Override public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
 
     }
 
@@ -117,18 +99,15 @@ public class SwaggerConfig implements WebMvcConfigurer {
 
     }
 
-    @Override
-    public void addFormatters(FormatterRegistry registry) {
+    @Override public void addFormatters(FormatterRegistry registry) {
 
     }
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
+    @Override public void addInterceptors(InterceptorRegistry registry) {
 
     }
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
+    @Override public void addCorsMappings(CorsRegistry registry) {
 
     }
 }

@@ -15,46 +15,34 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CommonsRequestLoggingFilter;
 import org.springframework.web.filter.CorsFilter;
 
 import javax.annotation.Resource;
 
-@Configuration
-@EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@Configuration @EnableWebSecurity @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Resource(name = "userService")
-    private UserDetailsService userDetailsService;
+    @Resource(name = "userService") private UserDetailsService userDetailsService;
 
-    @Override
-    @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
+    @Override @Bean public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
-
-    @Autowired
-    public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
+    @Autowired public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService);
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
-                .anonymous().disable()
-                .authorizeRequests()
-                .antMatchers("/api-docs/**").permitAll();
+    @Override protected void configure(HttpSecurity http) throws Exception {
+        http.csrf().disable().anonymous().disable().authorizeRequests().antMatchers("/api-docs/**")
+            .permitAll();
     }
 
-    @Bean
-    public TokenStore tokenStore() {
+    @Bean public TokenStore tokenStore() {
         return new InMemoryTokenStore();
     }
 
-    @Bean
-    public FilterRegistrationBean corsFilter() {
+    @Bean public FilterRegistrationBean corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);

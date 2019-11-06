@@ -23,8 +23,8 @@ public interface ParkingZoneService {
 
     ResponseEntity deleteParkingZone(@PathVariable("id") String id);
 
-    ResponseEntity updateParkingZone(String idParkingZone, MultipartFile file
-            , String parkingZoneJSON) throws IOException;
+    ResponseEntity updateParkingZone(String idParkingZone, MultipartFile file,
+        String parkingZoneJSON) throws IOException;
 
     ResponseEntity getImage(String imageName) throws IOException;
 }

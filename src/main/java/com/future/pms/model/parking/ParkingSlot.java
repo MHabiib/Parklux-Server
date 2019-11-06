@@ -8,13 +8,8 @@ import org.springframework.data.annotation.Id;
 
 import static com.future.pms.Constants.AVAILABLE;
 
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class ParkingSlot {
-    @Id
-    private String idSlot;
+@Data @Builder @AllArgsConstructor @NoArgsConstructor public class ParkingSlot {
+    @Id private String idSlot;
     private String idSection;
     private String idParkingZone;
     private String name;

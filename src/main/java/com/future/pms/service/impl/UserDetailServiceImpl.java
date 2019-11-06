@@ -14,18 +14,17 @@ import java.util.Arrays;
 import java.util.List;
 
 
-@Service(value = "userService")
-public class UserDetailServiceImpl implements UserDetailsService {
+@Service(value = "userService") public class UserDetailServiceImpl implements UserDetailsService {
 
-    @Autowired
-    UserRepository userRepository;
+    @Autowired UserRepository userRepository;
 
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);
         if (null == user) {
             throw new UsernameNotFoundException("Invalid username or password.");
         }
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), getAuthority());
+        return new org.springframework.security.core.userdetails.User(user.getEmail(),
+            user.getPassword(), getAuthority());
     }
 
     private List<SimpleGrantedAuthority> getAuthority() {

@@ -12,7 +12,8 @@ public interface BookingService {
 
     ResponseEntity checkoutBooking(@RequestBody String idBooking);
 
-    ResponseEntity<Booking> updateBooking(@PathVariable("id") String id, @RequestBody Booking booking);
+    ResponseEntity<Booking> updateBooking(@PathVariable("id") String id,
+        @RequestBody Booking booking);
 
     ResponseEntity deleteBooking(@PathVariable("id") String id);
 }

@@ -13,21 +13,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-@CrossOrigin("**")
-@RestController
-@RequestMapping("/api/parking-zone")
+@CrossOrigin("**") @RestController @RequestMapping("/api/parking-zone")
 public class ParkingZoneController {
 
-    @Autowired
-    ParkingZoneService parkingZoneService;
+    @Autowired ParkingZoneService parkingZoneService;
 
-    @GetMapping
-    public ResponseEntity loadAll() {
+    @GetMapping public ResponseEntity loadAll() {
         return ResponseEntity.ok(parkingZoneService.loadAll());
     }
 
-    @PostMapping
-    public ResponseEntity createParkingZone(@RequestBody ParkingZone parkingZone) {
+    @PostMapping public ResponseEntity createParkingZone(@RequestBody ParkingZone parkingZone) {
         return parkingZoneService.createParkingZone(parkingZone);
     }
 
@@ -42,15 +37,15 @@ public class ParkingZoneController {
     }
 
     @PostMapping("update-slot/{id}")
-    public ResponseEntity updateParkingSlot(@PathVariable("id") String idParkingSlot, @RequestBody String status) {
+    public ResponseEntity updateParkingSlot(@PathVariable("id") String idParkingSlot,
+        @RequestBody String status) {
         return parkingZoneService.updateParkingSlot(idParkingSlot, status);
     }
 
     @PutMapping(value = "update-zone/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity updateParkingZone(
-            @PathVariable("id") String idParkingZone,
-            @Nullable @RequestPart("file") MultipartFile file,
-            @RequestPart("parkingZone") String parkingZoneJSON) throws IOException {
+    public ResponseEntity updateParkingZone(@PathVariable("id") String idParkingZone,
+        @Nullable @RequestPart("file") MultipartFile file,
+        @RequestPart("parkingZone") String parkingZoneJSON) throws IOException {
         return parkingZoneService.updateParkingZone(idParkingZone, file, parkingZoneJSON);
     }
 }

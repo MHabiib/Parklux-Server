@@ -9,23 +9,18 @@ import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHand
 
 import static com.future.pms.Constants.RESOURCE_ID;
 
-@Configuration
-@EnableResourceServer
-public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
+@Configuration @EnableResourceServer public class ResourceServerConfig
+    extends ResourceServerConfigurerAdapter {
 
-
-    @Override
-    public void configure(ResourceServerSecurityConfigurer resources) {
+    @Override public void configure(ResourceServerSecurityConfigurer resources) {
         resources.resourceId(RESOURCE_ID).stateless(false);
     }
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
+    @Override public void configure(HttpSecurity http) throws Exception {
         http.
-                anonymous().disable()
-                .authorizeRequests()
-                .antMatchers("/api/**").access("hasRole('ADMIN')")
-                .and().exceptionHandling().accessDeniedHandler(new OAuth2AccessDeniedHandler());
+            anonymous().disable().authorizeRequests().antMatchers("/api/**")
+            .access("hasRole('ADMIN')").and().exceptionHandling()
+            .accessDeniedHandler(new OAuth2AccessDeniedHandler());
     }
 
 }
