@@ -17,9 +17,10 @@ import static com.future.pms.Constants.*;
 @Configuration @EnableAuthorizationServer public class AuthorizationServerConfig
     extends AuthorizationServerConfigurerAdapter {
 
-    @Autowired private TokenStore tokenStore;
+    @Autowired private MongoTokenStore mongoTokenStore;
 
     @Autowired private AuthenticationManager authenticationManager;
+
 
     @Primary @Bean public BCryptPasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
@@ -36,6 +37,11 @@ import static com.future.pms.Constants.*;
 
     @Override public void configure(AuthorizationServerEndpointsConfigurer endpoints)
         throws Exception {
-        endpoints.tokenStore(tokenStore).authenticationManager(authenticationManager);
+        endpoints.tokenStore(tokenStore()).authenticationManager(authenticationManager);
+    }
+
+    @Bean
+    public TokenStore tokenStore() {
+        return mongoTokenStore;
     }
 }
