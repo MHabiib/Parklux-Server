@@ -10,4 +10,6 @@ import java.util.List;
     List<User> findAll();
 
     User findByEmail(String email);
+
+    User findByIdUser(String idUser);
 }

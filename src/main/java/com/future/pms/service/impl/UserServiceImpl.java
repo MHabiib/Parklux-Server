@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -50,6 +51,10 @@ import static com.future.pms.Constants.CUSTOMER;
         }
         userRepository.save(user);
         return new ResponseEntity<>("Create user successful !", HttpStatus.OK);
+    }
+
+    @Override public ResponseEntity getUserDetail (Principal principal) {
+        return ResponseEntity.ok(customerRepository.findByEmail(principal.getName()));
     }
 
     @Override public ResponseEntity<User> updateUser(String id, User user) {

@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Collection;
 import java.util.Map;
 
@@ -20,6 +21,15 @@ import java.util.Map;
 
     @GetMapping public ResponseEntity loadAll() {
         return ResponseEntity.ok(userService.loadAll());
+    }
+
+    @GetMapping("/me")
+    public Principal getUser(Principal principal) {
+        return principal;
+    }
+
+    @GetMapping("/customer/detail") public ResponseEntity getUserDetail(Principal principal) {
+        return ResponseEntity.ok(userService.getUserDetail(principal));
     }
 
     @PostMapping public ResponseEntity createUser(@RequestBody User user) {

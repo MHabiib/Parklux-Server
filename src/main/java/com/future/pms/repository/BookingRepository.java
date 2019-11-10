@@ -10,4 +10,6 @@ import java.util.List;
     List<Booking> findAll();
 
     Booking findBookingByIdBooking(String idBooking);
+
+    List<Booking> findBookingByIdUser(String idUser);
 }
