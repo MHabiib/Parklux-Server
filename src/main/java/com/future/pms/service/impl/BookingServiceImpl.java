@@ -40,17 +40,20 @@ import static com.future.pms.Utils.getTotalTime;
 
     @Override public ResponseEntity findBookingCustomer(Principal principal) {
         Customer customer = customerRepository.findByEmail(principal.getName());
-        return ResponseEntity.ok(bookingRepository.findBookingByIdUser(customer.getIdCustomer()));}
+        return ResponseEntity.ok(bookingRepository.findBookingByIdUser(customer.getIdCustomer()));
+    }
 
     @Override public ResponseEntity createBooking(Booking booking) {
         ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(booking.getIdSlot());
         if (SCAN_ME.equals(parkingSlot.getStatus())) {
             parkingSlot.setStatus(BOOKED);
             Booking bookingParking = new Booking();
-            bookingParking.setParkingZoneName(parkingZoneRepository
-                    .findParkingZoneByIdParkingZone(parkingSlot.getIdParkingZone()).getName());
-            bookingParking.setPrice(parkingZoneRepository
-                    .findParkingZoneByIdParkingZone(parkingSlot.getIdParkingZone()).getPrice());
+            bookingParking.setParkingZoneName(
+                parkingZoneRepository.findParkingZoneByIdParkingZone(parkingSlot.getIdParkingZone())
+                    .getName());
+            bookingParking.setPrice(
+                parkingZoneRepository.findParkingZoneByIdParkingZone(parkingSlot.getIdParkingZone())
+                    .getPrice());
             bookingParking.setIdParkingZone(parkingSlot.getIdParkingZone());
             bookingParking.setSlotName(parkingSlot.getName());
             bookingParking.setIdUser(booking.getIdUser());
@@ -65,10 +68,10 @@ import static com.future.pms.Utils.getTotalTime;
         }
     }
 
-    @Override
-    public ResponseEntity bookingReceipt(String idBooking) {
+    @Override public ResponseEntity bookingReceipt(String idBooking) {
         Booking booking = bookingRepository.findBookingByIdBooking(idBooking);
-        ParkingZone parkingZone = parkingZoneRepository.findParkingZoneByIdParkingZone(booking.getIdParkingZone());
+        ParkingZone parkingZone =
+            parkingZoneRepository.findParkingZoneByIdParkingZone(booking.getIdParkingZone());
         Receipt receipt = new Receipt();
         receipt.setIdBooking(booking.getIdBooking());
         receipt.setParkingZoneName(booking.getParkingZoneName());
@@ -76,7 +79,8 @@ import static com.future.pms.Utils.getTotalTime;
         receipt.setSlotName(booking.getSlotName());
         receipt.setPrice(booking.getPrice());
         receipt.setTotalMinutes(Integer.valueOf(booking.getTotalTime()) % 60);
-        receipt.setTotalHours((Integer.valueOf(booking.getTotalTime()) - receipt.getTotalMinutes()) / 60);
+        receipt.setTotalHours(
+            (Integer.valueOf(booking.getTotalTime()) - receipt.getTotalMinutes()) / 60);
         receipt.setDateIn(booking.getDateIn());
         receipt.setDateOut(booking.getDateOut());
         receipt.setTotalPrice(getTotalPrice(booking.getTotalTime(), booking.getPrice()));

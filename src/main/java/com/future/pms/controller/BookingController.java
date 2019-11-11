@@ -21,7 +21,8 @@ import java.security.Principal;
         return bookingService.findBookingCustomer(principal);
     }
 
-    @GetMapping("/{id}/receipt") public ResponseEntity bookingReceipt(@PathVariable("id") String id) {
+    @GetMapping("/{id}/receipt")
+    public ResponseEntity bookingReceipt(@PathVariable("id") String id) {
         return bookingService.bookingReceipt(id);
     }
 

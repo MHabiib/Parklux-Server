@@ -40,8 +40,7 @@ import static com.future.pms.Constants.*;
         endpoints.tokenStore(tokenStore()).authenticationManager(authenticationManager);
     }
 
-    @Bean
-    public TokenStore tokenStore() {
+    @Bean public TokenStore tokenStore() {
         return mongoTokenStore;
     }
 }

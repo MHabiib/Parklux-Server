@@ -43,35 +43,34 @@ import java.util.List;
     }
 
     @Override public void configureViewResolvers(ViewResolverRegistry registry) {
-
+        //No implementation required
     }
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-
+        //No implementation required
     }
 
     @Override
     public void addReturnValueHandlers(List<HandlerMethodReturnValueHandler> returnValueHandlers) {
-
+        //No implementation required
     }
 
     @Override public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-
+        //No implementation required
     }
 
     @Override public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
-
+        //No implementation required
     }
 
     @Override public void configureHandlerExceptionResolvers(
         List<HandlerExceptionResolver> exceptionResolvers) {
-
     }
 
     @Override
     public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
-
+        //No implementation required
     }
 
     @Override public Validator getValidator() {
@@ -83,31 +82,31 @@ import java.util.List;
     }
 
     @Override public void configurePathMatch(PathMatchConfigurer configurer) {
-
+        //No implementation required
     }
 
     @Override public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-
+        //No implementation required
     }
 
     @Override public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
-
+        //No implementation required
     }
 
     @Override
     public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
-
+        //No implementation required
     }
 
     @Override public void addFormatters(FormatterRegistry registry) {
-
+        //No implementation required
     }
 
     @Override public void addInterceptors(InterceptorRegistry registry) {
-
+        //No implementation required
     }
 
     @Override public void addCorsMappings(CorsRegistry registry) {
-
+        //No implementation required
     }
 }

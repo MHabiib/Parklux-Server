@@ -53,7 +53,7 @@ import static com.future.pms.Constants.CUSTOMER;
         return new ResponseEntity<>("Create user successful !", HttpStatus.OK);
     }
 
-    @Override public ResponseEntity getUserDetail (Principal principal) {
+    @Override public ResponseEntity getUserDetail(Principal principal) {
         return ResponseEntity.ok(customerRepository.findByEmail(principal.getName()));
     }
 

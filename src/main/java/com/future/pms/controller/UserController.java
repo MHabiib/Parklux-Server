@@ -23,8 +23,7 @@ import java.util.Map;
         return ResponseEntity.ok(userService.loadAll());
     }
 
-    @GetMapping("/me")
-    public Principal getUser(Principal principal) {
+    @GetMapping("/me") public Principal getUser(Principal principal) {
         return principal;
     }
 

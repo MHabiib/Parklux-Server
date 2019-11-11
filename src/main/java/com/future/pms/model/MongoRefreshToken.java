@@ -11,12 +11,8 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 
 import java.io.Serializable;
 
-@Document
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode()
-public class MongoRefreshToken implements Serializable {
+@Document @Getter @Setter @ToString @EqualsAndHashCode() public class MongoRefreshToken
+    implements Serializable {
 
     public static final String TOKEN_ID = "tokenId";
 

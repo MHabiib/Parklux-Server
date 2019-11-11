@@ -34,17 +34,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().anonymous().disable().authorizeRequests().antMatchers("/api-docs/**")
-                .permitAll();
+            .permitAll();
     }
 
-    @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
-    @Override
+    @Bean(name = BeanIds.AUTHENTICATION_MANAGER) @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
-    @Bean
-    public AuthenticationKeyGenerator authenticationKeyGenerator() {
+    @Bean public AuthenticationKeyGenerator authenticationKeyGenerator() {
         return new DefaultAuthenticationKeyGenerator();
     }
 
