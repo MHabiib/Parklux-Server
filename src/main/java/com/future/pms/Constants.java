@@ -17,6 +17,10 @@ public class Constants {
     public static final String TRUST = "trust";
     public static final Integer ACCESS_TOKEN_VALIDITY_SECONDS = 1 * 60 * 60;
     public static final Integer REFRESH_TOKEN_VALIDITY_SECONDS = 6 * 60 * 60;
+    public static final String MD_ALGORITHM_NOT_AVAILABLE =
+        "MD5 algorithm not available.  Fatal (should be in the JDK).";
+    public static final String ENCODING_NO_AVAILABLE =
+        "UTF-8 encoding not available.  Fatal (should be in the JDK).";
 
     //Parking zone service
     public static final String AVAILABLE = "AVAILABLE";

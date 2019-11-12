@@ -3,14 +3,12 @@ package com.future.pms.controller;
 import com.future.pms.model.Booking;
 import com.future.pms.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
 @CrossOrigin("**") @RestController @RequestMapping("/api/booking") public class BookingController {
-
     @Autowired private BookingService bookingService;
 
     @GetMapping public ResponseEntity loadAll() {

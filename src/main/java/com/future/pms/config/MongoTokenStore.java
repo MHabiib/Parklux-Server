@@ -9,7 +9,6 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2RefreshToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.AuthenticationKeyGenerator;
-import org.springframework.security.oauth2.provider.token.DefaultAuthenticationKeyGenerator;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.stereotype.Component;
 
@@ -23,8 +22,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-@Component public class MongoTokenStore implements TokenStore {
+import static com.future.pms.Constants.ENCODING_NO_AVAILABLE;
+import static com.future.pms.Constants.MD_ALGORITHM_NOT_AVAILABLE;
 
+@Component public class MongoTokenStore implements TokenStore {
     private final AuthenticationKeyGenerator authenticationKeyGenerator;
     private final MongoTemplate mongoTemplate;
 
@@ -43,22 +44,18 @@ import java.util.Objects;
         query.addCriteria(Criteria.where(MongoAccessToken.TOKEN_ID).is(extractTokenKey(token)));
 
         MongoAccessToken mongoAccessToken = mongoTemplate.findOne(query, MongoAccessToken.class);
-
         return mongoAccessToken != null ? mongoAccessToken.getAuthentication() : null;
     }
 
     @Override public void storeAccessToken(OAuth2AccessToken accessToken,
         OAuth2Authentication authentication) {
         String refreshToken = null;
-
         if (Objects.nonNull(accessToken.getRefreshToken())) {
             refreshToken = accessToken.getRefreshToken().getValue();
         }
-
         if (Objects.nonNull(readAccessToken(accessToken.getValue()))) {
             this.removeAccessToken(accessToken);
         }
-
         MongoAccessToken mongoAccessToken = new MongoAccessToken();
         mongoAccessToken.setTokenId(extractTokenKey(accessToken.getValue()));
         mongoAccessToken.setToken(accessToken);
@@ -78,7 +75,6 @@ import java.util.Objects;
             .addCriteria(Criteria.where(MongoAccessToken.TOKEN_ID).is(extractTokenKey(tokenValue)));
 
         MongoAccessToken mongoAccessToken = mongoTemplate.findOne(query, MongoAccessToken.class);
-
         return Objects.nonNull(mongoAccessToken) ? mongoAccessToken.getToken() : null;
     }
 
@@ -86,7 +82,6 @@ import java.util.Objects;
         Query query = new Query();
         query.addCriteria(Criteria.where(MongoAccessToken.TOKEN_ID)
             .is(extractTokenKey(oAuth2AccessToken.getValue())));
-
         mongoTemplate.remove(query, MongoAccessToken.class);
     }
 
@@ -105,7 +100,6 @@ import java.util.Objects;
             Criteria.where(MongoRefreshToken.TOKEN_ID).is(extractTokenKey(tokenValue)));
 
         MongoRefreshToken mongoRefreshToken = mongoTemplate.findOne(query, MongoRefreshToken.class);
-
         return Objects.nonNull(mongoRefreshToken) ? mongoRefreshToken.getToken() : null;
     }
 
@@ -116,7 +110,6 @@ import java.util.Objects;
             .is(extractTokenKey(refreshToken.getValue())));
 
         MongoRefreshToken mongoRefreshToken = mongoTemplate.findOne(query, MongoRefreshToken.class);
-
         return Objects.nonNull(mongoRefreshToken) ? mongoRefreshToken.getAuthentication() : null;
     }
 
@@ -186,15 +179,14 @@ import java.util.Objects;
                 digest = MessageDigest.getInstance("MD5");
             } catch (NoSuchAlgorithmException var5) {
                 throw new IllegalStateException(
-                    "MD5 algorithm not available.  Fatal (should be in the JDK).");
+                    MD_ALGORITHM_NOT_AVAILABLE);
             }
-
             try {
                 byte[] e = digest.digest(value.getBytes(StandardCharsets.UTF_8.name()));
                 return String.format("%032x", new BigInteger(1, e));
             } catch (UnsupportedEncodingException var4) {
                 throw new IllegalStateException(
-                    "UTF-8 encoding not available.  Fatal (should be in the JDK).");
+                    ENCODING_NO_AVAILABLE);
             }
         }
     }

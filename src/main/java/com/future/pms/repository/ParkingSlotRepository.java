@@ -11,5 +11,4 @@ import java.util.List;
     List<ParkingSlot> findAllByIdParkingZoneAndStatus(String idParkingZone, String status);
 
     ParkingSlot findByIdSlot(String idSlot);
-
 }

@@ -15,7 +15,6 @@ import java.util.List;
 
 
 @Service(value = "userService") public class UserDetailServiceImpl implements UserDetailsService {
-
     @Autowired UserRepository userRepository;
 
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

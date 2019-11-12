@@ -15,7 +15,6 @@ import java.io.IOException;
 
 @CrossOrigin("**") @RestController @RequestMapping("/api/parking-zone")
 public class ParkingZoneController {
-
     @Autowired ParkingZoneService parkingZoneService;
 
     @GetMapping public ResponseEntity loadAll() {

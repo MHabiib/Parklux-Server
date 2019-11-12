@@ -13,15 +13,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 import static com.future.pms.Constants.*;
 
 @Service public class GenerateQRServiceImpl implements GenerateQRService {
-
     @Autowired ParkingZoneRepository parkingZoneRepository;
-
     @Autowired ParkingSlotRepository parkingSlotRepository;
 
     @Override public ResponseEntity generateQR(String idParkingZone) {

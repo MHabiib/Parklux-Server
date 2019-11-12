@@ -5,7 +5,6 @@ import org.springframework.security.oauth2.common.util.SerializationUtils;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 
 class SerializableObjectConverter {
-
     private SerializableObjectConverter() {
         throw new IllegalStateException();
     }
@@ -19,5 +18,4 @@ class SerializableObjectConverter {
         byte[] bytes = Base64.decodeBase64(encodedObject);
         return (OAuth2Authentication) SerializationUtils.deserialize(bytes);
     }
-
 }

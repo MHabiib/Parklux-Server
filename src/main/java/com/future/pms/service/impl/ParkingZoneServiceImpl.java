@@ -1,11 +1,10 @@
 package com.future.pms.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.future.pms.Utils;
-import com.future.pms.model.parking.ParkingSlot;
-import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.model.parking.ParkingLevel;
 import com.future.pms.model.parking.ParkingSection;
+import com.future.pms.model.parking.ParkingSlot;
+import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.model.request.CreateParkingSlotRequest;
 import com.future.pms.repository.ParkingLevelRepository;
 import com.future.pms.repository.ParkingSectionRepository;
@@ -18,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,17 +31,11 @@ import static com.future.pms.Constants.*;
 import static com.future.pms.Utils.checkImageFile;
 import static com.future.pms.Utils.saveUploadedFile;
 
-
 @Service public class ParkingZoneServiceImpl implements ParkingZoneService {
-
     @Autowired ParkingZoneRepository parkingZoneRepository;
-
     @Autowired ParkingLevelRepository parkingLevelRepository;
-
     @Autowired ParkingSectionRepository parkingSectionRepository;
-
     @Autowired ParkingSlotRepository parkingSlotRepository;
-
     @Autowired PasswordEncoder passwordEncoder;
 
     @Override public ResponseEntity loadAll() {

@@ -11,5 +11,4 @@ import org.springframework.data.annotation.Id;
     private String email;
     private String password;
     private String role;
-
 }

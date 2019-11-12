@@ -1,8 +1,8 @@
 package com.future.pms.service.impl;
 
 import com.future.pms.model.Customer;
-import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.model.User;
+import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.repository.CustomerRepository;
 import com.future.pms.repository.ParkingZoneRepository;
 import com.future.pms.repository.UserRepository;
@@ -14,20 +14,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.util.Arrays;
-import java.util.List;
 
 import static com.future.pms.Constants.ADMIN;
 import static com.future.pms.Constants.CUSTOMER;
 
 @Service public class UserServiceImpl implements UserService {
-
     @Autowired UserRepository userRepository;
-
     @Autowired CustomerRepository customerRepository;
-
     @Autowired ParkingZoneRepository parkingZoneRepository;
-
     @Autowired PasswordEncoder passwordEncoder;
 
     @Override public ResponseEntity loadAll() {

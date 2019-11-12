@@ -16,18 +16,14 @@ import static com.future.pms.Constants.*;
 
 @Configuration @EnableAuthorizationServer public class AuthorizationServerConfig
     extends AuthorizationServerConfigurerAdapter {
-
     @Autowired private MongoTokenStore mongoTokenStore;
-
     @Autowired private AuthenticationManager authenticationManager;
-
 
     @Primary @Bean public BCryptPasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Override public void configure(ClientDetailsServiceConfigurer configurer) throws Exception {
-
         configurer.inMemory().withClient(CLIEN_ID).secret(encoder().encode(CLIENT_SECRET))
             .authorizedGrantTypes(GRANT_TYPE_PASSWORD, AUTHORIZATION_CODE, REFRESH_TOKEN, IMPLICIT)
             .scopes(SCOPE_READ, SCOPE_WRITE, TRUST)
