@@ -67,11 +67,11 @@ import static com.future.pms.Utils.getTotalTime;
             parkingZoneRepository.findParkingZoneByIdParkingZone(booking.getIdParkingZone());
         Receipt receipt = new Receipt();
         receipt.setIdBooking(booking.getIdBooking());
-        receipt.setParkingZoneName(booking.getParkingZoneName());
+        receipt.setParkingZoneName(parkingZone.getName());
         receipt.setAddress(parkingZone.getAddress());
         receipt.setSlotName(booking.getSlotName());
         receipt.setPrice(booking.getPrice());
-        receipt.setTotalMinutes(Integer.valueOf(booking.getTotalTime()) % 60);
+        receipt.setTotalMinutes((Integer.valueOf(booking.getTotalTime()) % 60) + 1);
         receipt.setTotalHours(
             (Integer.valueOf(booking.getTotalTime()) - receipt.getTotalMinutes()) / 60);
         receipt.setDateIn(booking.getDateIn());
