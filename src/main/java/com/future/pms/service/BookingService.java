@@ -18,7 +18,7 @@ public interface BookingService {
 
     ResponseEntity bookingReceipt(@PathVariable("id") String id);
 
-    ResponseEntity checkoutBooking(@RequestBody String idBooking);
+    ResponseEntity checkoutBooking(Principal principal);
 
     ResponseEntity<Booking> updateBooking(@PathVariable("id") String id,
         @RequestBody Booking booking);

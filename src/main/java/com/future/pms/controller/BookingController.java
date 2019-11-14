@@ -34,8 +34,9 @@ import java.security.Principal;
         return bookingService.createBooking(principal, idSlot);
     }
 
-    @PostMapping("/checkout") public ResponseEntity checkoutBooking(@RequestBody String idBooking) {
-        return bookingService.checkoutBooking(idBooking);
+    @PostMapping("/checkout")
+    public ResponseEntity checkoutBooking(Principal principal) {
+        return bookingService.checkoutBooking(principal);
     }
 
     @PutMapping("/{id}") public ResponseEntity<Booking> updateBooking(@PathVariable("id") String id,
