@@ -12,4 +12,6 @@ import java.util.List;
     Booking findBookingByIdBooking(String idBooking);
 
     List<Booking> findBookingByIdUser(String idUser);
+
+    Booking findBookingByIdUserAndDateOut(String idUser, Boolean dateOut);
 }

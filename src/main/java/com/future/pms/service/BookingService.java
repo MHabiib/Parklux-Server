@@ -12,7 +12,9 @@ public interface BookingService {
 
     ResponseEntity<Booking> findBookingCustomer(Principal principal);
 
-    ResponseEntity createBooking(@RequestBody Booking booking);
+    ResponseEntity findOngoingBookingCustomer(Principal principal);
+
+    ResponseEntity createBooking(Principal principal, @RequestBody String idSlot);
 
     ResponseEntity bookingReceipt(@PathVariable("id") String id);
 

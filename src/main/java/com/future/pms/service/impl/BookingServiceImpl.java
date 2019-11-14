@@ -36,8 +36,15 @@ import static com.future.pms.Utils.getTotalTime;
         return ResponseEntity.ok(bookingRepository.findBookingByIdUser(customer.getIdCustomer()));
     }
 
-    @Override public ResponseEntity createBooking(Booking booking) {
-        ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(booking.getIdSlot());
+    @Override public ResponseEntity findOngoingBookingCustomer(Principal principal) {
+        Customer customer = customerRepository.findByEmail(principal.getName());
+        return ResponseEntity
+            .ok(bookingRepository.findBookingByIdUserAndDateOut(customer.getIdCustomer(), null));
+    }
+
+    @Override public ResponseEntity createBooking(Principal principal, String idSlot) {
+        Customer customer = customerRepository.findByEmail(principal.getName());
+        ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(idSlot);
         if (SCAN_ME.equals(parkingSlot.getStatus())) {
             parkingSlot.setStatus(BOOKED);
             Booking bookingParking = new Booking();
@@ -49,8 +56,8 @@ import static com.future.pms.Utils.getTotalTime;
                     .getPrice());
             bookingParking.setIdParkingZone(parkingSlot.getIdParkingZone());
             bookingParking.setSlotName(parkingSlot.getName());
-            bookingParking.setIdUser(booking.getIdUser());
-            bookingParking.setIdSlot(booking.getIdSlot());
+            bookingParking.setIdUser(customer.getIdCustomer());
+            bookingParking.setIdSlot(idSlot);
             bookingParking.setIdParkingZone(parkingSlot.getIdParkingZone());
             bookingParking.setDateIn(Calendar.getInstance().getTimeInMillis());
             parkingSlotRepository.save(parkingSlot);

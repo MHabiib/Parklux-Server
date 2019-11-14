@@ -19,13 +19,19 @@ import java.security.Principal;
         return bookingService.findBookingCustomer(principal);
     }
 
+    @GetMapping("/customer/ongoing")
+    public ResponseEntity findOngoingBookingCustomer(Principal principal) {
+        return bookingService.findOngoingBookingCustomer(principal);
+    }
+
     @GetMapping("/{id}/receipt")
     public ResponseEntity bookingReceipt(@PathVariable("id") String id) {
         return bookingService.bookingReceipt(id);
     }
 
-    @PostMapping public ResponseEntity createBooking(@RequestBody Booking booking) {
-        return bookingService.createBooking(booking);
+    @PostMapping
+    public ResponseEntity createBooking(Principal principal, @RequestBody String idSlot) {
+        return bookingService.createBooking(principal, idSlot);
     }
 
     @PostMapping("/checkout") public ResponseEntity checkoutBooking(@RequestBody String idBooking) {
