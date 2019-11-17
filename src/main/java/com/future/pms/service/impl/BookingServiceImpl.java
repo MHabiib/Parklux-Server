@@ -57,26 +57,26 @@ public class BookingServiceImpl implements BookingService {
         Customer customer = customerRepository.findByEmail(principal.getName());
         ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(idSlot);
         if (SCAN_ME.equals(parkingSlot.getStatus())) {
-            parkingSlot.setStatus(BOOKED);
-            parkingSlotRepository.save(parkingSlot);
-            Booking bookingParking = new Booking();
-            bookingParking.setParkingZoneName(
-                    parkingZoneRepository.findParkingZoneByIdParkingZone(parkingSlot.getIdParkingZone())
-                            .getName());
-            bookingParking.setPrice(
-                    parkingZoneRepository.findParkingZoneByIdParkingZone(parkingSlot.getIdParkingZone())
-                            .getPrice());
-            bookingParking.setIdParkingZone(parkingSlot.getIdParkingZone());
-            bookingParking.setSlotName(parkingSlot.getName());
-            bookingParking.setIdUser(customer.getIdCustomer());
-            bookingParking.setIdSlot(idSlot);
-            bookingParking.setIdParkingZone(parkingSlot.getIdParkingZone());
-            bookingParking.setDateIn(Calendar.getInstance().getTimeInMillis());
-            bookingRepository.save(bookingParking);
-            return ResponseEntity.ok().body(bookingParking);
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            if (1 > bookingRepository.countAllByDateOutAndIdUser(null, customer.getIdCustomer())) {
+                parkingSlot.setStatus(BOOKED);
+                parkingSlotRepository.save(parkingSlot);
+                ParkingZone parkingZone = parkingZoneRepository
+                    .findParkingZoneByIdParkingZone(parkingSlot.getIdParkingZone());
+                Booking bookingParking = new Booking();
+                bookingParking.setParkingZoneName(parkingZone.getName());
+                bookingParking.setPrice(parkingZone.getPrice());
+                bookingParking.setImageUrl(parkingZone.getImageUrl());
+                bookingParking.setIdParkingZone(parkingSlot.getIdParkingZone());
+                bookingParking.setSlotName(parkingSlot.getName());
+                bookingParking.setIdUser(customer.getIdCustomer());
+                bookingParking.setIdSlot(idSlot);
+                bookingParking.setIdParkingZone(parkingSlot.getIdParkingZone());
+                bookingParking.setDateIn(Calendar.getInstance().getTimeInMillis());
+                bookingRepository.save(bookingParking);
+                return ResponseEntity.ok().body(bookingParking);
+            }
         }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @Override

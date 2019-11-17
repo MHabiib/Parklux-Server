@@ -14,4 +14,6 @@ import java.util.List;
     List<Booking> findBookingByIdUser(String idUser);
 
     Booking findBookingByIdUserAndDateOut(String idUser, Boolean dateOut);
+
+    Integer countAllByDateOutAndIdUser(Boolean dateOut, String idUser);
 }

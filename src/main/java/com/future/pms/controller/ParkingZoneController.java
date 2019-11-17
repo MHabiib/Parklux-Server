@@ -1,8 +1,8 @@
 package com.future.pms.controller;
 
-import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.model.parking.ParkingLevel;
 import com.future.pms.model.parking.ParkingSection;
+import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.service.ParkingZoneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.security.Principal;
 
 @CrossOrigin("**") @RestController @RequestMapping("/api/parking-zone")
 public class ParkingZoneController {
@@ -41,10 +42,10 @@ public class ParkingZoneController {
         return parkingZoneService.updateParkingSlot(idParkingSlot, status);
     }
 
-    @PutMapping(value = "update-zone/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity updateParkingZone(@PathVariable("id") String idParkingZone,
+    @PutMapping(value = "update-zone", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updateParkingZone(Principal principal,
         @Nullable @RequestPart("file") MultipartFile file,
         @RequestPart("parkingZone") String parkingZoneJSON) throws IOException {
-        return parkingZoneService.updateParkingZone(idParkingZone, file, parkingZoneJSON);
+        return parkingZoneService.updateParkingZone(principal, file, parkingZoneJSON);
     }
 }

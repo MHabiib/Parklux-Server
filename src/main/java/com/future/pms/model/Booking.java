@@ -17,4 +17,5 @@ import org.springframework.data.annotation.Id;
     private String totalTime;
     private Long dateIn;
     private Long dateOut;
+    private String imageUrl;
 }
