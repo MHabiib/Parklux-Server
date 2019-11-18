@@ -1,5 +1,6 @@
 package com.future.pms.service;
 
+import com.future.pms.model.request.CreateCustomerRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestPart;
 
@@ -11,4 +12,6 @@ public interface CustomerService {
 
     ResponseEntity updateCustomer(Principal principal, @RequestPart("customer") String customerJson)
         throws IOException;
+
+    ResponseEntity createCustomer(CreateCustomerRequest createCustomerRequest);
 }

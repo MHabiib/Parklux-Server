@@ -3,6 +3,7 @@ package com.future.pms.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.pms.model.Customer;
 import com.future.pms.model.User;
+import com.future.pms.model.request.CreateCustomerRequest;
 import com.future.pms.model.request.UpdateCustomerRequest;
 import com.future.pms.repository.CustomerRepository;
 import com.future.pms.repository.UserRepository;
@@ -45,5 +46,19 @@ import java.security.Principal;
         return new ResponseEntity<>("Customer updated", HttpStatus.OK);
     }
 
-
+    @Override public ResponseEntity createCustomer(CreateCustomerRequest createCustomerRequest) {
+        if (null != userRepository.findByEmail(createCustomerRequest.getEmail()))
+            return new ResponseEntity<>("Email already registered", HttpStatus.BAD_REQUEST);
+        Customer customer = new Customer();
+        User user = new User();
+        customer.setName(createCustomerRequest.getName());
+        customer.setPhoneNumber(createCustomerRequest.getPhoneNumber());
+        customer.setEmail(createCustomerRequest.getEmail());
+        user.setEmail(createCustomerRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(createCustomerRequest.getPassword()));
+        user.setRole("CUSTOMER");
+        customerRepository.save(customer);
+        userRepository.save(user);
+        return new ResponseEntity<>("Customer Created", HttpStatus.OK);
+    }
 }
