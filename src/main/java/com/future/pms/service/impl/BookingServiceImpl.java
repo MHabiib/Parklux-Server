@@ -64,13 +64,13 @@ public class BookingServiceImpl implements BookingService {
                     .findParkingZoneByIdParkingZone(parkingSlot.getIdParkingZone());
                 Booking bookingParking = new Booking();
                 bookingParking.setParkingZoneName(parkingZone.getName());
+                bookingParking.setAddress(parkingZone.getAddress());
                 bookingParking.setPrice(parkingZone.getPrice());
                 bookingParking.setImageUrl(parkingZone.getImageUrl());
                 bookingParking.setIdParkingZone(parkingSlot.getIdParkingZone());
                 bookingParking.setSlotName(parkingSlot.getName());
                 bookingParking.setIdUser(customer.getIdCustomer());
                 bookingParking.setIdSlot(idSlot);
-                bookingParking.setIdParkingZone(parkingSlot.getIdParkingZone());
                 bookingParking.setDateIn(Calendar.getInstance().getTimeInMillis());
                 bookingRepository.save(bookingParking);
                 return ResponseEntity.ok().body(bookingParking);

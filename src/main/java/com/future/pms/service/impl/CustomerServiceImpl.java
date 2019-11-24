@@ -37,13 +37,13 @@ import java.security.Principal;
         customer.setName(updatedCustomer.getName());
         customer.setPhoneNumber(updatedCustomer.getPhoneNumber());
         customer.setEmail(updatedCustomer.getEmail());
-        if (null != updatedCustomer.getPassword() && null != updatedCustomer.getEmail()) {
+        user.setEmail(updatedCustomer.getEmail());
+        if (!"".equals(updatedCustomer.getPassword())) {
             user.setPassword(passwordEncoder.encode(updatedCustomer.getPassword()));
-            user.setEmail(updatedCustomer.getEmail());
         }
         customerRepository.save(customer);
         userRepository.save(user);
-        return new ResponseEntity<>("Customer updated", HttpStatus.OK);
+        return new ResponseEntity<>(updatedCustomer, HttpStatus.OK);
     }
 
     @Override public ResponseEntity createCustomer(CreateCustomerRequest createCustomerRequest) {

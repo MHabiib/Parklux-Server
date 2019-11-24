@@ -12,6 +12,7 @@ import org.springframework.data.annotation.Id;
     private String idUser;
     private String idParkingZone;
     private String parkingZoneName;
+    private String address;
     private Double price;
     private String slotName;
     private String totalTime;
