@@ -93,18 +93,24 @@ public class BookingServiceImpl implements BookingService {
         receipt.setAddress(parkingZone.getAddress());
         receipt.setSlotName(booking.getSlotName());
         receipt.setPrice(booking.getPrice());
-        receipt.setTotalMinutes((Integer.valueOf(booking.getTotalTime()) % 60) + 1);
-        receipt.setTotalHours(
-                (Integer.valueOf(booking.getTotalTime()) - receipt.getTotalMinutes()) / 60);
+        receipt.setTotalMinutes(getTotalMinute(booking.getTotalTime()));
+        receipt.setTotalHours(getTotalHours(booking.getTotalTime(), receipt.getTotalMinutes()));
         receipt.setDateIn(booking.getDateIn());
         receipt.setDateOut(booking.getDateOut());
-        receipt.setTotalPrice(getTotalPrice(booking.getTotalTime(), booking.getPrice()));
+        receipt.setTotalPrice(
+            getTotalPrice(receipt.getTotalMinutes(), receipt.getTotalHours(), booking.getPrice()));
         return ResponseEntity.ok().body(receipt);
     }
 
-    private String getTotalPrice(String totalTime, Double price) {
-        int totalMinutes = Integer.valueOf(totalTime) % 60;
-        int totalHours = (Integer.valueOf(totalTime) - totalMinutes) / 60;
+    private Integer getTotalMinute(String totalTime) {
+        return (Integer.parseInt(totalTime) % 60) + 1;
+    }
+
+    private Integer getTotalHours(String totalTime, int totalMinutes) {
+        return (Integer.parseInt(totalTime) - totalMinutes + 1) / 60;
+    }
+
+    private String getTotalPrice(int totalMinutes, int totalHours, Double price) {
         if (totalMinutes != 0)
             totalHours += 1;
         return String.valueOf(totalHours * price);
