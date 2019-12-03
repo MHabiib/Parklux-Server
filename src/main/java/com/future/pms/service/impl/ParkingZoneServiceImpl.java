@@ -12,6 +12,8 @@ import com.future.pms.repository.ParkingSlotRepository;
 import com.future.pms.repository.ParkingZoneRepository;
 import com.future.pms.service.ParkingZoneService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,8 +41,9 @@ import static com.future.pms.Utils.saveUploadedFile;
     @Autowired ParkingSlotRepository parkingSlotRepository;
     @Autowired PasswordEncoder passwordEncoder;
 
-    @Override public ResponseEntity loadAll() {
-        return ResponseEntity.ok(parkingZoneRepository.findAll());
+    @Override public ResponseEntity loadAll(Integer page) {
+        PageRequest request = new PageRequest(page, 5, new Sort(Sort.Direction.ASC, "name"));
+        return ResponseEntity.ok(parkingZoneRepository.findAllBy(request));
     }
 
     @Override public ResponseEntity createParkingZone(ParkingZone parkingZone) {

@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.security.Principal;
 
 public interface BookingService {
-    ResponseEntity<Booking> loadAll();
+    ResponseEntity loadAll(Integer page);
 
-    ResponseEntity<Booking> findBookingCustomer(Principal principal);
+    ResponseEntity findBookingCustomer(Principal principal, Integer page);
 
     ResponseEntity findOngoingBookingCustomer(Principal principal);
 

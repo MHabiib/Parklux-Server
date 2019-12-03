@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.security.Principal;
 
 public interface CustomerService {
+    ResponseEntity loadAll(Integer page);
+
     ResponseEntity getUserDetail(Principal principal);
 
     ResponseEntity updateCustomer(Principal principal, @RequestPart("customer") String customerJson)

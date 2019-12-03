@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.security.Principal;
 
 public interface ParkingZoneService {
-    ResponseEntity<ParkingZone> loadAll();
+    ResponseEntity loadAll(Integer page);
 
     ResponseEntity createParkingZone(@RequestBody ParkingZone parkingZone);
 

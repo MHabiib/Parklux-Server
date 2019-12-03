@@ -14,6 +14,10 @@ import java.security.Principal;
 public class CustomerController {
     @Autowired CustomerService customerService;
 
+    @GetMapping("/api/customer") public ResponseEntity loadAll(Integer page) {
+        return ResponseEntity.ok(customerService.loadAll(page));
+    }
+
     @GetMapping("/api/customer/detail") public ResponseEntity getUserDetail(Principal principal) {
         return ResponseEntity.ok(customerService.getUserDetail(principal));
     }

@@ -11,12 +11,13 @@ import java.security.Principal;
 @CrossOrigin("**") @RestController @RequestMapping("/api/booking") public class BookingController {
     @Autowired private BookingService bookingService;
 
-    @GetMapping public ResponseEntity loadAll() {
-        return ResponseEntity.ok(bookingService.loadAll());
+    @GetMapping public ResponseEntity loadAll(Integer page) {
+        return ResponseEntity.ok(bookingService.loadAll(page));
     }
 
-    @GetMapping("/customer") public ResponseEntity findBookingCustomer(Principal principal) {
-        return bookingService.findBookingCustomer(principal);
+    @GetMapping("/customer")
+    public ResponseEntity findBookingCustomer(Principal principal, Integer page) {
+        return bookingService.findBookingCustomer(principal, page);
     }
 
     @GetMapping("/customer/ongoing")

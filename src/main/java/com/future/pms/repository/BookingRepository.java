@@ -1,19 +1,19 @@
 package com.future.pms.repository;
 
 import com.future.pms.model.Booking;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository public interface BookingRepository extends MongoRepository<Booking, String> {
-    List<Booking> findAll();
+    Page<Booking> findBookingBy(Pageable pageable);
 
     Booking findBookingByIdBooking(String idBooking);
 
-    List<Booking> findBookingByIdUser(String idUser);
+    Page<Booking> findBookingByIdUser(String idUser, Pageable pageable);
 
-    Booking findBookingByIdUserAndDateOut(String idUser, Boolean dateOut);
+    Booking findBookingByIdUserAndDateOut(String idUser, Long dateOut);
 
-    Integer countAllByDateOutAndIdUser(Boolean dateOut, String idUser);
+    Integer countAllByDateOutAndIdUser(Long dateOut, String idUser);
 }

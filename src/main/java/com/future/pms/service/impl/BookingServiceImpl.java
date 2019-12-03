@@ -12,6 +12,8 @@ import com.future.pms.repository.ParkingZoneRepository;
 import com.future.pms.service.BookingService;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -33,15 +35,16 @@ public class BookingServiceImpl implements BookingService {
     @Autowired
     ParkingZoneRepository parkingZoneRepository;
 
-    @Override
-    public ResponseEntity loadAll() {
-        return ResponseEntity.ok(bookingRepository.findAll());
+    @Override public ResponseEntity loadAll(Integer page) {
+        PageRequest request = new PageRequest(page, 5, new Sort(Sort.Direction.ASC, "dateIn"));
+        return ResponseEntity.ok(bookingRepository.findBookingBy(request));
     }
 
-    @Override
-    public ResponseEntity findBookingCustomer(Principal principal) {
+    @Override public ResponseEntity findBookingCustomer(Principal principal, Integer page) {
         Customer customer = customerRepository.findByEmail(principal.getName());
-        return ResponseEntity.ok(bookingRepository.findBookingByIdUser(customer.getIdCustomer()));
+        PageRequest request = new PageRequest(page, 5, new Sort(Sort.Direction.ASC, "dateIn"));
+        return ResponseEntity
+            .ok(bookingRepository.findBookingByIdUser(customer.getIdCustomer(), request));
     }
 
     @Override

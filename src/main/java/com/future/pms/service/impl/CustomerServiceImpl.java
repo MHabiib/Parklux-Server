@@ -9,6 +9,8 @@ import com.future.pms.repository.CustomerRepository;
 import com.future.pms.repository.UserRepository;
 import com.future.pms.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +23,11 @@ import java.security.Principal;
     @Autowired CustomerRepository customerRepository;
     @Autowired UserRepository userRepository;
     @Autowired PasswordEncoder passwordEncoder;
+
+    @Override public ResponseEntity loadAll(Integer page) {
+        PageRequest request = new PageRequest(page, 5, new Sort(Sort.Direction.ASC, "name"));
+        return ResponseEntity.ok(customerRepository.findAllBy(request));
+    }
 
     @Override public ResponseEntity getUserDetail(Principal principal) {
         return ResponseEntity.ok(customerRepository.findByEmail(principal.getName()));

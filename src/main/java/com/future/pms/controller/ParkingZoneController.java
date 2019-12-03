@@ -18,8 +18,8 @@ import java.security.Principal;
 public class ParkingZoneController {
     @Autowired ParkingZoneService parkingZoneService;
 
-    @GetMapping public ResponseEntity loadAll() {
-        return ResponseEntity.ok(parkingZoneService.loadAll());
+    @GetMapping public ResponseEntity loadAll(Integer page) {
+        return ResponseEntity.ok(parkingZoneService.loadAll(page));
     }
 
     @PostMapping public ResponseEntity createParkingZone(@RequestBody ParkingZone parkingZone) {
