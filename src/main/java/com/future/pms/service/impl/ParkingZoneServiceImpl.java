@@ -12,6 +12,8 @@ import com.future.pms.repository.ParkingSlotRepository;
 import com.future.pms.repository.ParkingZoneRepository;
 import com.future.pms.service.ParkingZoneService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 
 import static com.future.pms.Constants.*;
 import static com.future.pms.Utils.checkImageFile;
@@ -38,8 +41,9 @@ import static com.future.pms.Utils.saveUploadedFile;
     @Autowired ParkingSlotRepository parkingSlotRepository;
     @Autowired PasswordEncoder passwordEncoder;
 
-    @Override public ResponseEntity loadAll() {
-        return ResponseEntity.ok(parkingZoneRepository.findAll());
+    @Override public ResponseEntity loadAll(Integer page) {
+        PageRequest request = new PageRequest(page, 5, new Sort(Sort.Direction.ASC, "name"));
+        return ResponseEntity.ok(parkingZoneRepository.findAllBy(request));
     }
 
     @Override public ResponseEntity createParkingZone(ParkingZone parkingZone) {
@@ -113,11 +117,13 @@ import static com.future.pms.Utils.saveUploadedFile;
         return null;
     }
 
-    @Override public ResponseEntity updateParkingZone(String idParkingZone, MultipartFile file,
+    @Override public ResponseEntity updateParkingZone(Principal principal, MultipartFile file,
         String parkingZoneJSON) throws IOException {
         ParkingZone parkingZone = new ObjectMapper().readValue(parkingZoneJSON, ParkingZone.class);
-        ParkingZone parkingZoneExist =
-            parkingZoneRepository.findParkingZoneByIdParkingZone(idParkingZone);
+        ParkingZone parkingZoneDetail =
+            parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
+        ParkingZone parkingZoneExist = parkingZoneRepository
+            .findParkingZoneByIdParkingZone(parkingZoneDetail.getIdParkingZone());
         if (parkingZoneExist == null) {
             return new ResponseEntity<>(PARKING_ZONE_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
@@ -127,9 +133,7 @@ import static com.future.pms.Utils.saveUploadedFile;
                     Path deletePath = Paths.get(UPLOADED_FOLDER + parkingZoneExist.getImageUrl());
                     Files.delete(deletePath);
                 }
-                String fileName = String
-                    .format("parkingZone/%s_%s", parkingZoneExist.getIdParkingZone(),
-                        file.getOriginalFilename());
+                String fileName = parkingZone.getEmailAdmin();
                 saveUploadedFile(file, fileName);
                 parkingZone.setImageUrl(UPLOADED_FOLDER + fileName);
             } catch (IOException e) {
@@ -137,7 +141,12 @@ import static com.future.pms.Utils.saveUploadedFile;
                     HttpStatus.BAD_REQUEST);
             }
         }
-        parkingZoneExist = parkingZone;
+        parkingZoneExist.setName(parkingZone.getName());
+        parkingZoneExist.setAddress(parkingZone.getAddress());
+        parkingZoneExist.setOpenHour(parkingZone.getOpenHour());
+        parkingZoneExist.setPhoneNumber(parkingZone.getPhoneNumber());
+        parkingZoneExist.setPrice(parkingZone.getPrice());
+        parkingZoneExist.setImageUrl(parkingZone.getImageUrl());
         parkingZoneRepository.save(parkingZoneExist);
         return new ResponseEntity<>("Parking Zone Updated", HttpStatus.OK);
     }

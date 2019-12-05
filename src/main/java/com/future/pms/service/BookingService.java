@@ -8,15 +8,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.security.Principal;
 
 public interface BookingService {
-    ResponseEntity<Booking> loadAll();
+    ResponseEntity loadAll(Integer page);
 
-    ResponseEntity<Booking> findBookingCustomer(Principal principal);
+    ResponseEntity findBookingCustomer(Principal principal, Integer page);
 
-    ResponseEntity createBooking(@RequestBody Booking booking);
+    ResponseEntity findOngoingBookingCustomer(Principal principal);
+
+    ResponseEntity createBooking(Principal principal, @RequestBody String idSlot);
 
     ResponseEntity bookingReceipt(@PathVariable("id") String id);
 
-    ResponseEntity checkoutBooking(@RequestBody String idBooking);
+    ResponseEntity checkoutBooking(Principal principal);
 
     ResponseEntity<Booking> updateBooking(@PathVariable("id") String id,
         @RequestBody Booking booking);

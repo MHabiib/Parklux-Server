@@ -12,7 +12,6 @@ import static com.future.pms.Constants.OPEN_HOUR;
     @Id private String idParkingZone;
     private String emailAdmin;
     private String name = "";
-    private String emailParkingZone;
     private Double price = 0.0;
     private String openHour = OPEN_HOUR;
     private String address = "";

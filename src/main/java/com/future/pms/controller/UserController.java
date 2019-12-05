@@ -19,10 +19,6 @@ import java.security.Principal;
         return principal;
     }
 
-    @GetMapping("/customer/detail") public ResponseEntity getUserDetail(Principal principal) {
-        return ResponseEntity.ok(userService.getUserDetail(principal));
-    }
-
     @PostMapping public ResponseEntity createUser(@RequestBody User user) {
         return userService.createUser(user);
     }

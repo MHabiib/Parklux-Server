@@ -22,7 +22,7 @@ import static com.future.pms.Constants.UPLOADED_FOLDER;
 
     public static boolean checkImageFile(MultipartFile file) {
         boolean isImage = false;
-        if (null != file && StringUtils.isEmpty(file.getOriginalFilename())) {
+        if (null != file && !StringUtils.isEmpty(file.getOriginalFilename())) {
             isImage = file.getContentType().equals("image/png") || file.getContentType()
                 .equals("image/jpg") || file.getContentType().equals("image/jpeg") || file
                 .getContentType().equals("image/bmp");

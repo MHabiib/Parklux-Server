@@ -11,12 +11,18 @@ import java.security.Principal;
 @CrossOrigin("**") @RestController @RequestMapping("/api/booking") public class BookingController {
     @Autowired private BookingService bookingService;
 
-    @GetMapping public ResponseEntity loadAll() {
-        return ResponseEntity.ok(bookingService.loadAll());
+    @GetMapping public ResponseEntity loadAll(Integer page) {
+        return ResponseEntity.ok(bookingService.loadAll(page));
     }
 
-    @GetMapping("/customer") public ResponseEntity findBookingCustomer(Principal principal) {
-        return bookingService.findBookingCustomer(principal);
+    @GetMapping("/customer")
+    public ResponseEntity findBookingCustomer(Principal principal, Integer page) {
+        return bookingService.findBookingCustomer(principal, page);
+    }
+
+    @GetMapping("/customer/ongoing")
+    public ResponseEntity findOngoingBookingCustomer(Principal principal) {
+        return bookingService.findOngoingBookingCustomer(principal);
     }
 
     @GetMapping("/{id}/receipt")
@@ -24,12 +30,14 @@ import java.security.Principal;
         return bookingService.bookingReceipt(id);
     }
 
-    @PostMapping public ResponseEntity createBooking(@RequestBody Booking booking) {
-        return bookingService.createBooking(booking);
+    @PostMapping
+    public ResponseEntity createBooking(Principal principal, @RequestBody String idSlot) {
+        return bookingService.createBooking(principal, idSlot);
     }
 
-    @PostMapping("/checkout") public ResponseEntity checkoutBooking(@RequestBody String idBooking) {
-        return bookingService.checkoutBooking(idBooking);
+    @PostMapping("/checkout")
+    public ResponseEntity checkoutBooking(Principal principal) {
+        return bookingService.checkoutBooking(principal);
     }
 
     @PutMapping("/{id}") public ResponseEntity<Booking> updateBooking(@PathVariable("id") String id,
