@@ -13,4 +13,5 @@ import static com.future.pms.Constants.AVAILABLE;
     private String idParkingZone;
     private String levelName;
     private String status = AVAILABLE;
+    private String[] slotsLayout;
 }

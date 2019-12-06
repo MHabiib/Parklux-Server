@@ -54,13 +54,28 @@ import static com.future.pms.Utils.saveUploadedFile;
         ParkingZone parkingZoneExist =
             parkingZoneRepository.findParkingZoneByIdParkingZone(parkingLevel.getIdParkingZone());
         if (null != parkingZoneExist) {
-            return new ResponseEntity<>(parkingLevelRepository.save(parkingLevel), HttpStatus.OK);
+            parkingLevel.setSlotsLayout(SLOTS);
+            parkingLevelRepository.save(parkingLevel);
+            addSection(parkingLevel.getIdLevel());
+            return new ResponseEntity<>("ok", HttpStatus.OK);
         } else {
             return new ResponseEntity<>(PARKING_ZONE_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
     }
 
-    @Override public ResponseEntity addParkingSection(@RequestBody ParkingSection parkingSection) {
+    private void addSection(String idLevel) {
+        ParkingLevel parkingLevel = parkingLevelRepository.findByIdLevel(idLevel);
+        for (int i = 1; i < 5; i++) {
+            ParkingSection parkingSection = new ParkingSection();
+            parkingSection.setIdLevel(idLevel);
+            parkingSection.setIdParkingZone(parkingLevel.getIdParkingZone());
+            parkingSection.setSectionName(parkingLevel.getLevelName() + "section" + i);
+            parkingSection.setStatus("NOT_ACTIVE");
+            parkingSectionRepository.save(parkingSection);
+        }
+    }
+
+   /* @Override public ResponseEntity addParkingSection(@RequestBody ParkingSection parkingSection) {
         ParkingLevel parkingLevelExist =
             parkingLevelRepository.findByIdLevel(parkingSection.getIdLevel());
         if (null != parkingLevelExist) {
@@ -79,6 +94,14 @@ import static com.future.pms.Utils.saveUploadedFile;
         } else {
             return new ResponseEntity<>("Parking Level Not Found", HttpStatus.BAD_REQUEST);
         }
+    }*/
+
+    private void addSlot(CreateParkingSlotRequest slotRequest) {
+        ParkingSlot parkingSlot = new ParkingSlot();
+        parkingSlot.setIdSection(slotRequest.getIdSection());
+        parkingSlot.setIdParkingZone(slotRequest.getIdParkingZone());
+        parkingSlot.setName(slotRequest.getSlotName());
+        parkingSlotRepository.save(parkingSlot);
     }
 
     @Override public ResponseEntity updateParkingSlot(String idParkingSlot, String status) {
@@ -103,14 +126,6 @@ import static com.future.pms.Utils.saveUploadedFile;
         } else {
             return new ResponseEntity<>("Slot not found !", HttpStatus.BAD_REQUEST);
         }
-    }
-
-    private void addSlot(CreateParkingSlotRequest slotRequest) {
-        ParkingSlot parkingSlot = new ParkingSlot();
-        parkingSlot.setIdSection(slotRequest.getIdSection());
-        parkingSlot.setIdParkingZone(slotRequest.getIdParkingZone());
-        parkingSlot.setName(slotRequest.getSlotName());
-        parkingSlotRepository.save(parkingSlot);
     }
 
     @Override public ResponseEntity deleteParkingZone(String id) {

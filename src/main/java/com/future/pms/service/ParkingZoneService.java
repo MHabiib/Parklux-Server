@@ -1,7 +1,6 @@
 package com.future.pms.service;
 
 import com.future.pms.model.parking.ParkingLevel;
-import com.future.pms.model.parking.ParkingSection;
 import com.future.pms.model.parking.ParkingZone;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +16,6 @@ public interface ParkingZoneService {
     ResponseEntity createParkingZone(@RequestBody ParkingZone parkingZone);
 
     ResponseEntity addParkingLevel(@RequestBody ParkingLevel parkingLevel);
-
-    ResponseEntity addParkingSection(@RequestBody ParkingSection parkingSection);
 
     ResponseEntity updateParkingSlot(@RequestBody String idParkingSlot, @RequestBody String status);
 
