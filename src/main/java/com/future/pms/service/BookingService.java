@@ -10,7 +10,9 @@ import java.security.Principal;
 public interface BookingService {
     ResponseEntity loadAll(Integer page);
 
-    ResponseEntity findBookingCustomer(Principal principal, Integer page);
+    //    ResponseEntity findBookingCustomer(Principal principal, Integer page);
+
+    ResponseEntity findBookingCustomerNonPaging(Principal principal);
 
     ResponseEntity findOngoingBookingCustomer(Principal principal);
 

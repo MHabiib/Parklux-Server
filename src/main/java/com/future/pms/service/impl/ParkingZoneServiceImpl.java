@@ -1,15 +1,12 @@
 package com.future.pms.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.pms.model.Booking;
 import com.future.pms.model.parking.ParkingLevel;
 import com.future.pms.model.parking.ParkingSection;
 import com.future.pms.model.parking.ParkingSlot;
 import com.future.pms.model.parking.ParkingZone;
-import com.future.pms.model.request.CreateParkingSlotRequest;
-import com.future.pms.repository.ParkingLevelRepository;
-import com.future.pms.repository.ParkingSectionRepository;
-import com.future.pms.repository.ParkingSlotRepository;
-import com.future.pms.repository.ParkingZoneRepository;
+import com.future.pms.repository.*;
 import com.future.pms.service.ParkingZoneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.util.ArrayList;
 
 import static com.future.pms.Constants.*;
 import static com.future.pms.Utils.checkImageFile;
@@ -39,6 +37,8 @@ import static com.future.pms.Utils.saveUploadedFile;
     @Autowired ParkingLevelRepository parkingLevelRepository;
     @Autowired ParkingSectionRepository parkingSectionRepository;
     @Autowired ParkingSlotRepository parkingSlotRepository;
+    @Autowired CustomerRepository customerRepository;
+    @Autowired BookingRepository bookingRepository;
     @Autowired PasswordEncoder passwordEncoder;
 
     @Override public ResponseEntity loadAll(Integer page) {
@@ -50,14 +50,19 @@ import static com.future.pms.Utils.saveUploadedFile;
         return null;
     }
 
-    @Override public ResponseEntity addParkingLevel(@RequestBody ParkingLevel parkingLevel) {
+    @Override
+    public ResponseEntity addParkingLevel(@RequestBody String levelName, Principal principal) {
         ParkingZone parkingZoneExist =
-            parkingZoneRepository.findParkingZoneByIdParkingZone(parkingLevel.getIdParkingZone());
+            parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
         if (null != parkingZoneExist) {
+            ParkingLevel parkingLevel = new ParkingLevel();
+            parkingLevel.setIdParkingZone(parkingZoneExist.getIdParkingZone());
             parkingLevel.setSlotsLayout(SLOTS);
+            parkingLevel.setLevelName(levelName);
+            parkingLevel.setStatus(LEVEL_AVAILABLE);
             parkingLevelRepository.save(parkingLevel);
             addSection(parkingLevel.getIdLevel());
-            return new ResponseEntity<>("ok", HttpStatus.OK);
+            return new ResponseEntity<>("Ok", HttpStatus.OK);
         } else {
             return new ResponseEntity<>(PARKING_ZONE_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
@@ -69,52 +74,112 @@ import static com.future.pms.Utils.saveUploadedFile;
             ParkingSection parkingSection = new ParkingSection();
             parkingSection.setIdLevel(idLevel);
             parkingSection.setIdParkingZone(parkingLevel.getIdParkingZone());
-            parkingSection.setSectionName(parkingLevel.getLevelName() + "section" + i);
-            parkingSection.setStatus("NOT_ACTIVE");
+            parkingSection.setIdParkingZone(parkingLevel.getIdParkingZone());
+            parkingSection.setSectionName(parkingLevel.getLevelName() + " Section " + i);
+            parkingSection.setStatus(NOT_ACTIVE);
             parkingSectionRepository.save(parkingSection);
         }
     }
 
-   /* @Override public ResponseEntity addParkingSection(@RequestBody ParkingSection parkingSection) {
-        ParkingLevel parkingLevelExist =
-            parkingLevelRepository.findByIdLevel(parkingSection.getIdLevel());
-        if (null != parkingLevelExist) {
-            parkingSectionRepository.save(parkingSection);
-            CreateParkingSlotRequest parkingSlotRequest = new CreateParkingSlotRequest();
-            parkingSlotRequest.setIdParkingZone(parkingLevelExist.getIdParkingZone());
-            parkingSlotRequest.setIdSection(parkingSection.getIdSection());
-            for (int i = 1; i <= NUMBER_OF_SLOT; i++) {
-                parkingSlotRequest
-                    .setSlotName(String.format("%s - %s", parkingSection.getSectionName(), i));
-                addSlot(parkingSlotRequest);
+    @Override public ResponseEntity updateParkingSection(String idSection) {
+        ParkingSection parkingSection =
+            parkingSectionRepository.findParkingSectionByIdSection(idSection);
+        if (null != parkingSection) {
+            switch (parkingSection.getStatus()) {
+                case NOT_ACTIVE: {
+                    if (updateSlot(parkingSection, ACTIVE).equals(SUCCESS)) {
+                        parkingSection.setStatus(ACTIVE);
+                        parkingSectionRepository.save(parkingSection);
+                        return new ResponseEntity<>(SLOT_UPDATED, HttpStatus.OK);
+                    } else {
+                        return new ResponseEntity<>("Can't update section !",
+                            HttpStatus.BAD_REQUEST);
+                    }
+                }
+                case ACTIVE: {
+                    if (updateSlot(parkingSection, NOT_ACTIVE).equals(SUCCESS)) {
+                        parkingSection.setStatus(NOT_ACTIVE);
+                        parkingSectionRepository.save(parkingSection);
+                        return new ResponseEntity<>(SLOT_UPDATED, HttpStatus.OK);
+                    } else {
+                        return new ResponseEntity<>("Can't update section !",
+                            HttpStatus.BAD_REQUEST);
+                    }
+                }
+                default: {
+                    return new ResponseEntity<>("Can't update section !", HttpStatus.BAD_REQUEST);
+                }
             }
-            return new ResponseEntity<>(
-                "Parking Section Created and Adds 20 Slot on " + parkingSection.getSectionName(),
-                HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("Parking Level Not Found", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Slot not found !", HttpStatus.BAD_REQUEST);
         }
-    }*/
+    }
 
-    private void addSlot(CreateParkingSlotRequest slotRequest) {
-        ParkingSlot parkingSlot = new ParkingSlot();
-        parkingSlot.setIdSection(slotRequest.getIdSection());
-        parkingSlot.setIdParkingZone(slotRequest.getIdParkingZone());
-        parkingSlot.setName(slotRequest.getSlotName());
-        parkingSlotRepository.save(parkingSlot);
+    @Override public ResponseEntity updateLevel(String idLevel, String slotsLayout) {
+        ParkingLevel parkingLevel = parkingLevelRepository.findByIdLevel(idLevel);
+        if (null != parkingLevel && slotsLayout.length() == TOTAL_SLOT_IN_LEVEL) {
+            ArrayList<String> layout = parkingLevel.getSlotsLayout();
+            for (int i = 1; i < layout.size(); i++) {
+                layout.set(i, slotsLayout.charAt(i - 1) + layout.get(i).substring(1));
+                if (layout.get(i).contains(SLOT_EMPTY)) {
+                    ParkingSlot parkingSlot = new ParkingSlot();
+                    parkingSlot.setStatus(SLOT_EMPTY);
+                    parkingSlot.setIdLevel(parkingLevel.getIdLevel());
+                    parkingSlot.setIdParkingZone(parkingLevel.getIdParkingZone());
+                    parkingSlot.setSlotNumberInLayout(i);
+                    parkingSlot.setName(parkingLevel.getLevelName() + " " + i);
+                    parkingSlotRepository.save(parkingSlot);
+                }
+            }
+            parkingLevel.setSlotsLayout(layout);
+            parkingLevelRepository.save(parkingLevel);
+            return new ResponseEntity<>("Success", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Level not found !", HttpStatus.BAD_REQUEST);
+    }
+
+    private String updateSlot(ParkingSection parkingSection, String status) {
+        ParkingLevel parkingLevel =
+            parkingLevelRepository.findByIdLevel(parkingSection.getIdLevel());
+        ArrayList<String> layout = parkingLevel.getSlotsLayout();
+        String sectionNumber =
+            parkingSection.getSectionName().substring(parkingSection.getSectionName().length() - 1);
+        String newLayoutValue;
+        int totalUpdated = 0;
+        if (status.equals(ACTIVE)) {
+            newLayoutValue = SLOT_READY;
+        } else {
+            newLayoutValue = SLOT_NULL;
+        }
+        for (int i = 1; i < layout.size(); i++) {
+            if (layout.get(i).contains(sectionNumber)) {
+                layout.set(i, newLayoutValue + layout.get(i).substring(1));
+                totalUpdated++;
+                if (totalUpdated == TOTAL_SLOT_IN_SECTION) {
+                    i = layout.size() + 1;
+                }
+            }
+        }
+        if (totalUpdated == TOTAL_SLOT_IN_SECTION) {
+            parkingLevel.setSlotsLayout(layout);
+            parkingLevelRepository.save(parkingLevel);
+            return SUCCESS;
+        } else {
+            return FAILED;
+        }
     }
 
     @Override public ResponseEntity updateParkingSlot(String idParkingSlot, String status) {
         ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(idParkingSlot);
         if (null != parkingSlot) {
             switch (parkingSlot.getStatus()) {
-                case AVAILABLE: {
-                    parkingSlot.setStatus(DISABLE);
+                case SLOT_EMPTY: {
+                    parkingSlot.setStatus(SLOT_DISABLE);
                     parkingSlotRepository.save(parkingSlot);
                     return new ResponseEntity<>(SLOT_UPDATED, HttpStatus.OK);
                 }
-                case DISABLE: {
-                    parkingSlot.setStatus(AVAILABLE);
+                case SLOT_DISABLE: {
+                    parkingSlot.setStatus(SLOT_EMPTY);
                     parkingSlotRepository.save(parkingSlot);
                     return new ResponseEntity<>(SLOT_UPDATED, HttpStatus.OK);
                 }
@@ -126,10 +191,6 @@ import static com.future.pms.Utils.saveUploadedFile;
         } else {
             return new ResponseEntity<>("Slot not found !", HttpStatus.BAD_REQUEST);
         }
-    }
-
-    @Override public ResponseEntity deleteParkingZone(String id) {
-        return null;
     }
 
     @Override public ResponseEntity updateParkingZone(Principal principal, MultipartFile file,
@@ -164,6 +225,27 @@ import static com.future.pms.Utils.saveUploadedFile;
         parkingZoneExist.setImageUrl(parkingZone.getImageUrl());
         parkingZoneRepository.save(parkingZoneExist);
         return new ResponseEntity<>("Parking Zone Updated", HttpStatus.OK);
+    }
+
+    @Override public ResponseEntity getParkingLayout(String idBooking) {
+        Booking booking = bookingRepository.findBookingByIdBooking(idBooking);
+        if (null != booking) {
+            ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(booking.getIdSlot());
+            ParkingLevel parkingLevel =
+                parkingLevelRepository.findByIdLevel(parkingSlot.getIdLevel());
+            StringBuilder layoutInString = new StringBuilder();
+            ArrayList<String> layout = parkingLevel.getSlotsLayout();
+            for (int i = 0; i < layout.size(); i++) {
+                if (i != parkingSlot.getSlotNumberInLayout()) {
+                    layoutInString.append(layout.get(i).charAt(0));
+                } else {
+                    layoutInString.append(MY_SLOT);
+                }
+            }
+            return new ResponseEntity<>(layoutInString, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Level not found !", HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Override public ResponseEntity getImage(String imageName) throws IOException {

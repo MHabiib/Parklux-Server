@@ -29,15 +29,16 @@ import static com.future.pms.Constants.*;
         ParkingZone parkingZoneExist =
             parkingZoneRepository.findParkingZoneByIdParkingZone(idParkingZone);
         List<ParkingSlot> listParkingSlot = parkingSlotRepository
-            .findAllByIdParkingZoneAndStatus(parkingZoneExist.getIdParkingZone(), "AVAILABLE");
-        if (null == listParkingSlot)
-            return new ResponseEntity<>("Parking Zone on " + parkingZoneExist.getName() + "Full !",
+            .findAllByIdParkingZoneAndStatus(parkingZoneExist.getIdParkingZone(), SLOT_EMPTY);
+        if (null == listParkingSlot || listParkingSlot.size() == 0)
+            return new ResponseEntity<>(
+                "Parking Zone on " + parkingZoneExist.getName() + " already full !",
                 HttpStatus.OK);
         else {
             ParkingSlot parkingSlot =
                 listParkingSlot.get((int) (Math.random() * listParkingSlot.size()));
-            if (AVAILABLE.equals(parkingSlot.getStatus())) {
-                parkingSlot.setStatus(SCAN_ME);
+            if (SLOT_EMPTY.equals(parkingSlot.getStatus())) {
+                parkingSlot.setStatus(SLOT_SCAN_ME);
                 parkingSlotRepository.save(parkingSlot);
                 QR qr = new QR();
                 qr.setIdSlot(parkingSlot.getIdSlot());

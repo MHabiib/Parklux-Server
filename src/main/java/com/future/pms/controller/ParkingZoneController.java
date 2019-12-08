@@ -1,7 +1,5 @@
 package com.future.pms.controller;
 
-import com.future.pms.model.parking.ParkingLevel;
-import com.future.pms.model.parking.ParkingSection;
 import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.service.ParkingZoneService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +25,19 @@ public class ParkingZoneController {
     }
 
     @PostMapping("/add-level")
-    public ResponseEntity addParkingLevel(@RequestBody ParkingLevel parkingLevel) {
-        return parkingZoneService.addParkingLevel(parkingLevel);
+    public ResponseEntity addParkingLevel(@RequestBody String levelName, Principal principal) {
+        return parkingZoneService.addParkingLevel(levelName, principal);
     }
 
-    @PostMapping("/add-section")
-    public ResponseEntity addParkingSection(@RequestBody ParkingSection parkingSection) {
-        return parkingZoneService.addParkingSection(parkingSection);
+    @PostMapping("/update-level/{id}")
+    public ResponseEntity updateLevel(@PathVariable("id") String idLevel,
+        @RequestBody String slotsLayout) {
+        return parkingZoneService.updateLevel(idLevel, slotsLayout);
+    }
+
+    @PostMapping("/update-section")
+    public ResponseEntity addParkingSection(@RequestBody String idSection) {
+        return parkingZoneService.updateParkingSection(idSection);
     }
 
     @PostMapping("update-slot/{id}")
@@ -47,5 +51,10 @@ public class ParkingZoneController {
         @Nullable @RequestPart("file") MultipartFile file,
         @RequestPart("parkingZone") String parkingZoneJSON) throws IOException {
         return parkingZoneService.updateParkingZone(principal, file, parkingZoneJSON);
+    }
+
+    @GetMapping("/{idBooking}/parking-layout")
+    public ResponseEntity getParkingLayout(@PathVariable("idBooking") String idBooking) {
+        return parkingZoneService.getParkingLayout(idBooking);
     }
 }

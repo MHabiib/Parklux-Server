@@ -40,11 +40,16 @@ public class BookingServiceImpl implements BookingService {
         return ResponseEntity.ok(bookingRepository.findBookingBy(request));
     }
 
-    @Override public ResponseEntity findBookingCustomer(Principal principal, Integer page) {
+   /* @Override public ResponseEntity findBookingCustomer(Principal principal, Integer page) {
         Customer customer = customerRepository.findByEmail(principal.getName());
         PageRequest request = new PageRequest(page, 5, new Sort(Sort.Direction.ASC, "dateIn"));
         return ResponseEntity
             .ok(bookingRepository.findBookingByIdUser(customer.getIdCustomer(), request));
+    }*/
+
+    @Override public ResponseEntity findBookingCustomerNonPaging(Principal principal) {
+        Customer customer = customerRepository.findByEmail(principal.getName());
+        return ResponseEntity.ok(bookingRepository.findBookingByIdUser(customer.getIdCustomer()));
     }
 
     @Override
@@ -59,7 +64,7 @@ public class BookingServiceImpl implements BookingService {
         val idSlot = idSlotStr.substring(1, 25);
         Customer customer = customerRepository.findByEmail(principal.getName());
         ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(idSlot);
-        if (SCAN_ME.equals(parkingSlot.getStatus())) {
+        if (SLOT_SCAN_ME.equals(parkingSlot.getStatus())) {
             if (1 > bookingRepository.countAllByDateOutAndIdUser(null, customer.getIdCustomer())) {
                 parkingSlot.setStatus(BOOKED);
                 parkingSlotRepository.save(parkingSlot);
@@ -126,7 +131,7 @@ public class BookingServiceImpl implements BookingService {
                 bookingExist.setDateOut(Calendar.getInstance().getTimeInMillis());
                 bookingExist.setTotalTime(Long.toString(
                         getTotalTime(bookingExist.getDateIn(), bookingExist.getDateOut())));
-                parkingSlot.setStatus(AVAILABLE);
+                parkingSlot.setStatus(SLOT_EMPTY);
                 parkingSlotRepository.save(parkingSlot);
                 bookingRepository.save(bookingExist);
                 return ResponseEntity.ok().body(bookingExist);
