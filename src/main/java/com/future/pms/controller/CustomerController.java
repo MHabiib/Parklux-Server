@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.security.Principal;
 
-@CrossOrigin("**") @RestController @RequestMapping
-public class CustomerController {
+@CrossOrigin("**") @RestController @RequestMapping public class CustomerController {
     @Autowired CustomerService customerService;
 
     @GetMapping("/api/customer") public ResponseEntity loadAll(Integer page) {

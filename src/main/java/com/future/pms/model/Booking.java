@@ -15,6 +15,7 @@ import org.springframework.data.annotation.Id;
     private String address;
     private Double price;
     private String slotName;
+    private String levelName;
     private String totalTime;
     private Long dateIn;
     private Long dateOut;

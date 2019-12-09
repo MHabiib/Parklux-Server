@@ -11,6 +11,8 @@ import java.security.Principal;
 public interface ParkingZoneService {
     ResponseEntity loadAll(Integer page);
 
+    ResponseEntity getParkingZoneDetail(Principal principal);
+
     ResponseEntity createParkingZone(@RequestBody ParkingZone parkingZone);
 
     ResponseEntity addParkingLevel(@RequestBody String levelName, Principal principal);

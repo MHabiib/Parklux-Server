@@ -178,15 +178,13 @@ import static com.future.pms.Constants.MD_ALGORITHM_NOT_AVAILABLE;
             try {
                 digest = MessageDigest.getInstance("MD5");
             } catch (NoSuchAlgorithmException var5) {
-                throw new IllegalStateException(
-                    MD_ALGORITHM_NOT_AVAILABLE);
+                throw new IllegalStateException(MD_ALGORITHM_NOT_AVAILABLE);
             }
             try {
                 byte[] e = digest.digest(value.getBytes(StandardCharsets.UTF_8.name()));
                 return String.format("%032x", new BigInteger(1, e));
             } catch (UnsupportedEncodingException var4) {
-                throw new IllegalStateException(
-                    ENCODING_NO_AVAILABLE);
+                throw new IllegalStateException(ENCODING_NO_AVAILABLE);
             }
         }
     }

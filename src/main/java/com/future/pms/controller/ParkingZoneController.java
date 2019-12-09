@@ -20,6 +20,10 @@ public class ParkingZoneController {
         return ResponseEntity.ok(parkingZoneService.loadAll(page));
     }
 
+    @GetMapping("/detail") public ResponseEntity getParkingZoneDetail(Principal principal) {
+        return ResponseEntity.ok(parkingZoneService.getParkingZoneDetail(principal));
+    }
+
     @PostMapping public ResponseEntity createParkingZone(@RequestBody ParkingZone parkingZone) {
         return parkingZoneService.createParkingZone(parkingZone);
     }

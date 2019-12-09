@@ -39,8 +39,7 @@ import java.security.Principal;
         return bookingService.createBooking(principal, idSlot);
     }
 
-    @PostMapping("/checkout")
-    public ResponseEntity checkoutBooking(Principal principal) {
+    @PostMapping("/checkout") public ResponseEntity checkoutBooking(Principal principal) {
         return bookingService.checkoutBooking(principal);
     }
 

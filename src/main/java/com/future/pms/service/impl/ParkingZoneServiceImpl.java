@@ -46,6 +46,11 @@ import static com.future.pms.Utils.saveUploadedFile;
         return ResponseEntity.ok(parkingZoneRepository.findAllBy(request));
     }
 
+    @Override public ResponseEntity getParkingZoneDetail(Principal principal) {
+        return ResponseEntity
+            .ok(parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName()));
+    }
+
     @Override public ResponseEntity createParkingZone(ParkingZone parkingZone) {
         return null;
     }
@@ -119,21 +124,33 @@ import static com.future.pms.Utils.saveUploadedFile;
         ParkingLevel parkingLevel = parkingLevelRepository.findByIdLevel(idLevel);
         if (null != parkingLevel && slotsLayout.length() == TOTAL_SLOT_IN_LEVEL) {
             ArrayList<String> layout = parkingLevel.getSlotsLayout();
-            for (int i = 1; i < layout.size(); i++) {
-                layout.set(i, slotsLayout.charAt(i - 1) + layout.get(i).substring(1));
+            String existSlot = "";
+            String successCreateSlot = "";
+            for (int i = 0; i < layout.size(); i++) {
+                layout.set(i, slotsLayout.charAt(i) + layout.get(i).substring(1));
                 if (layout.get(i).contains(SLOT_EMPTY)) {
-                    ParkingSlot parkingSlot = new ParkingSlot();
-                    parkingSlot.setStatus(SLOT_EMPTY);
-                    parkingSlot.setIdLevel(parkingLevel.getIdLevel());
-                    parkingSlot.setIdParkingZone(parkingLevel.getIdParkingZone());
-                    parkingSlot.setSlotNumberInLayout(i);
-                    parkingSlot.setName(parkingLevel.getLevelName() + " " + i);
-                    parkingSlotRepository.save(parkingSlot);
+                    ParkingSlot parkingSlotExist = parkingSlotRepository
+                        .findByIdParkingZoneAndSlotNumberInLayout(parkingLevel.getIdParkingZone(),
+                            i);
+                    if (null == parkingSlotExist) {
+                        ParkingSlot parkingSlot = new ParkingSlot();
+                        parkingSlot.setStatus(SLOT_EMPTY);
+                        parkingSlot.setIdLevel(parkingLevel.getIdLevel());
+                        parkingSlot.setIdParkingZone(parkingLevel.getIdParkingZone());
+                        parkingSlot.setSlotNumberInLayout(i);
+                        parkingSlot.setName(parkingLevel.getLevelName() + " " + i + 1);
+                        parkingSlotRepository.save(parkingSlot);
+                        successCreateSlot += (i + ", ");
+                    } else {
+                        existSlot += (i + ", ");
+                    }
                 }
             }
             parkingLevel.setSlotsLayout(layout);
             parkingLevelRepository.save(parkingLevel);
-            return new ResponseEntity<>("Success", HttpStatus.OK);
+            return new ResponseEntity<>(
+                "Success create slot " + successCreateSlot + ", not update slot " + existSlot,
+                HttpStatus.OK);
         }
         return new ResponseEntity<>("Level not found !", HttpStatus.BAD_REQUEST);
     }
@@ -151,8 +168,9 @@ import static com.future.pms.Utils.saveUploadedFile;
         } else {
             newLayoutValue = SLOT_NULL;
         }
-        for (int i = 1; i < layout.size(); i++) {
-            if (layout.get(i).contains(sectionNumber)) {
+        for (int i = 0; i < layout.size(); i++) {
+            if (layout.get(i).contains(sectionNumber) && !layout.get(i).contains(SLOT_SCAN_ME)
+                && !layout.get(i).contains(SLOT_TAKEN)) {
                 layout.set(i, newLayoutValue + layout.get(i).substring(1));
                 totalUpdated++;
                 if (totalUpdated == TOTAL_SLOT_IN_SECTION) {
