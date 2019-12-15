@@ -6,6 +6,8 @@ import com.future.pms.model.parking.ParkingLevel;
 import com.future.pms.model.parking.ParkingSection;
 import com.future.pms.model.parking.ParkingSlot;
 import com.future.pms.model.parking.ParkingZone;
+import com.future.pms.model.request.ListLevelRequest;
+import com.future.pms.model.request.SectionDetailRequest;
 import com.future.pms.repository.*;
 import com.future.pms.service.ParkingZoneService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.future.pms.Constants.*;
 import static com.future.pms.Utils.checkImageFile;
@@ -80,15 +83,15 @@ import static com.future.pms.Utils.saveUploadedFile;
             parkingSection.setIdLevel(idLevel);
             parkingSection.setIdParkingZone(parkingLevel.getIdParkingZone());
             parkingSection.setIdParkingZone(parkingLevel.getIdParkingZone());
-            parkingSection.setSectionName(parkingLevel.getLevelName() + " Section " + i);
+            parkingSection.setSectionName("Section " + i);
             parkingSection.setStatus(NOT_ACTIVE);
             parkingSectionRepository.save(parkingSection);
         }
     }
 
     @Override public ResponseEntity updateParkingSection(String idSection) {
-        ParkingSection parkingSection =
-            parkingSectionRepository.findParkingSectionByIdSection(idSection);
+        ParkingSection parkingSection = parkingSectionRepository
+            .findParkingSectionByIdSection(idSection.substring(1, idSection.length() - 1));
         if (null != parkingSection) {
             switch (parkingSection.getStatus()) {
                 case NOT_ACTIVE: {
@@ -245,7 +248,21 @@ import static com.future.pms.Utils.saveUploadedFile;
         return new ResponseEntity<>("Parking Zone Updated", HttpStatus.OK);
     }
 
-    @Override public ResponseEntity getParkingLayout(String idBooking) {
+    @Override public ResponseEntity getLevels(Principal principal) {
+        List<ParkingLevel> parkingLevel = parkingLevelRepository.findByIdParkingZone(
+            parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName())
+                .getIdParkingZone());
+        ArrayList<ListLevelRequest> listLevelRequest = new ArrayList<>();
+        for (ParkingLevel level : parkingLevel) {
+            ListLevelRequest listLevel = new ListLevelRequest();
+            listLevel.setIdLevel(level.getIdLevel());
+            listLevel.setLevelName(level.getLevelName());
+            listLevelRequest.add(listLevel);
+        }
+        return new ResponseEntity<>(listLevelRequest, HttpStatus.OK);
+    }
+
+    @Override public ResponseEntity getParkingBookingLayout(String idBooking) {
         Booking booking = bookingRepository.findBookingByIdBooking(idBooking);
         if (null != booking) {
             ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(booking.getIdSlot());
@@ -263,6 +280,80 @@ import static com.future.pms.Utils.saveUploadedFile;
             return new ResponseEntity<>(layoutInString, HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Level not found !", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Override public ResponseEntity getParkingLevelLayout(String idLevel) {
+        ParkingLevel parkingLevel = parkingLevelRepository.findByIdLevel(idLevel);
+        StringBuilder layoutInString = new StringBuilder();
+        ArrayList<String> layout = parkingLevel.getSlotsLayout();
+        for (String s : layout) {
+            layoutInString.append(s.charAt(0));
+        }
+        return new ResponseEntity<>(layoutInString, HttpStatus.OK);
+    }
+
+    @Override public ResponseEntity getSectionDetails(String idLevel) {
+        ArrayList<SectionDetailRequest> sectionDetailRequests = new ArrayList<>();
+        SectionDetailRequest section1 = new SectionDetailRequest();
+        SectionDetailRequest section2 = new SectionDetailRequest();
+        SectionDetailRequest section3 = new SectionDetailRequest();
+        SectionDetailRequest section4 = new SectionDetailRequest();
+        section1.setSectionName(SECTION_ONE);
+        section1.setIdSection(
+            parkingSectionRepository.findParkingSectionBySectionNameAndIdLevel(SECTION_ONE, idLevel)
+                .getIdSection());
+        section2.setSectionName(SECTION_TWO);
+        section2.setIdSection(
+            parkingSectionRepository.findParkingSectionBySectionNameAndIdLevel(SECTION_TWO, idLevel)
+                .getIdSection());
+        section3.setSectionName(SECTION_THREE);
+        section3.setIdSection(parkingSectionRepository
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_THREE, idLevel).getIdSection());
+        section4.setSectionName(SECTION_FOUR);
+        section4.setIdSection(parkingSectionRepository
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_FOUR, idLevel).getIdSection());
+
+        ArrayList<String> layout = parkingLevelRepository.findByIdLevel(idLevel).getSlotsLayout();
+        for (String s : layout) {
+            if (Character.toString(s.charAt(1)).equals("1")) {
+                sectionDetail(section1, s);
+            }
+            if (Character.toString(s.charAt(1)).equals("2")) {
+                sectionDetail(section2, s);
+            }
+            if (Character.toString(s.charAt(1)).equals("3")) {
+                sectionDetail(section3, s);
+            }
+            if (Character.toString(s.charAt(1)).equals("4")) {
+                sectionDetail(section4, s);
+            }
+        }
+
+        sectionDetailRequests.add(section1);
+        sectionDetailRequests.add(section2);
+        sectionDetailRequests.add(section3);
+        sectionDetailRequests.add(section4);
+        return new ResponseEntity<>(sectionDetailRequests, HttpStatus.OK);
+    }
+
+    private void sectionDetail(SectionDetailRequest section, String s) {
+        if (!SLOT_NULL.equals(Character.toString(s.charAt(0)))) {
+            section.setStatus(ACTIVE);
+            switch (Character.toString(s.charAt(0))) {
+                case SLOT_TAKEN:
+                case SLOT_SCAN_ME:
+                    section.setTotalTakenSlot(section.getTotalTakenSlot() + 1);
+                    break;
+                case SLOT_EMPTY:
+                    section.setTotalEmptySlot(section.getTotalEmptySlot() + 1);
+                    break;
+                case SLOT_DISABLE:
+                    section.setTotalDisableSlot(section.getTotalDisableSlot() + 1);
+                    break;
+            }
+        } else {
+            section.setStatus(NOT_ACTIVE);
         }
     }
 

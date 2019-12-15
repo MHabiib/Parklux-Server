@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.future.pms.Constants.*;
 
@@ -41,15 +43,7 @@ import static com.future.pms.Constants.*;
             ParkingSlot parkingSlot =
                 listParkingSlot.get((int) (Math.random() * listParkingSlot.size()));
             if (SLOT_EMPTY.equals(parkingSlot.getStatus())) {
-                parkingSlot.setStatus(SLOT_SCAN_ME);
-                parkingSlotRepository.save(parkingSlot);
-                ParkingLevel parkingLevel =
-                    parkingLevelRepository.findByIdLevel(parkingSlot.getIdLevel());
-                ArrayList<String> layout = parkingLevel.getSlotsLayout();
-                layout.set(parkingSlot.getSlotNumberInLayout(),
-                    SLOT_SCAN_ME + layout.get(parkingSlot.getSlotNumberInLayout()).substring(1));
-                parkingLevel.setSlotsLayout(layout);
-                parkingLevelRepository.save(parkingLevel);
+                setLayout(SLOT_SCAN_ME, parkingSlot);
                 QR qr = new QR();
                 qr.setIdSlot(parkingSlot.getIdSlot());
                 ByteArrayOutputStream bout =
@@ -68,7 +62,29 @@ import static com.future.pms.Constants.*;
             } else {
                 return new ResponseEntity<>("Slot taken !", HttpStatus.BAD_REQUEST);
             }
+            expiredQrCountdown(parkingSlot);
             return new ResponseEntity<>("Parking Location " + parkingSlot.getName(), HttpStatus.OK);
         }
+    }
+
+    private void expiredQrCountdown(ParkingSlot parkingSlot) {
+        new Timer().schedule(new TimerTask() {
+            @Override public void run() {
+                if (SLOT_SCAN_ME.equals(parkingSlot.getStatus())) {
+                    setLayout(SLOT_EMPTY, parkingSlot);
+                }
+            }
+        }, 25000);
+    }
+
+    private void setLayout(String slotStatus, ParkingSlot parkingSlot) {
+        parkingSlot.setStatus(slotStatus);
+        parkingSlotRepository.save(parkingSlot);
+        ParkingLevel parkingLevel = parkingLevelRepository.findByIdLevel(parkingSlot.getIdLevel());
+        ArrayList<String> layout = parkingLevel.getSlotsLayout();
+        layout.set(parkingSlot.getSlotNumberInLayout(),
+            slotStatus + layout.get(parkingSlot.getSlotNumberInLayout()).substring(1));
+        parkingLevel.setSlotsLayout(layout);
+        parkingLevelRepository.save(parkingLevel);
     }
 }

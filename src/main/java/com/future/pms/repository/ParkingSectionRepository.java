@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository public interface ParkingSectionRepository
     extends MongoRepository<ParkingSection, String> {
     ParkingSection findParkingSectionByIdSection(String idSection);
+
+    ParkingSection findParkingSectionBySectionNameAndIdLevel(String sectionName, String idLevel);
 }

@@ -40,7 +40,7 @@ public class ParkingZoneController {
     }
 
     @PostMapping("/update-section")
-    public ResponseEntity addParkingSection(@RequestBody String idSection) {
+    public ResponseEntity updateParkingSection(@RequestBody String idSection) {
         return parkingZoneService.updateParkingSection(idSection);
     }
 
@@ -57,8 +57,22 @@ public class ParkingZoneController {
         return parkingZoneService.updateParkingZone(principal, file, parkingZoneJSON);
     }
 
+    @GetMapping("/levels") public ResponseEntity getLevels(Principal principal) {
+        return parkingZoneService.getLevels(principal);
+    }
+
     @GetMapping("/{idBooking}/parking-layout")
-    public ResponseEntity getParkingLayout(@PathVariable("idBooking") String idBooking) {
-        return parkingZoneService.getParkingLayout(idBooking);
+    public ResponseEntity getParkingBookingLayout(@PathVariable("idBooking") String idBooking) {
+        return parkingZoneService.getParkingBookingLayout(idBooking);
+    }
+
+    @GetMapping("/{idLevel}/level-layout")
+    public ResponseEntity getParkingLevelBookingLayout(@PathVariable("idLevel") String idLevel) {
+        return parkingZoneService.getParkingLevelLayout(idLevel);
+    }
+
+    @GetMapping("/{idLevel}/section-details")
+    public ResponseEntity getSectionDetails(@PathVariable("idLevel") String idLevel) {
+        return parkingZoneService.getSectionDetails(idLevel);
     }
 }

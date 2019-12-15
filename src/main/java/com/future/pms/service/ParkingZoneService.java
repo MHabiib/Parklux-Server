@@ -26,7 +26,13 @@ public interface ParkingZoneService {
     ResponseEntity updateParkingZone(Principal principal, MultipartFile file,
         String parkingZoneJSON) throws IOException;
 
-    ResponseEntity getParkingLayout(String idBooking);
+    ResponseEntity getLevels(Principal principal);
+
+    ResponseEntity getParkingBookingLayout(String idBooking);
+
+    ResponseEntity getParkingLevelLayout(String idLevel);
+
+    ResponseEntity getSectionDetails(String idLevel);
 
     ResponseEntity getImage(String imageName) throws IOException;
 }

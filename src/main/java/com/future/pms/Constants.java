@@ -36,6 +36,11 @@ public class Constants {
     public static final String SLOT_SCAN_ME = "S";
     public static final String LEVEL_AVAILABLE = "A";
 
+    public static final String SECTION_ONE = "Section 1";
+    public static final String SECTION_TWO = "Section 2";
+    public static final String SECTION_THREE = "Section 3";
+    public static final String SECTION_FOUR = "Section 4";
+
     public static final String UPLOADED_FOLDER = "../assets/";
 
     public static final String CUSTOMER = "CUSTOMER";
