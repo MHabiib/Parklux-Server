@@ -12,13 +12,15 @@ import net.glxn.qrgen.core.image.ImageType;
 import net.glxn.qrgen.javase.QRCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import javax.activation.FileTypeMap;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -86,5 +88,13 @@ import static com.future.pms.Constants.*;
             slotStatus + layout.get(parkingSlot.getSlotNumberInLayout()).substring(1));
         parkingLevel.setSlotsLayout(layout);
         parkingLevelRepository.save(parkingLevel);
+    }
+
+    @Override public ResponseEntity getImage(String imageName) throws IOException {
+        Path path = Paths.get(FILE_LOCATION + imageName);
+        File img = new File(String.valueOf(path));
+        String mimetype = FileTypeMap.getDefaultFileTypeMap().getContentType(img);
+        return ResponseEntity.ok().contentType(MediaType.valueOf(mimetype))
+            .body(Files.readAllBytes(img.toPath()));
     }
 }

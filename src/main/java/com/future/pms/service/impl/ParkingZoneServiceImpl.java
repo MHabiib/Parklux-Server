@@ -124,6 +124,7 @@ import static com.future.pms.Utils.saveUploadedFile;
     }
 
     @Override public ResponseEntity updateLevel(String idLevel, String slotsLayout) {
+        slotsLayout = slotsLayout.substring(1, slotsLayout.length() - 1);
         ParkingLevel parkingLevel = parkingLevelRepository.findByIdLevel(idLevel);
         if (null != parkingLevel && slotsLayout.length() == TOTAL_SLOT_IN_LEVEL) {
             ArrayList<String> layout = parkingLevel.getSlotsLayout();
@@ -131,11 +132,16 @@ import static com.future.pms.Utils.saveUploadedFile;
             String successCreateSlot = "";
             for (int i = 0; i < layout.size(); i++) {
                 layout.set(i, slotsLayout.charAt(i) + layout.get(i).substring(1));
+                ParkingSlot parkingSlotExist = parkingSlotRepository
+                    .findByIdParkingZoneAndSlotNumberInLayout(parkingLevel.getIdParkingZone(), i);
+                if (null != parkingSlotExist) {
+                    parkingSlotExist.setStatus(Character.toString(slotsLayout.charAt(i)));
+                    parkingSlotRepository.save(parkingSlotExist);
+                }
                 if (layout.get(i).contains(SLOT_EMPTY)) {
-                    ParkingSlot parkingSlotExist = parkingSlotRepository
+                    if (null == parkingSlotRepository
                         .findByIdParkingZoneAndSlotNumberInLayout(parkingLevel.getIdParkingZone(),
-                            i);
-                    if (null == parkingSlotExist) {
+                            i)) {
                         ParkingSlot parkingSlot = new ParkingSlot();
                         parkingSlot.setStatus(SLOT_EMPTY);
                         parkingSlot.setIdLevel(parkingLevel.getIdLevel());

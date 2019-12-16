@@ -46,7 +46,7 @@ public class Constants {
     public static final String CUSTOMER = "CUSTOMER";
     public static final String ADMIN = "ADMIN";
     public static final String OPEN_HOUR = "-- : -- / -- : --";
-    public static final String FILE_LOCATION = "../tmp/";
+    public static final String FILE_LOCATION = "../qr/";
     public static final String SLOT_UPDATED = "Slot Updated";
     public static final String PARKING_ZONE_NOT_FOUND = "Parking zone not found !";
 
