@@ -17,6 +17,12 @@ import java.util.List;
 
     //    Page<Booking> findBookingByIdUser(String idUser, Pageable pageable);
 
+    Page<Booking> findBookingByIdParkingZoneAndDateOut(String idParkingZone, Long dateOut,
+        Pageable pageable);
+
+    Page<Booking> findBookingByIdParkingZoneAndDateOutNotNull(String idParkingZone,
+        Pageable pageable);
+
     Booking findBookingByIdUserAndDateOut(String idUser, Long dateOut);
 
     Integer countAllByDateOutAndIdUser(Long dateOut, String idUser);

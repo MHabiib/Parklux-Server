@@ -9,15 +9,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.security.Principal;
 
-@RestController @RequestMapping("api/qr") public class GenerateQRController {
+@RestController @RequestMapping public class GenerateQRController {
     @Autowired GenerateQRService generateQRService;
 
-    @GetMapping private ResponseEntity generateQr(String idParkingZone) {
-        return generateQRService.generateQR(idParkingZone);
+    @GetMapping("api/qr") private ResponseEntity generateQr(Principal principal) {
+        return generateQRService.generateQR(principal);
     }
 
-    @GetMapping(value = "/{imageName:.+}")
+    @GetMapping(value = "qr/{imageName:.+}")
     public ResponseEntity getQrImage(@PathVariable("imageName") String imageName)
         throws IOException {
         return generateQRService.getImage(imageName);

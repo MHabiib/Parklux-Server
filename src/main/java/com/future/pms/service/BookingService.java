@@ -12,6 +12,10 @@ public interface BookingService {
 
     //    ResponseEntity findBookingCustomer(Principal principal, Integer page);
 
+    ResponseEntity findOngoingBookingParkingZone(Principal principal, Integer page);
+
+    ResponseEntity findPastBookingParkingZone(Principal principal, Integer page);
+
     ResponseEntity findBookingCustomerNonPaging(Principal principal);
 
     ResponseEntity findOngoingBookingCustomer(Principal principal);

@@ -21,6 +21,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -33,14 +34,16 @@ import static com.future.pms.Constants.*;
     @Autowired ParkingSlotRepository parkingSlotRepository;
     @Autowired ParkingLevelRepository parkingLevelRepository;
 
-    @Override public ResponseEntity generateQR(String idParkingZone) {
+    @Override public ResponseEntity generateQR(Principal principal) {
+        String filename = "";
         ParkingZone parkingZoneExist =
-            parkingZoneRepository.findParkingZoneByIdParkingZone(idParkingZone);
+            parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
         List<ParkingSlot> listParkingSlot = parkingSlotRepository
             .findAllByIdParkingZoneAndStatus(parkingZoneExist.getIdParkingZone(), SLOT_EMPTY);
         if (null == listParkingSlot || listParkingSlot.size() == 0)
             return new ResponseEntity<>(
-                "Parking Zone on " + parkingZoneExist.getName() + " already full !", HttpStatus.OK);
+                "Parking Zone on " + parkingZoneExist.getName() + " already full !",
+                HttpStatus.BAD_REQUEST);
         else {
             ParkingSlot parkingSlot =
                 listParkingSlot.get((int) (Math.random() * listParkingSlot.size()));
@@ -51,32 +54,33 @@ import static com.future.pms.Constants.*;
                 ByteArrayOutputStream bout =
                     QRCode.from(String.valueOf(qr)).withSize(250, 250).to(ImageType.PNG).stream();
                 try {
-                    OutputStream out = new FileOutputStream(
-                        FILE_LOCATION + parkingZoneExist.getName() + " - " + parkingSlot.getName()
-                            + ".png");
+                    filename = parkingZoneExist.getName().replaceAll("\\s+", "") + "-" + parkingSlot
+                        .getName().replaceAll("\\s+", "") + ".png";
+                    OutputStream out = new FileOutputStream(FILE_LOCATION + filename);
                     bout.writeTo(out);
                     out.flush();
                     out.close();
-
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             } else {
                 return new ResponseEntity<>("Slot taken !", HttpStatus.BAD_REQUEST);
             }
-            expiredQrCountdown(parkingSlot);
-            return new ResponseEntity<>("Parking Location " + parkingSlot.getName(), HttpStatus.OK);
+            expiredQrCountdown(parkingSlot.getIdSlot());
+            return new ResponseEntity<>(filename, HttpStatus.OK);
+
         }
     }
 
-    private void expiredQrCountdown(ParkingSlot parkingSlot) {
+    private void expiredQrCountdown(String idSlot) {
         new Timer().schedule(new TimerTask() {
             @Override public void run() {
+                ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(idSlot);
                 if (SLOT_SCAN_ME.equals(parkingSlot.getStatus())) {
                     setLayout(SLOT_EMPTY, parkingSlot);
                 }
             }
-        }, 25000);
+        }, 23000);
     }
 
     private void setLayout(String slotStatus, ParkingSlot parkingSlot) {

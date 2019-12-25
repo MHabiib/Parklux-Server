@@ -66,7 +66,7 @@ import static com.future.pms.Utils.saveUploadedFile;
             ParkingLevel parkingLevel = new ParkingLevel();
             parkingLevel.setIdParkingZone(parkingZoneExist.getIdParkingZone());
             parkingLevel.setSlotsLayout(SLOTS);
-            parkingLevel.setLevelName(levelName);
+            parkingLevel.setLevelName(levelName.substring(1, levelName.length() - 1));
             parkingLevel.setStatus(LEVEL_AVAILABLE);
             parkingLevelRepository.save(parkingLevel);
             addSection(parkingLevel.getIdLevel());
@@ -291,12 +291,16 @@ import static com.future.pms.Utils.saveUploadedFile;
 
     @Override public ResponseEntity getParkingLevelLayout(String idLevel) {
         ParkingLevel parkingLevel = parkingLevelRepository.findByIdLevel(idLevel);
-        StringBuilder layoutInString = new StringBuilder();
-        ArrayList<String> layout = parkingLevel.getSlotsLayout();
-        for (String s : layout) {
-            layoutInString.append(s.charAt(0));
+        if (null != parkingLevel) {
+            StringBuilder layoutInString = new StringBuilder();
+            ArrayList<String> layout = parkingLevel.getSlotsLayout();
+            for (String s : layout) {
+                layoutInString.append(s.charAt(0));
+            }
+            return new ResponseEntity<>(layoutInString, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Parking zone not found", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(layoutInString, HttpStatus.OK);
     }
 
     @Override public ResponseEntity getSectionDetails(String idLevel) {

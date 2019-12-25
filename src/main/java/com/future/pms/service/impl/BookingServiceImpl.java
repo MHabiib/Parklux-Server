@@ -54,14 +54,33 @@ import static com.future.pms.Utils.getTotalTime;
             .ok(bookingRepository.findBookingByIdUserAndDateOut(customer.getIdCustomer(), null));
     }
 
+    @Override
+    public ResponseEntity findOngoingBookingParkingZone(Principal principal, Integer page) {
+        ParkingZone parkingZone =
+            parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
+        PageRequest request = new PageRequest(page, 10, new Sort(Sort.Direction.DESC, "dateIn"));
+        return ResponseEntity.ok(bookingRepository
+            .findBookingByIdParkingZoneAndDateOut(parkingZone.getIdParkingZone(), null, request));
+    }
+
+    @Override public ResponseEntity findPastBookingParkingZone(Principal principal, Integer page) {
+        ParkingZone parkingZone =
+            parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
+        PageRequest request = new PageRequest(page, 10, new Sort(Sort.Direction.DESC, "dateIn"));
+        return ResponseEntity.ok(bookingRepository
+            .findBookingByIdParkingZoneAndDateOutNotNull(parkingZone.getIdParkingZone(), request));
+    }
+
     @Override public ResponseEntity createBooking(Principal principal, String idSlotStr) {
         val idSlot = idSlotStr.substring(1, 25);
         Customer customer = customerRepository.findByEmail(principal.getName());
         ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(idSlot);
-        if (SLOT_SCAN_ME.equals(parkingSlot.getStatus())) {
+        if (null != customer && null != parkingSlot && SLOT_SCAN_ME
+            .equals(parkingSlot.getStatus())) {
             if (1 > bookingRepository.countAllByDateOutAndIdUser(null, customer.getIdCustomer())) {
                 parkingSlot.setStatus(SLOT_TAKEN);
                 parkingSlotRepository.save(parkingSlot);
+                setupParkingLayout(parkingSlot, SLOT_TAKEN);
                 ParkingZone parkingZone = parkingZoneRepository
                     .findParkingZoneByIdParkingZone(parkingSlot.getIdParkingZone());
                 Booking bookingParking = new Booking();
@@ -74,6 +93,8 @@ import static com.future.pms.Utils.getTotalTime;
                 bookingParking.setLevelName(
                     parkingLevelRepository.findByIdLevel(parkingSlot.getIdLevel()).getLevelName());
                 bookingParking.setIdUser(customer.getIdCustomer());
+                bookingParking.setCustomerName(customer.getName());
+                bookingParking.setCustomerPhone(customer.getPhoneNumber());
                 bookingParking.setIdSlot(idSlot);
                 bookingParking.setDateIn(Calendar.getInstance().getTimeInMillis());
                 bookingRepository.save(bookingParking);
@@ -97,8 +118,7 @@ import static com.future.pms.Utils.getTotalTime;
         receipt.setTotalHours(getTotalHours(booking.getTotalTime(), receipt.getTotalMinutes()));
         receipt.setDateIn(booking.getDateIn());
         receipt.setDateOut(booking.getDateOut());
-        receipt.setTotalPrice(
-            getTotalPrice(receipt.getTotalMinutes(), receipt.getTotalHours(), booking.getPrice()));
+        receipt.setTotalPrice(booking.getTotalPrice());
         return ResponseEntity.ok().body(receipt);
     }
 
@@ -113,7 +133,7 @@ import static com.future.pms.Utils.getTotalTime;
     private String getTotalPrice(int totalMinutes, int totalHours, Double price) {
         if (totalMinutes != 0)
             totalHours += 1;
-        return String.valueOf(totalHours * price);
+        return (String.valueOf(totalHours * price)).split("\\.")[0];
     }
 
     @Override public ResponseEntity checkoutBooking(Principal principal) {
@@ -127,20 +147,27 @@ import static com.future.pms.Utils.getTotalTime;
                 bookingExist.setDateOut(Calendar.getInstance().getTimeInMillis());
                 bookingExist.setTotalTime(Long.toString(
                     getTotalTime(bookingExist.getDateIn(), bookingExist.getDateOut())));
+                bookingExist.setTotalPrice(
+                    getTotalPrice(getTotalMinute(bookingExist.getTotalTime()),
+                        getTotalHours(bookingExist.getTotalTime(),
+                            getTotalMinute(bookingExist.getTotalTime())), bookingExist.getPrice()));
                 parkingSlot.setStatus(SLOT_EMPTY);
                 parkingSlotRepository.save(parkingSlot);
                 bookingRepository.save(bookingExist);
-                ParkingLevel parkingLevel =
-                    parkingLevelRepository.findByIdLevel(parkingSlot.getIdLevel());
-                ArrayList<String> layout = parkingLevel.getSlotsLayout();
-                layout.set(parkingSlot.getSlotNumberInLayout(),
-                    SLOT_EMPTY + layout.get(parkingSlot.getSlotNumberInLayout()).substring(1));
-                parkingLevel.setSlotsLayout(layout);
-                parkingLevelRepository.save(parkingLevel);
+                setupParkingLayout(parkingSlot, SLOT_EMPTY);
                 return ResponseEntity.ok().body(bookingExist);
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    private void setupParkingLayout(ParkingSlot parkingSlot, String slotEmpty) {
+        ParkingLevel parkingLevel = parkingLevelRepository.findByIdLevel(parkingSlot.getIdLevel());
+        ArrayList<String> layout = parkingLevel.getSlotsLayout();
+        layout.set(parkingSlot.getSlotNumberInLayout(),
+            slotEmpty + layout.get(parkingSlot.getSlotNumberInLayout()).substring(1));
+        parkingLevel.setSlotsLayout(layout);
+        parkingLevelRepository.save(parkingLevel);
     }
 
     @Override public ResponseEntity<Booking> updateBooking(String id, Booking booking) {

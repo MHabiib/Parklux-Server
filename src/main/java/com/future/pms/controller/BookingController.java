@@ -24,6 +24,16 @@ import java.security.Principal;
         return bookingService.findBookingCustomer(principal, page);
     }*/
 
+    @GetMapping("/ongoing/parking-zone")
+    public ResponseEntity findOngoingBookingParkingZone(Principal principal, Integer page) {
+        return bookingService.findOngoingBookingParkingZone(principal, page);
+    }
+
+    @GetMapping("/past/parking-zone")
+    public ResponseEntity findPastBookingParkingZone(Principal principal, Integer page) {
+        return bookingService.findPastBookingParkingZone(principal, page);
+    }
+
     @GetMapping("/customer/ongoing")
     public ResponseEntity findOngoingBookingCustomer(Principal principal) {
         return bookingService.findOngoingBookingCustomer(principal);
