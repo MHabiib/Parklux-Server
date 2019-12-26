@@ -143,7 +143,8 @@ import static com.future.pms.Utils.getTotalTime;
                 .getIdBooking());
         if (null != bookingExist) {
             ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(bookingExist.getIdSlot());
-            if (SLOT_TAKEN.equals(parkingSlot.getStatus())) {
+            if (SLOT_TAKEN.equals(parkingSlot.getStatus()) || SLOT_TAKEN
+                .equals(parkingSlot.getStatus().substring(parkingSlot.getStatus().length() - 1))) {
                 bookingExist.setDateOut(Calendar.getInstance().getTimeInMillis());
                 bookingExist.setTotalTime(Long.toString(
                     getTotalTime(bookingExist.getDateIn(), bookingExist.getDateOut())));

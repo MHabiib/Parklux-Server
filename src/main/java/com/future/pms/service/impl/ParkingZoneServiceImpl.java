@@ -374,4 +374,33 @@ import static com.future.pms.Utils.saveUploadedFile;
         return ResponseEntity.ok().contentType(MediaType.valueOf(mimetype))
             .body(Files.readAllBytes(img.toPath()));
     }
+
+    @Override public ResponseEntity editModeParkingLevel(String idLevel) {
+        ParkingLevel parkingLevel = parkingLevelRepository.findByIdLevel(idLevel);
+        if (null != parkingLevel) {
+            List<ParkingSlot> parkingSlotList = parkingSlotRepository.findAllByIdLevel(idLevel);
+            if (parkingLevel.getStatus().equals(LEVEL_AVAILABLE)) {
+                if (null != parkingSlotList) {
+                    for (ParkingSlot parkingSlot : parkingSlotList) {
+                        parkingSlot.setStatus(
+                            String.format("%s-%s", LEVEL_ON_EDIT, parkingSlot.getStatus()));
+                        parkingSlotRepository.save(parkingSlot);
+                    }
+                }
+                parkingLevel.setStatus(LEVEL_ON_EDIT);
+            } else {
+                if (null != parkingSlotList) {
+                    for (ParkingSlot parkingSlot : parkingSlotList) {
+                        parkingSlot.setStatus(parkingSlot.getStatus()
+                            .substring(parkingSlot.getStatus().length() - 1));
+                        parkingSlotRepository.save(parkingSlot);
+                    }
+                }
+                parkingLevel.setStatus(LEVEL_AVAILABLE);
+            }
+            parkingLevelRepository.save(parkingLevel);
+            return new ResponseEntity<>("Success change level mode", HttpStatus.OK);
+        } else
+            return new ResponseEntity<>("Parking zone not found", HttpStatus.BAD_REQUEST);
+    }
 }

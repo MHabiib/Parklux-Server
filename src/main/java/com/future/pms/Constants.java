@@ -34,6 +34,7 @@ public class Constants {
     public static final String SLOT_NULL = "_";
     public static final String SLOT_READY = "O";
     public static final String SLOT_SCAN_ME = "S";
+    public static final String LEVEL_ON_EDIT = "X";
     public static final String LEVEL_AVAILABLE = "A";
 
     public static final String SECTION_ONE = "Section 1";

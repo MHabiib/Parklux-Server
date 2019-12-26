@@ -2,6 +2,7 @@ package com.future.pms.service;
 
 import com.future.pms.model.parking.ParkingZone;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,4 +36,6 @@ public interface ParkingZoneService {
     ResponseEntity getSectionDetails(String idLevel);
 
     ResponseEntity getImage(String imageName) throws IOException;
+
+    ResponseEntity editModeParkingLevel(@PathVariable("id") String idLevel);
 }

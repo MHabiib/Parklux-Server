@@ -10,6 +10,8 @@ import java.util.List;
 @Repository public interface ParkingSlotRepository extends MongoRepository<ParkingSlot, String> {
     List<ParkingSlot> findAllByIdParkingZoneAndStatus(String idParkingZone, String status);
 
+    List<ParkingSlot> findAllByIdLevel(String idLevel);
+
     ParkingSlot findByIdSlot(String idSlot);
 
     ParkingSlot findByIdParkingZoneAndSlotNumberInLayout(String idParkingZone, int slotNumber);
