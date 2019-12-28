@@ -5,9 +5,7 @@ import com.future.pms.service.ParkingZoneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -52,9 +50,8 @@ public class ParkingZoneController {
 
     @PutMapping(value = "update-zone", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateParkingZone(Principal principal,
-        @Nullable @RequestPart("file") MultipartFile file,
         @RequestPart("parkingZone") String parkingZoneJSON) throws IOException {
-        return parkingZoneService.updateParkingZone(principal, file, parkingZoneJSON);
+        return parkingZoneService.updateParkingZone(principal, parkingZoneJSON);
     }
 
     @GetMapping("/levels") public ResponseEntity getLevels(Principal principal) {

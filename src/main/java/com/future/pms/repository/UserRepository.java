@@ -12,4 +12,6 @@ import java.util.List;
     User findByEmail(String email);
 
     User findByIdUser(String idUser);
+
+    Integer countByEmail(String email);
 }

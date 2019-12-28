@@ -43,6 +43,10 @@ import java.security.Principal;
             return new ResponseEntity<>("Error update customer", HttpStatus.BAD_REQUEST);
         customer.setName(updatedCustomer.getName());
         customer.setPhoneNumber(updatedCustomer.getPhoneNumber());
+        if (!customer.getEmail().equals(updatedCustomer.getEmail())
+            && userRepository.countByEmail(updatedCustomer.getEmail()) > 0) {
+            return new ResponseEntity<>("Error update customer", HttpStatus.BAD_REQUEST);
+        }
         customer.setEmail(updatedCustomer.getEmail());
         user.setEmail(updatedCustomer.getEmail());
         if (!"".equals(updatedCustomer.getPassword())) {

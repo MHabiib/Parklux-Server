@@ -45,7 +45,7 @@ public class Constants {
     public static final String EDIT_MODE = "EditMode";
     public static final String EXIT_EDIT_MODE = "ExitEditMode";
 
-    public static final String UPLOADED_FOLDER = "../assets/";
+    public static final String UPLOADED_FOLDER = "../assets/parkingZone";
 
     public static final String CUSTOMER = "CUSTOMER";
     public static final String ADMIN = "ADMIN";

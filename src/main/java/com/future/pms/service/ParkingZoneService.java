@@ -2,7 +2,6 @@ package com.future.pms.service;
 
 import com.future.pms.model.parking.ParkingZone;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -22,8 +21,8 @@ public interface ParkingZoneService {
 
     ResponseEntity updateLevel(String idLevel, String slotsLayout);
 
-    ResponseEntity updateParkingZone(Principal principal, MultipartFile file,
-        String parkingZoneJSON) throws IOException;
+    ResponseEntity updateParkingZone(Principal principal, String parkingZoneJSON)
+        throws IOException;
 
     ResponseEntity getLevels(Principal principal);
 
