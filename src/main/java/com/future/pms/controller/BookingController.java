@@ -15,14 +15,10 @@ import java.security.Principal;
         return ResponseEntity.ok(bookingService.loadAll(page));
     }
 
-    @GetMapping("/customer") public ResponseEntity findBookingCustomer(Principal principal) {
-        return bookingService.findBookingCustomerNonPaging(principal);
-    }
-
-    /*@GetMapping("/customer")
+    @GetMapping("/customer")
     public ResponseEntity findBookingCustomerPaging(Principal principal, Integer page) {
         return bookingService.findBookingCustomer(principal, page);
-    }*/
+    }
 
     @GetMapping("/ongoing/parking-zone")
     public ResponseEntity findOngoingBookingParkingZone(Principal principal, Integer page) {

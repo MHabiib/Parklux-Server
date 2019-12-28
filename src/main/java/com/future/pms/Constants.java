@@ -42,6 +42,9 @@ public class Constants {
     public static final String SECTION_THREE = "Section 3";
     public static final String SECTION_FOUR = "Section 4";
 
+    public static final String EDIT_MODE = "EditMode";
+    public static final String EXIT_EDIT_MODE = "ExitEditMode";
+
     public static final String UPLOADED_FOLDER = "../assets/";
 
     public static final String CUSTOMER = "CUSTOMER";

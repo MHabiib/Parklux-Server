@@ -76,11 +76,12 @@ import static com.future.pms.Constants.*;
         new Timer().schedule(new TimerTask() {
             @Override public void run() {
                 ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(idSlot);
-                if (SLOT_SCAN_ME.equals(parkingSlot.getStatus())) {
+                if (SLOT_SCAN_ME.equals(
+                    parkingSlot.getStatus().substring(parkingSlot.getStatus().length() - 1))) {
                     setLayout(SLOT_EMPTY, parkingSlot);
                 }
             }
-        }, 23000);
+        }, 22000);
     }
 
     private void setLayout(String slotStatus, ParkingSlot parkingSlot) {

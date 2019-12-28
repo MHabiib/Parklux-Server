@@ -76,8 +76,9 @@ public class ParkingZoneController {
         return parkingZoneService.getSectionDetails(idLevel);
     }
 
-    @PostMapping("/level/edit-mode/{id}")
-    public ResponseEntity editModeParkingLevel(@PathVariable("id") String idLevel) {
-        return parkingZoneService.editModeParkingLevel(idLevel);
+    @PostMapping("/level/edit-mode/{id}/{mode}")
+    public ResponseEntity editModeParkingLevel(@PathVariable("id") String idLevel,
+        @PathVariable("mode") String mode) {
+        return parkingZoneService.editModeParkingLevel(idLevel, mode);
     }
 }

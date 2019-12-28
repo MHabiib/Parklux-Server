@@ -2,8 +2,6 @@ package com.future.pms.service;
 
 import com.future.pms.model.parking.ParkingZone;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -14,13 +12,13 @@ public interface ParkingZoneService {
 
     ResponseEntity getParkingZoneDetail(Principal principal);
 
-    ResponseEntity createParkingZone(@RequestBody ParkingZone parkingZone);
+    ResponseEntity createParkingZone(ParkingZone parkingZone);
 
-    ResponseEntity addParkingLevel(@RequestBody String levelName, Principal principal);
+    ResponseEntity addParkingLevel(String levelName, Principal principal);
 
-    ResponseEntity updateParkingSlot(@RequestBody String idParkingSlot, @RequestBody String status);
+    ResponseEntity updateParkingSlot(String idParkingSlot, String status);
 
-    ResponseEntity updateParkingSection(@RequestBody String idSection);
+    ResponseEntity updateParkingSection(String idSection);
 
     ResponseEntity updateLevel(String idLevel, String slotsLayout);
 
@@ -37,5 +35,5 @@ public interface ParkingZoneService {
 
     ResponseEntity getImage(String imageName) throws IOException;
 
-    ResponseEntity editModeParkingLevel(@PathVariable("id") String idLevel);
+    ResponseEntity editModeParkingLevel(String idLevel, String mode);
 }

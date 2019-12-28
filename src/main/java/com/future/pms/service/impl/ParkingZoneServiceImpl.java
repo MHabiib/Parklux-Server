@@ -375,11 +375,11 @@ import static com.future.pms.Utils.saveUploadedFile;
             .body(Files.readAllBytes(img.toPath()));
     }
 
-    @Override public ResponseEntity editModeParkingLevel(String idLevel) {
+    @Override public ResponseEntity editModeParkingLevel(String idLevel, String mode) {
         ParkingLevel parkingLevel = parkingLevelRepository.findByIdLevel(idLevel);
         if (null != parkingLevel) {
             List<ParkingSlot> parkingSlotList = parkingSlotRepository.findAllByIdLevel(idLevel);
-            if (parkingLevel.getStatus().equals(LEVEL_AVAILABLE)) {
+            if (mode.equals(EDIT_MODE)) {
                 if (null != parkingSlotList) {
                     for (ParkingSlot parkingSlot : parkingSlotList) {
                         parkingSlot.setStatus(
@@ -389,7 +389,7 @@ import static com.future.pms.Utils.saveUploadedFile;
                 }
                 parkingLevel.setStatus(LEVEL_ON_EDIT);
             } else {
-                if (null != parkingSlotList) {
+                if (mode.equals(EXIT_EDIT_MODE)) {
                     for (ParkingSlot parkingSlot : parkingSlotList) {
                         parkingSlot.setStatus(parkingSlot.getStatus()
                             .substring(parkingSlot.getStatus().length() - 1));
