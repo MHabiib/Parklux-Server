@@ -1,6 +1,7 @@
 package com.future.pms.controller;
 
 import com.future.pms.model.parking.ParkingZone;
+import com.future.pms.model.request.LevelDetailsRequest;
 import com.future.pms.service.ParkingZoneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -52,6 +53,12 @@ public class ParkingZoneController {
     public ResponseEntity updateParkingZone(Principal principal,
         @RequestPart("parkingZone") String parkingZoneJSON) throws IOException {
         return parkingZoneService.updateParkingZone(principal, parkingZoneJSON);
+    }
+
+    @PutMapping("update-level")
+    public ResponseEntity updateParkingLevel(@RequestBody LevelDetailsRequest levelDetailsRequest,
+        Principal principal) {
+        return parkingZoneService.updateParkingLevel(levelDetailsRequest, principal);
     }
 
     @GetMapping("/levels") public ResponseEntity getLevels(Principal principal) {

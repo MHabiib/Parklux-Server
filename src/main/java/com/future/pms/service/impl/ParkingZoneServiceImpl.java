@@ -7,6 +7,7 @@ import com.future.pms.model.parking.ParkingLevel;
 import com.future.pms.model.parking.ParkingSection;
 import com.future.pms.model.parking.ParkingSlot;
 import com.future.pms.model.parking.ParkingZone;
+import com.future.pms.model.request.LevelDetailsRequest;
 import com.future.pms.model.request.ListLevelRequest;
 import com.future.pms.model.request.SectionDetailRequest;
 import com.future.pms.model.request.UpdateParkingZoneRequest;
@@ -268,15 +269,85 @@ import static com.future.pms.Constants.*;
         return new ResponseEntity<>(parkingZoneExist, HttpStatus.OK);
     }
 
+    @Override public ResponseEntity updateParkingLevel(LevelDetailsRequest levelDetailsRequest,
+        Principal principal) {
+        ParkingLevel parkingLevel =
+            parkingLevelRepository.findByIdLevel(levelDetailsRequest.getIdLevel());
+        List<ParkingSlot> parkingSlotList =
+            parkingSlotRepository.findAllByIdLevel(parkingLevel.getIdLevel());
+        switch (levelDetailsRequest.getStatus()) {
+            case LEVEL_AVAILABLE: {
+                if (levelDetailsRequest.getLevelName().equals("")) {
+                    levelDetailsRequest.setLevelName(parkingLevel.getLevelName());
+                }
+                if (!parkingLevel.getStatus().equals(levelDetailsRequest.getStatus())
+                    && null != parkingSlotList) {
+                    for (ParkingSlot parkingSlot : parkingSlotList) {
+                        parkingSlot.setStatus(parkingSlot.getStatus()
+                            .substring(parkingSlot.getStatus().length() - 1));
+                        parkingSlotRepository.save(parkingSlot);
+                    }
+                }
+                if (levelDetailsRequest.getLevelName().equals(parkingLevel.getLevelName())) {
+                    levelDetailsRequest.setLevelName(levelDetailsRequest.getLevelName()
+                        .substring(0, levelDetailsRequest.getLevelName().length() - 14));
+                }
+                parkingLevel.setLevelName(levelDetailsRequest.getLevelName());
+                parkingLevel.setStatus(LEVEL_AVAILABLE);
+                parkingLevelRepository.save(parkingLevel);
+                return new ResponseEntity<>("Success", HttpStatus.OK);
+            }
+            case LEVEL_UNAVAILABLE: {
+                if (levelDetailsRequest.getLevelName().equals("")) {
+                    levelDetailsRequest.setLevelName(parkingLevel.getLevelName());
+                }
+                parkingLevel.setLevelName(levelDetailsRequest.getLevelName() + " - Unavailable");
+                if (!parkingLevel.getStatus().equals(levelDetailsRequest.getStatus())
+                    && null != parkingSlotList) {
+                    for (ParkingSlot parkingSlot : parkingSlotList) {
+                        if (parkingSlot.getStatus().equals(SLOT_TAKEN) || parkingSlot.getStatus()
+                            .equals(SLOT_SCAN_ME)) {
+                            return new ResponseEntity<>("There are ongoing parking",
+                                HttpStatus.BAD_REQUEST);
+                        }
+                        parkingSlot.setStatus(
+                            String.format("%s-%s", LEVEL_UNAVAILABLE, parkingSlot.getStatus()));
+                        parkingSlotRepository.save(parkingSlot);
+                    }
+                }
+                parkingLevel.setStatus(LEVEL_UNAVAILABLE);
+                parkingLevelRepository.save(parkingLevel);
+                return new ResponseEntity<>("Success", HttpStatus.OK);
+            }
+            case LEVEL_TAKE_OUT: {
+                for (ParkingSlot parkingSlot : parkingSlotList) {
+                    if (parkingSlot.getStatus().equals(SLOT_TAKEN) || parkingSlot.getStatus()
+                        .equals(SLOT_SCAN_ME)) {
+                        return new ResponseEntity<>("There are ongoing parking",
+                            HttpStatus.BAD_REQUEST);
+                    }
+                }
+                parkingSectionRepository.deleteAll(parkingSectionRepository
+                    .findParkingSectionByIdLevel(parkingLevel.getIdLevel()));
+                parkingSlotRepository.deleteAll(parkingSlotList);
+                parkingLevelRepository.delete(parkingLevel);
+                return new ResponseEntity(HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>("Failed", HttpStatus.BAD_REQUEST);
+    }
+
     @Override public ResponseEntity getLevels(Principal principal) {
-        List<ParkingLevel> parkingLevel = parkingLevelRepository.findByIdParkingZone(
-            parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName())
-                .getIdParkingZone());
+        List<ParkingLevel> parkingLevel = parkingLevelRepository
+            .findByIdParkingZoneOrderByLevelName(
+                parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName())
+                    .getIdParkingZone());
         ArrayList<ListLevelRequest> listLevelRequest = new ArrayList<>();
         for (ParkingLevel level : parkingLevel) {
             ListLevelRequest listLevel = new ListLevelRequest();
             listLevel.setIdLevel(level.getIdLevel());
             listLevel.setLevelName(level.getLevelName());
+            listLevel.setLevelStatus(level.getStatus());
             listLevelRequest.add(listLevel);
         }
         return new ResponseEntity<>(listLevelRequest, HttpStatus.OK);

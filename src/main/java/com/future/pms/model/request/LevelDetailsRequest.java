@@ -5,8 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data @AllArgsConstructor @NoArgsConstructor @Builder public class ListLevelRequest {
+@Data @Builder @AllArgsConstructor @NoArgsConstructor public class LevelDetailsRequest {
     private String idLevel;
     private String levelName;
-    private String levelStatus;
+    private String status;
 }

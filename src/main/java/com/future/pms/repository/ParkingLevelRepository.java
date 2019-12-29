@@ -9,5 +9,5 @@ import java.util.List;
 @Repository public interface ParkingLevelRepository extends MongoRepository<ParkingLevel, String> {
     ParkingLevel findByIdLevel(String idLevel);
 
-    List<ParkingLevel> findByIdParkingZone(String idParkingZone);
+    List<ParkingLevel> findByIdParkingZoneOrderByLevelName(String idParkingZone);
 }

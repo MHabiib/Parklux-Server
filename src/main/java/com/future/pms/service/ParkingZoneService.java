@@ -1,6 +1,7 @@
 package com.future.pms.service;
 
 import com.future.pms.model.parking.ParkingZone;
+import com.future.pms.model.request.LevelDetailsRequest;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
@@ -23,6 +24,8 @@ public interface ParkingZoneService {
 
     ResponseEntity updateParkingZone(Principal principal, String parkingZoneJSON)
         throws IOException;
+
+    ResponseEntity updateParkingLevel(LevelDetailsRequest levelDetailsRequest, Principal principal);
 
     ResponseEntity getLevels(Principal principal);
 
