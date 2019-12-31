@@ -132,6 +132,16 @@ import static com.future.pms.Constants.*;
             String existSlot = "";
             String successCreateSlot = "";
             for (int i = 0; i < layout.size(); i++) {
+                if (layout.get(i).contains(SLOT_TAKEN) && slotsLayout.charAt(i) != (SLOT_TAKEN_CHAR)) {
+                    ParkingSlot parkingSlot = parkingSlotRepository
+                        .findByIdParkingZoneAndSlotNumberInLayout(parkingLevel.getIdParkingZone(),
+                            i);
+                    Booking booking = bookingRepository
+                        .findBookingByIdSlotAndDateOutNull(parkingSlot.getIdSlot());
+                    BookingServiceImpl bookingService = new BookingServiceImpl();
+                    bookingService.bookingCheckoutSetup(booking, parkingSlot, parkingSlotRepository,
+                        bookingRepository);
+                }
                 layout.set(i, slotsLayout.charAt(i) + layout.get(i).substring(1));
                 ParkingSlot parkingSlotExist = parkingSlotRepository
                     .findByIdParkingZoneAndSlotNumberInLayout(parkingLevel.getIdParkingZone(), i);

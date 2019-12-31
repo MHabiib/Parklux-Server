@@ -27,6 +27,7 @@ public class Constants {
 
     //Parking zone service
     public static final String SLOT_TAKEN = "T";
+    public static final Character SLOT_TAKEN_CHAR = 'T';
     public static final String MY_SLOT = "V";
     public static final String SLOT_EMPTY = "E";
     public static final String SLOT_DISABLE = "D";

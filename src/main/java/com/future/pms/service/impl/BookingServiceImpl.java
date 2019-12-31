@@ -140,21 +140,26 @@ import static com.future.pms.Utils.getTotalTime;
             ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(bookingExist.getIdSlot());
             if (SLOT_TAKEN.equals(parkingSlot.getStatus()) || SLOT_TAKEN
                 .equals(parkingSlot.getStatus().substring(parkingSlot.getStatus().length() - 1))) {
-                bookingExist.setDateOut(Calendar.getInstance().getTimeInMillis());
-                bookingExist.setTotalTime(Long.toString(
-                    getTotalTime(bookingExist.getDateIn(), bookingExist.getDateOut())));
-                bookingExist.setTotalPrice(
-                    getTotalPrice(getTotalMinute(bookingExist.getTotalTime()),
-                        getTotalHours(bookingExist.getTotalTime(),
-                            getTotalMinute(bookingExist.getTotalTime())), bookingExist.getPrice()));
-                parkingSlot.setStatus(SLOT_EMPTY);
-                parkingSlotRepository.save(parkingSlot);
-                bookingRepository.save(bookingExist);
+                bookingCheckoutSetup(bookingExist, parkingSlot, parkingSlotRepository,
+                    bookingRepository);
                 setupParkingLayout(parkingSlot, SLOT_EMPTY);
                 return ResponseEntity.ok().body(bookingExist);
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    void bookingCheckoutSetup(Booking bookingExist, ParkingSlot parkingSlot,
+        ParkingSlotRepository parkingSlotRepository, BookingRepository bookingRepository) {
+        bookingExist.setDateOut(Calendar.getInstance().getTimeInMillis());
+        bookingExist.setTotalTime(
+            Long.toString(getTotalTime(bookingExist.getDateIn(), bookingExist.getDateOut())));
+        bookingExist.setTotalPrice(getTotalPrice(getTotalMinute(bookingExist.getTotalTime()),
+            getTotalHours(bookingExist.getTotalTime(), getTotalMinute(bookingExist.getTotalTime())),
+            bookingExist.getPrice()));
+        parkingSlot.setStatus(SLOT_EMPTY);
+        parkingSlotRepository.save(parkingSlot);
+        bookingRepository.save(bookingExist);
     }
 
     private void setupParkingLayout(ParkingSlot parkingSlot, String slotEmpty) {
