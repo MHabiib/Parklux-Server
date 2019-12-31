@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -53,6 +54,12 @@ public class ParkingZoneController {
     public ResponseEntity updateParkingZone(Principal principal,
         @RequestPart("parkingZone") String parkingZoneJSON) throws IOException {
         return parkingZoneService.updateParkingZone(principal, parkingZoneJSON);
+    }
+
+    @PutMapping(value = "update-zone/picture", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updateParkingZonePicture(Principal principal,
+        @RequestPart("file") MultipartFile file) {
+        return parkingZoneService.updateParkingZonePicture(principal, file);
     }
 
     @PutMapping("update-level")

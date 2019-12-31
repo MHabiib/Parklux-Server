@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.activation.FileTypeMap;
 import java.io.File;
@@ -34,6 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.future.pms.Constants.*;
+import static com.future.pms.Utils.checkImageFile;
+import static com.future.pms.Utils.saveUploadedFile;
 
 @Service public class ParkingZoneServiceImpl implements ParkingZoneService {
     @Autowired ParkingZoneRepository parkingZoneRepository;
@@ -132,7 +135,8 @@ import static com.future.pms.Constants.*;
             String existSlot = "";
             String successCreateSlot = "";
             for (int i = 0; i < layout.size(); i++) {
-                if (layout.get(i).contains(SLOT_TAKEN) && slotsLayout.charAt(i) != (SLOT_TAKEN_CHAR)) {
+                if (layout.get(i).contains(SLOT_TAKEN)
+                    && slotsLayout.charAt(i) != (SLOT_TAKEN_CHAR)) {
                     ParkingSlot parkingSlot = parkingSlotRepository
                         .findByIdParkingZoneAndSlotNumberInLayout(parkingLevel.getIdParkingZone(),
                             i);
@@ -158,7 +162,7 @@ import static com.future.pms.Constants.*;
                         parkingSlot.setIdLevel(parkingLevel.getIdLevel());
                         parkingSlot.setIdParkingZone(parkingLevel.getIdParkingZone());
                         parkingSlot.setSlotNumberInLayout(i);
-                        parkingSlot.setName(parkingLevel.getLevelName() + " " + i + 1);
+                        parkingSlot.setName(parkingLevel.getLevelName() + " " + slotName(i));
                         parkingSlotRepository.save(parkingSlot);
                         successCreateSlot += (i + ", ");
                     } else {
@@ -173,6 +177,15 @@ import static com.future.pms.Constants.*;
                 HttpStatus.OK);
         }
         return new ResponseEntity<>("Level not found !", HttpStatus.BAD_REQUEST);
+    }
+
+    private String slotName(Integer slotAt) {
+        for (int i = 1; i <= TOTAL_SLOT_IN_ROW; i++) {
+            if (slotAt < TOTAL_SLOT_IN_ROW * i) {
+                return "(" + LETTER.get(i - 1) + "-" + ((slotAt % 16) + 1) + ")";
+            }
+        }
+        return "x";
     }
 
     private String updateSlot(ParkingSection parkingSection, String status) {
@@ -250,23 +263,12 @@ import static com.future.pms.Constants.*;
             && userRepository.countByEmail(parkingZone.getEmailAdmin()) > 0) {
             return new ResponseEntity<>(PARKING_ZONE_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
+        if (parkingZone.getImageUrl().equals("")) {
+            parkingZone.setImageUrl(parkingZoneDetail.getImageUrl());
+        }
         if (0.0 != (parkingZone.getPrice())) {
             parkingZoneExist.setPrice(parkingZone.getPrice());
         }
-       /* if (checkImageFile(file)) {
-            try {
-                if (parkingZoneExist.getImageUrl() != null) {
-                    Path deletePath = Paths.get(UPLOADED_FOLDER + parkingZoneExist.getImageUrl());
-                    Files.delete(deletePath);
-                }
-                String fileName = parkingZoneExist.getName().replaceAll("\\s+", "") + ".png";
-                saveUploadedFile(file, fileName);
-                parkingZone.setImageUrl(UPLOADED_FOLDER + fileName);
-            } catch (IOException e) {
-                return new ResponseEntity<>("Some error occured. Failed to add image",
-                    HttpStatus.BAD_REQUEST);
-            }
-        }*/
         parkingZoneExist.setName(parkingZone.getName());
         parkingZoneExist.setAddress(parkingZone.getAddress());
         parkingZoneExist.setOpenHour(parkingZone.getOpenHour());
@@ -497,5 +499,30 @@ import static com.future.pms.Constants.*;
             return new ResponseEntity<>("Success change level mode", HttpStatus.OK);
         } else
             return new ResponseEntity<>("Parking zone not found", HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    public ResponseEntity updateParkingZonePicture(Principal principal, MultipartFile file) {
+        ParkingZone parkingZoneExist =
+            parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
+        if (checkImageFile(file)) {
+            try {
+                if (parkingZoneExist.getImageUrl() != null) {
+                    Path deletePath = Paths.get(UPLOADED_FOLDER + parkingZoneExist.getImageUrl());
+                    Files.delete(deletePath);
+                }
+                String fileName = parkingZoneExist.getEmailAdmin().replaceAll("\\s+", "") + ".png";
+                saveUploadedFile(file, fileName);
+                parkingZoneExist.setImageUrl(fileName);
+                parkingZoneRepository.save(parkingZoneExist);
+                return new ResponseEntity<>("Image saved", HttpStatus.OK);
+            } catch (IOException e) {
+                return new ResponseEntity<>("Some error occured. Failed to add image",
+                    HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            return new ResponseEntity<>("Some error occured. Failed to add image",
+                HttpStatus.BAD_REQUEST);
+        }
     }
 }

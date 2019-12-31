@@ -49,7 +49,7 @@ public class Constants {
     public static final String EDIT_MODE = "EditMode";
     public static final String EXIT_EDIT_MODE = "ExitEditMode";
 
-    public static final String UPLOADED_FOLDER = "../assets/parkingZone";
+    public static final String UPLOADED_FOLDER = "../assets/";
 
     public static final String CUSTOMER = "CUSTOMER";
     public static final String ADMIN = "ADMIN";
@@ -64,8 +64,12 @@ public class Constants {
     public static final String NOT_ACTIVE = "NOT_ACTIVE";
     public static final String ACTIVE = "ACTIVE";
 
+    public static final Integer TOTAL_SLOT_IN_ROW = 16;
     public static final Integer TOTAL_SLOT_IN_SECTION = 64;
     public static final Integer TOTAL_SLOT_IN_LEVEL = 4 * 64;
+
+    public static final ArrayList<String> LETTER = new ArrayList<>(Arrays
+        .asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"));
 
     public static final ArrayList<String> SLOTS = new ArrayList<>(Arrays
         .asList("_1", "_1", "_1", "_1", "_1", "_1", "_1", "_1", "_2", "_2", "_2", "_2", "_2", "_2",

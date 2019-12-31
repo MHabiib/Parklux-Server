@@ -3,6 +3,7 @@ package com.future.pms.service;
 import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.model.request.LevelDetailsRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -38,4 +39,6 @@ public interface ParkingZoneService {
     ResponseEntity getImage(String imageName) throws IOException;
 
     ResponseEntity editModeParkingLevel(String idLevel, String mode);
+
+    ResponseEntity updateParkingZonePicture(Principal principal, MultipartFile file);
 }
