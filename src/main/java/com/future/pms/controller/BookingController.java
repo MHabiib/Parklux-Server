@@ -8,48 +8,50 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
-@CrossOrigin("**") @RestController @RequestMapping("/api/booking") public class BookingController {
+@CrossOrigin("**") @RestController @RequestMapping public class BookingController {
     @Autowired private BookingService bookingService;
 
-    @GetMapping public ResponseEntity loadAll(Integer page) {
-        return ResponseEntity.ok(bookingService.loadAll(page));
+    @GetMapping("/api3/booking") public ResponseEntity loadAll(Integer page) {
+        return bookingService.loadAll(page);
     }
 
-    @GetMapping("/customer")
+    @GetMapping("/api/booking/customer")
     public ResponseEntity findBookingCustomerPaging(Principal principal, Integer page) {
         return bookingService.findBookingCustomer(principal, page);
     }
 
-    @GetMapping("/ongoing/parking-zone")
+    @GetMapping("/api2/booking/ongoing/parking-zone")
     public ResponseEntity findOngoingBookingParkingZone(Principal principal, Integer page) {
         return bookingService.findOngoingBookingParkingZone(principal, page);
     }
 
-    @GetMapping("/past/parking-zone")
+    @GetMapping("/api2/booking/past/parking-zone")
     public ResponseEntity findPastBookingParkingZone(Principal principal, Integer page) {
         return bookingService.findPastBookingParkingZone(principal, page);
     }
 
-    @GetMapping("/customer/ongoing")
+    @GetMapping("/api/booking/customer/ongoing")
     public ResponseEntity findOngoingBookingCustomer(Principal principal) {
         return bookingService.findOngoingBookingCustomer(principal);
     }
 
-    @GetMapping("/{id}/receipt")
+    @GetMapping("/api/booking/{id}/receipt")
     public ResponseEntity bookingReceipt(@PathVariable("id") String id) {
         return bookingService.bookingReceipt(id);
     }
 
-    @PostMapping
+    @PostMapping("/api/booking")
     public ResponseEntity createBooking(Principal principal, @RequestBody String idSlot) {
         return bookingService.createBooking(principal, idSlot);
     }
 
-    @PostMapping("/checkout") public ResponseEntity checkoutBooking(Principal principal) {
+    @PostMapping("/api/booking/checkout")
+    public ResponseEntity checkoutBooking(Principal principal) {
         return bookingService.checkoutBooking(principal);
     }
 
-    @PutMapping("/{id}") public ResponseEntity<Booking> updateBooking(@PathVariable("id") String id,
+    @PutMapping("/api/booking/{id}")
+    public ResponseEntity<Booking> updateBooking(@PathVariable("id") String id,
         @RequestBody Booking booking) {
         return bookingService.updateBooking(id, booking);
     }

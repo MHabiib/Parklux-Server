@@ -32,13 +32,13 @@ import static com.future.pms.Utils.getTotalTime;
 
 
     @Override public ResponseEntity loadAll(Integer page) {
-        PageRequest request = new PageRequest(page, 5, new Sort(Sort.Direction.ASC, "dateIn"));
+        PageRequest request = new PageRequest(page, 10, new Sort(Sort.Direction.DESC, "dateIn"));
         return ResponseEntity.ok(bookingRepository.findBookingBy(request));
     }
 
     @Override public ResponseEntity findBookingCustomer(Principal principal, Integer page) {
         Customer customer = customerRepository.findByEmail(principal.getName());
-        PageRequest request = new PageRequest(page, 5, new Sort(Sort.Direction.ASC, "dateIn"));
+        PageRequest request = new PageRequest(page, 10, new Sort(Sort.Direction.DESC, "dateIn"));
         return ResponseEntity.ok(bookingRepository
             .findBookingByIdUserAndDateOutNotNull(customer.getIdCustomer(), request));
     }

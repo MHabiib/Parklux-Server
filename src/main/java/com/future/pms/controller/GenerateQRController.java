@@ -14,7 +14,7 @@ import java.security.Principal;
 @RestController @RequestMapping public class GenerateQRController {
     @Autowired GenerateQRService generateQRService;
 
-    @GetMapping("api/qr") private ResponseEntity generateQr(Principal principal) {
+    @GetMapping("api2/qr") private ResponseEntity generateQr(Principal principal) {
         return generateQRService.generateQR(principal);
     }
 

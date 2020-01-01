@@ -17,8 +17,6 @@ public interface ParkingZoneService {
 
     ResponseEntity addParkingLevel(String levelName, Principal principal);
 
-    ResponseEntity updateParkingSlot(String idParkingSlot, String status);
-
     ResponseEntity updateParkingSection(String idSection);
 
     ResponseEntity updateLevel(String idLevel, String slotsLayout);

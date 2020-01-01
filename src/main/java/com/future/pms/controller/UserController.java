@@ -3,27 +3,26 @@ package com.future.pms.controller;
 import com.future.pms.model.User;
 import com.future.pms.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
-
-@CrossOrigin("**") @RestController @RequestMapping("/api/user") public class UserController {
+@CrossOrigin("**") @RestController @RequestMapping public class UserController {
     @Autowired UserService userService;
 
-    @GetMapping public ResponseEntity loadAll() {
+    @GetMapping("/api/user") public ResponseEntity loadAll() {
         return ResponseEntity.ok(userService.loadAll());
     }
 
-    @GetMapping("/me") public Principal getUser(Principal principal) {
-        return principal;
+    @GetMapping("/api3/user/me") public ResponseEntity getUser() {
+        return new ResponseEntity<>("Authorized", HttpStatus.OK);
     }
 
-    @PostMapping public ResponseEntity createUser(@RequestBody User user) {
+    @PostMapping("/api/user") public ResponseEntity createUser(@RequestBody User user) {
         return userService.createUser(user);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/api/user/{id}")
     public ResponseEntity<User> updateUser(@PathVariable("id") String id, @RequestBody User user) {
         return userService.updateUser(id, user);
     }

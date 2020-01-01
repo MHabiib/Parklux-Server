@@ -51,8 +51,9 @@ public class Constants {
 
     public static final String UPLOADED_FOLDER = "../assets/";
 
-    public static final String CUSTOMER = "CUSTOMER";
-    public static final String ADMIN = "ADMIN";
+    public static final String CUSTOMER = "ROLE_CUSTOMER";
+    public static final String ADMIN = "ROLE_ADMIN";
+    public static final String SUPER_ADMIN = "ROLE_SUPER_ADMIN";
     public static final String OPEN_HOUR = "00:00 - 00:00";
     public static final String FILE_LOCATION = "../qr/";
     public static final String SLOT_UPDATED = "Slot Updated";

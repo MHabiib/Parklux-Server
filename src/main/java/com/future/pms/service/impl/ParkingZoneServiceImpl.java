@@ -49,7 +49,7 @@ import static com.future.pms.Utils.saveUploadedFile;
     @Autowired PasswordEncoder passwordEncoder;
 
     @Override public ResponseEntity loadAll(Integer page) {
-        PageRequest request = new PageRequest(page, 5, new Sort(Sort.Direction.ASC, "name"));
+        PageRequest request = new PageRequest(page, 10, new Sort(Sort.Direction.ASC, "name"));
         return ResponseEntity.ok(parkingZoneRepository.findAllBy(request));
     }
 
@@ -217,30 +217,6 @@ import static com.future.pms.Utils.saveUploadedFile;
             return SUCCESS;
         } else {
             return FAILED;
-        }
-    }
-
-    @Override public ResponseEntity updateParkingSlot(String idParkingSlot, String status) {
-        ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(idParkingSlot);
-        if (null != parkingSlot) {
-            switch (parkingSlot.getStatus()) {
-                case SLOT_EMPTY: {
-                    parkingSlot.setStatus(SLOT_DISABLE);
-                    parkingSlotRepository.save(parkingSlot);
-                    return new ResponseEntity<>(SLOT_UPDATED, HttpStatus.OK);
-                }
-                case SLOT_DISABLE: {
-                    parkingSlot.setStatus(SLOT_EMPTY);
-                    parkingSlotRepository.save(parkingSlot);
-                    return new ResponseEntity<>(SLOT_UPDATED, HttpStatus.OK);
-                }
-                default: {
-                    return new ResponseEntity<>("Can't update slot, there are ongoing booking !",
-                        HttpStatus.BAD_REQUEST);
-                }
-            }
-        } else {
-            return new ResponseEntity<>("Slot not found !", HttpStatus.BAD_REQUEST);
         }
     }
 

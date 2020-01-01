@@ -19,13 +19,15 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.security.Principal;
 
+import static com.future.pms.Constants.CUSTOMER;
+
 @Service public class CustomerServiceImpl implements CustomerService {
     @Autowired CustomerRepository customerRepository;
     @Autowired UserRepository userRepository;
     @Autowired PasswordEncoder passwordEncoder;
 
     @Override public ResponseEntity loadAll(Integer page) {
-        PageRequest request = new PageRequest(page, 5, new Sort(Sort.Direction.ASC, "name"));
+        PageRequest request = new PageRequest(page, 10, new Sort(Sort.Direction.ASC, "name"));
         return ResponseEntity.ok(customerRepository.findAllBy(request));
     }
 
@@ -67,7 +69,7 @@ import java.security.Principal;
         customer.setEmail(createCustomerRequest.getEmail());
         user.setEmail(createCustomerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(createCustomerRequest.getPassword()));
-        user.setRole("CUSTOMER");
+        user.setRole(CUSTOMER);
         customerRepository.save(customer);
         userRepository.save(user);
         return new ResponseEntity<>("Customer Created", HttpStatus.OK);

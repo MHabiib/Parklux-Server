@@ -13,7 +13,7 @@ import java.security.Principal;
 @CrossOrigin("**") @RestController @RequestMapping public class CustomerController {
     @Autowired CustomerService customerService;
 
-    @GetMapping("/api/customer") public ResponseEntity loadAll(Integer page) {
+    @GetMapping("/api3/customer") public ResponseEntity loadAll(Integer page) {
         return ResponseEntity.ok(customerService.loadAll(page));
     }
 
