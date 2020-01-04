@@ -21,6 +21,11 @@ import java.security.Principal;
         return ResponseEntity.ok(customerService.getUserDetail(principal));
     }
 
+    @GetMapping("/api3/customer/{id}/detail")
+    public ResponseEntity getUserDetailSA(@PathVariable("id") String id) {
+        return ResponseEntity.ok(customerService.getUserDetailSA(id));
+    }
+
     @PutMapping(value = "api/customer/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateCustomer(Principal principal,
         @RequestPart("customer") String customerJson) throws IOException {

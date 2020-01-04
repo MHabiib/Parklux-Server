@@ -32,7 +32,12 @@ import static com.future.pms.Constants.CUSTOMER;
     }
 
     @Override public ResponseEntity getUserDetail(Principal principal) {
-        return ResponseEntity.ok(customerRepository.findByEmail(principal.getName()));
+        if (customerRepository.findByEmail(principal.getName()) != null) {
+            return new ResponseEntity<>(customerRepository.findByEmail(principal.getName()),
+                HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
     }
 
     @Override public ResponseEntity updateCustomer(Principal principal, String customerJson)
@@ -73,5 +78,14 @@ import static com.future.pms.Constants.CUSTOMER;
         customerRepository.save(customer);
         userRepository.save(user);
         return new ResponseEntity<>("Customer Created", HttpStatus.OK);
+    }
+
+    @Override public ResponseEntity getUserDetailSA(String id) {
+        Customer customer = customerRepository.findByIdCustomer(id);
+        if (customer != null) {
+            return new ResponseEntity<>(customerRepository.findByIdCustomer(id), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
     }
 }

@@ -40,6 +40,16 @@ import java.security.Principal;
         return bookingService.bookingReceipt(id);
     }
 
+    @GetMapping("/api3/booking/{id}")
+    public ResponseEntity findBookingById(@PathVariable("id") String id) {
+        return bookingService.findBookingById(id);
+    }
+
+    @GetMapping("/api3/booking/{id}/receipt")
+    public ResponseEntity bookingReceiptSA(@PathVariable("id") String id) {
+        return bookingService.bookingReceipt(id);
+    }
+
     @PostMapping("/api/booking")
     public ResponseEntity createBooking(Principal principal, @RequestBody String idSlot) {
         return bookingService.createBooking(principal, idSlot);
@@ -48,6 +58,11 @@ import java.security.Principal;
     @PostMapping("/api/booking/checkout")
     public ResponseEntity checkoutBooking(Principal principal) {
         return bookingService.checkoutBooking(principal);
+    }
+
+    @PostMapping("/api3/booking/{id}/checkout")
+    public ResponseEntity checkoutBookingSA(@PathVariable("id") String id) {
+        return bookingService.checkoutBookingSA(id);
     }
 
     @PutMapping("/api/booking/{id}")

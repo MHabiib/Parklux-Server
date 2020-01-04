@@ -14,4 +14,6 @@ public interface CustomerService {
     ResponseEntity updateCustomer(Principal principal, String customerJson) throws IOException;
 
     ResponseEntity createCustomer(CreateCustomerRequest createCustomerRequest);
+
+    ResponseEntity getUserDetailSA(String id);
 }

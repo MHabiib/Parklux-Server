@@ -23,6 +23,11 @@ import java.security.Principal;
         return ResponseEntity.ok(parkingZoneService.getParkingZoneDetail(principal));
     }
 
+    @GetMapping("/api3/{id}/parking-zone")
+    public ResponseEntity getAdminSA(@PathVariable("id") String id) {
+        return ResponseEntity.ok(parkingZoneService.getAdminSA(id));
+    }
+
     @PostMapping("/api/parking-zone")
     public ResponseEntity createParkingZone(@RequestBody ParkingZone parkingZone) {
         return parkingZoneService.createParkingZone(parkingZone);

@@ -501,4 +501,14 @@ import static com.future.pms.Utils.saveUploadedFile;
                 HttpStatus.BAD_REQUEST);
         }
     }
+
+    @Override public ResponseEntity getAdminSA(String id) {
+        ParkingZone parkingZone = parkingZoneRepository.findParkingZoneByIdParkingZone(id);
+        if (parkingZone != null) {
+            return new ResponseEntity<>(parkingZoneRepository.findParkingZoneByIdParkingZone(id),
+                HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Admin not found", HttpStatus.NOT_FOUND);
+        }
+    }
 }

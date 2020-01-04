@@ -39,4 +39,6 @@ public interface ParkingZoneService {
     ResponseEntity editModeParkingLevel(String idLevel, String mode);
 
     ResponseEntity updateParkingZonePicture(Principal principal, MultipartFile file);
+
+    ResponseEntity getAdminSA(String id);
 }

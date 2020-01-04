@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
     Page<Customer> findAllBy(Pageable pageable);
 
     Customer findByEmail(String email);
+
+    Customer findByIdCustomer(String idCustomer);
 }

@@ -38,15 +38,24 @@ import static com.future.pms.Utils.getTotalTime;
 
     @Override public ResponseEntity findBookingCustomer(Principal principal, Integer page) {
         Customer customer = customerRepository.findByEmail(principal.getName());
-        PageRequest request = new PageRequest(page, 10, new Sort(Sort.Direction.DESC, "dateIn"));
-        return ResponseEntity.ok(bookingRepository
-            .findBookingByIdUserAndDateOutNotNull(customer.getIdCustomer(), request));
+        if (customer != null) {
+            PageRequest request =
+                new PageRequest(page, 10, new Sort(Sort.Direction.DESC, "dateIn"));
+            return ResponseEntity.ok(bookingRepository
+                .findBookingByIdUserAndDateOutNotNull(customer.getIdCustomer(), request));
+        } else {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
     }
 
     @Override public ResponseEntity findOngoingBookingCustomer(Principal principal) {
         Customer customer = customerRepository.findByEmail(principal.getName());
-        return ResponseEntity
-            .ok(bookingRepository.findBookingByIdUserAndDateOut(customer.getIdCustomer(), null));
+        if (customer != null) {
+            return ResponseEntity.ok(bookingRepository
+                .findBookingByIdUserAndDateOut(customer.getIdCustomer(), null));
+        } else {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
     }
 
     @Override
@@ -104,11 +113,21 @@ import static com.future.pms.Utils.getTotalTime;
         ParkingZone parkingZone =
             parkingZoneRepository.findParkingZoneByIdParkingZone(booking.getIdParkingZone());
         Receipt receipt = new Receipt();
+        receipt.setCustomerName(booking.getCustomerName());
         receipt.setIdBooking(booking.getIdBooking());
         receipt.setParkingZoneName(parkingZone.getName());
         receipt.setAddress(parkingZone.getAddress());
         receipt.setSlotName(booking.getSlotName());
         receipt.setPrice(booking.getPrice());
+        if (booking.getTotalTime() == null) {
+            booking.setTotalTime(Long.toString(
+                getTotalTime(booking.getDateIn(), Calendar.getInstance().getTimeInMillis())));
+            booking.setTotalPrice(getTotalPrice(getTotalMinute(booking.getTotalTime()),
+                getTotalHours(booking.getTotalTime(), getTotalMinute(booking.getTotalTime())),
+                booking.getPrice()));
+            booking.setDateOut(Calendar.getInstance().getTimeInMillis());
+            receipt.setStatus("Ongoing");
+        }
         receipt.setTotalMinutes(getTotalMinute(booking.getTotalTime()));
         receipt.setTotalHours(getTotalHours(booking.getTotalTime(), receipt.getTotalMinutes()));
         receipt.setDateIn(booking.getDateIn());
@@ -133,6 +152,16 @@ import static com.future.pms.Utils.getTotalTime;
 
     @Override public ResponseEntity checkoutBooking(Principal principal) {
         Customer customer = customerRepository.findByEmail(principal.getName());
+        return checkoutBooking(customer);
+    }
+
+    @Override public ResponseEntity checkoutBookingSA(String id) {
+        Booking booking = bookingRepository.findBookingByIdBooking(id);
+        Customer customer = customerRepository.findByIdCustomer(booking.getIdUser());
+        return checkoutBooking(customer);
+    }
+
+    private ResponseEntity checkoutBooking(Customer customer) {
         Booking bookingExist = bookingRepository.findBookingByIdBooking(
             bookingRepository.findBookingByIdUserAndDateOut(customer.getIdCustomer(), null)
                 .getIdBooking());
@@ -177,5 +206,9 @@ import static com.future.pms.Utils.getTotalTime;
 
     @Override public ResponseEntity deleteBooking(String id) {
         return null;
+    }
+
+    @Override public ResponseEntity findBookingById(String id) {
+        return ResponseEntity.ok(bookingRepository.findBookingByIdBooking(id));
     }
 }
