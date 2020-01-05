@@ -55,6 +55,12 @@ import java.security.Principal;
         return parkingZoneService.updateParkingZone(principal, parkingZoneJSON);
     }
 
+    @PutMapping("/api3/parking-zone/{id}/update-zone")
+    public ResponseEntity updateAdmin(@PathVariable("id") String id,
+        @RequestPart("parkingZone") String parkingZoneJSON) throws IOException {
+        return parkingZoneService.updateAdmin(id, parkingZoneJSON);
+    }
+
     @PutMapping("/api2/parking-zone/update-zone/picture")
     public ResponseEntity updateParkingZonePicture(Principal principal,
         @RequestPart("file") MultipartFile file) {

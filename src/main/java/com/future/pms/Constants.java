@@ -52,6 +52,7 @@ public class Constants {
     public static final String UPLOADED_FOLDER = "../assets/";
 
     public static final String CUSTOMER = "ROLE_CUSTOMER";
+    public static final String CUSTOMER_BANNED = "ROLE_CUSTOMER (BANNED)";
     public static final String ADMIN = "ROLE_ADMIN";
     public static final String SUPER_ADMIN = "ROLE_SUPER_ADMIN";
     public static final String OPEN_HOUR = "00:00 - 00:00";

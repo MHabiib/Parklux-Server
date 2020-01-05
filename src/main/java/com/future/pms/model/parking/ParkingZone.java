@@ -16,6 +16,6 @@ import static com.future.pms.Constants.OPEN_HOUR;
     private String openHour = OPEN_HOUR;
     private String address = "";
     private String phoneNumber = "";
-    private String imageUrl;
+    private String imageUrl = "";
 }
 

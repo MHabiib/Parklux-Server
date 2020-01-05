@@ -3,6 +3,7 @@ package com.future.pms.service.impl;
 import com.future.pms.model.Booking;
 import com.future.pms.model.Customer;
 import com.future.pms.model.Receipt;
+import com.future.pms.model.User;
 import com.future.pms.model.parking.ParkingLevel;
 import com.future.pms.model.parking.ParkingSlot;
 import com.future.pms.model.parking.ParkingZone;
@@ -27,6 +28,7 @@ import static com.future.pms.Utils.getTotalTime;
     @Autowired ParkingSlotRepository parkingSlotRepository;
     @Autowired BookingRepository bookingRepository;
     @Autowired CustomerRepository customerRepository;
+    @Autowired UserRepository userRepository;
     @Autowired ParkingZoneRepository parkingZoneRepository;
     @Autowired ParkingLevelRepository parkingLevelRepository;
 
@@ -81,7 +83,9 @@ import static com.future.pms.Utils.getTotalTime;
         ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(idSlot);
         if (null != customer && null != parkingSlot && SLOT_SCAN_ME
             .equals(parkingSlot.getStatus())) {
-            if (1 > bookingRepository.countAllByDateOutAndIdUser(null, customer.getIdCustomer())) {
+            User user = userRepository.findByEmail(customer.getEmail());
+            if (1 > bookingRepository.countAllByDateOutAndIdUser(null, customer.getIdCustomer())
+                && !user.getRole().equals(CUSTOMER_BANNED)) {
                 parkingSlot.setStatus(SLOT_TAKEN);
                 parkingSlotRepository.save(parkingSlot);
                 setupParkingLayout(parkingSlot, SLOT_TAKEN);

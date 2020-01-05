@@ -12,8 +12,8 @@ import java.security.Principal;
 @CrossOrigin("**") @RestController @RequestMapping public class UserController {
     @Autowired UserService userService;
 
-    @GetMapping("/api3/user") public ResponseEntity loadAll(Integer page) {
-        return ResponseEntity.ok(userService.loadAll(page));
+    @GetMapping("/api3/user") public ResponseEntity loadAll(Integer page, Principal principal) {
+        return ResponseEntity.ok(userService.loadAll(page, principal));
     }
 
     @GetMapping("/api3/user/me") public ResponseEntity getUser() {
@@ -35,5 +35,16 @@ import java.security.Principal;
     @PutMapping("/api3/user")
     public ResponseEntity updateUser(@RequestBody User user, Principal principal) {
         return userService.updateUser(user, principal);
+    }
+
+    @PutMapping("/api3/{id}/user")
+    public ResponseEntity updateUserFromList(@PathVariable("id") String id,
+        @RequestBody User user) {
+        return userService.updateUserFromList(id, user);
+    }
+
+    @DeleteMapping("/api3/{id}/user")
+    public String deleteSuperAdmin(@PathVariable("id") String id, Principal principal) {
+        return userService.deleteSuperAdmin(id, principal);
     }
 }

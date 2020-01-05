@@ -29,9 +29,10 @@ import static com.future.pms.Constants.*;
         return ResponseEntity.ok(userRepository.findAll());
     }
 
-    @Override public ResponseEntity loadAll(Integer page) {
+    @Override public ResponseEntity loadAll(Integer page, Principal principal) {
         PageRequest request = new PageRequest(page, 10, new Sort(Sort.Direction.ASC, "name"));
-        return ResponseEntity.ok(userRepository.findAllByRole(SUPER_ADMIN, request));
+        return ResponseEntity.ok(userRepository
+            .findAllByRoleAndEmailIsNot(SUPER_ADMIN, request, principal.getName()));
     }
 
     @Override public ResponseEntity createUser(User user) {
@@ -63,13 +64,29 @@ import static com.future.pms.Constants.*;
     }
 
     @Override public ResponseEntity updateUser(User user, Principal principal) {
+        if (null != userRepository.findByEmail(user.getEmail()) && !user.getEmail()
+            .equals(principal.getName()))
+            return new ResponseEntity<>("Email already registered !", HttpStatus.BAD_REQUEST);
+
         User userExist = userRepository.findByEmail(principal.getName());
-        if (null != userRepository.findByEmail(user.getEmail()) || null == userExist)
-            return new ResponseEntity<>("Email already registered !", HttpStatus.MULTI_STATUS);
-        userExist.setPassword(passwordEncoder.encode(user.getPassword()));
+        return updateUser(user, userExist);
+    }
+
+    @Override public ResponseEntity updateUserFromList(String id, User user) {
+        User userExist = userRepository.findByIdUser(id);
+        if (null != userRepository.findByEmail(user.getEmail()) && !user.getEmail()
+            .equals(userExist.getEmail()))
+            return new ResponseEntity<>("Email already registered !", HttpStatus.BAD_REQUEST);
+        return updateUser(user, userExist);
+    }
+
+    private ResponseEntity updateUser(User user, User userExist) {
+        if (!"".equals(user.getPassword()) && null != user.getPassword()) {
+            userExist.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
         userExist.setEmail(user.getEmail());
         userRepository.save(userExist);
-        return new ResponseEntity<>("Create user successful !", HttpStatus.OK);
+        return new ResponseEntity<>("Update user successful !", HttpStatus.OK);
     }
 
     @Override public ResponseEntity deleteUser(String id) {
@@ -82,6 +99,16 @@ import static com.future.pms.Constants.*;
             return new ResponseEntity<>(userRepository.findByIdUser(id), HttpStatus.OK);
         } else {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Override public String deleteSuperAdmin(String id, Principal principal) {
+        User user = userRepository.findByIdUser(id);
+        if (user != null && !user.getEmail().equals(principal.getName())) {
+            userRepository.delete(user);
+            return "Success delete Super Admin";
+        } else {
+            return "Failed delete Super Admin";
         }
     }
 }

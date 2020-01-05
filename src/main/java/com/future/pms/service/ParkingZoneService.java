@@ -24,6 +24,8 @@ public interface ParkingZoneService {
     ResponseEntity updateParkingZone(Principal principal, String parkingZoneJSON)
         throws IOException;
 
+    ResponseEntity updateAdmin(String id, String parkingZoneJSON) throws IOException;
+
     ResponseEntity updateParkingLevel(LevelDetailsRequest levelDetailsRequest, Principal principal);
 
     ResponseEntity getLevels(Principal principal);

@@ -32,8 +32,19 @@ import java.security.Principal;
         return customerService.updateCustomer(principal, customerJson);
     }
 
+    @PutMapping(value = "api3/customer/{id}/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updateCustomerSA(@PathVariable("id") String id,
+        @RequestPart("customer") String customerJson) throws IOException {
+        return customerService.updateCustomerSA(id, customerJson);
+    }
+
     @PostMapping("/customer/create")
     public ResponseEntity createCustomer(@RequestBody CreateCustomerRequest createCustomerRequest) {
         return customerService.createCustomer(createCustomerRequest);
+    }
+
+    @PostMapping("/api3/{id}/customer/ban")
+    public ResponseEntity banCustomer(@PathVariable("id") String id) {
+        return customerService.banCustomer(id);
     }
 }

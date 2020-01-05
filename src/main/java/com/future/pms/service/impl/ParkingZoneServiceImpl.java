@@ -226,12 +226,25 @@ import static com.future.pms.Utils.saveUploadedFile;
             new ObjectMapper().readValue(parkingZoneJSON, UpdateParkingZoneRequest.class);
         ParkingZone parkingZoneDetail =
             parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
+        return updateParkingZone(parkingZone, parkingZoneDetail, principal.getName());
+    }
+
+    @Override public ResponseEntity updateAdmin(String id, String parkingZoneJSON)
+        throws IOException {
+        UpdateParkingZoneRequest parkingZone =
+            new ObjectMapper().readValue(parkingZoneJSON, UpdateParkingZoneRequest.class);
+        ParkingZone parkingZoneDetail = parkingZoneRepository.findParkingZoneByIdParkingZone(id);
+        return updateParkingZone(parkingZone, parkingZoneDetail, parkingZoneDetail.getEmailAdmin());
+    }
+
+    private ResponseEntity updateParkingZone(UpdateParkingZoneRequest parkingZone,
+        ParkingZone parkingZoneDetail, String emailAdmin) {
         if (parkingZoneDetail == null) {
             return new ResponseEntity<>(PARKING_ZONE_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
         ParkingZone parkingZoneExist = parkingZoneRepository
             .findParkingZoneByIdParkingZone(parkingZoneDetail.getIdParkingZone());
-        User user = userRepository.findByEmail(principal.getName());
+        User user = userRepository.findByEmail(emailAdmin);
         if (!"".equals(parkingZone.getPassword())) {
             user.setPassword(passwordEncoder.encode(parkingZone.getPassword()));
         }
@@ -245,9 +258,11 @@ import static com.future.pms.Utils.saveUploadedFile;
         if (0.0 != (parkingZone.getPrice())) {
             parkingZoneExist.setPrice(parkingZone.getPrice());
         }
+        if (!" - ".equals(parkingZone.getOpenHour())) {
+            parkingZoneExist.setOpenHour(parkingZone.getOpenHour());
+        }
         parkingZoneExist.setName(parkingZone.getName());
         parkingZoneExist.setAddress(parkingZone.getAddress());
-        parkingZoneExist.setOpenHour(parkingZone.getOpenHour());
         parkingZoneExist.setPhoneNumber(parkingZone.getPhoneNumber());
         parkingZoneExist.setImageUrl(parkingZone.getImageUrl());
         parkingZoneExist.setEmailAdmin(parkingZone.getEmailAdmin());
@@ -483,7 +498,8 @@ import static com.future.pms.Utils.saveUploadedFile;
             parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
         if (checkImageFile(file)) {
             try {
-                if (parkingZoneExist.getImageUrl() != null) {
+                if (parkingZoneExist.getImageUrl() != null && !parkingZoneExist.getImageUrl()
+                    .equals("")) {
                     Path deletePath = Paths.get(UPLOADED_FOLDER + parkingZoneExist.getImageUrl());
                     Files.delete(deletePath);
                 }

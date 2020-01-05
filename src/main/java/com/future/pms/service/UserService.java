@@ -8,13 +8,17 @@ import java.security.Principal;
 public interface UserService {
     ResponseEntity<User> loadAll();
 
-    ResponseEntity loadAll(Integer page);
+    ResponseEntity loadAll(Integer page, Principal principal);
 
     ResponseEntity createUser(User user);
 
     ResponseEntity updateUser(User user, Principal principal);
 
+    ResponseEntity updateUserFromList(String id, User user);
+
     ResponseEntity deleteUser(String id);
 
     Object getUserSA(String id);
+
+    String deleteSuperAdmin(String id, Principal principal);
 }
