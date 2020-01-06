@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Date;
 
 @Service public class AmazonClient {
 
@@ -38,42 +38,28 @@ import java.util.Date;
         return convFile;
     }
 
-    private File convertMultiPartToFileQr(MultipartFile file) throws IOException {
-        File convFile = new File(file.getOriginalFilename());
+    public String convertMultiPartToFileQR(ByteArrayOutputStream file, String filename)
+        throws IOException {
+        String fileUrl = "";
+        File convFile = new File(filename);
         FileOutputStream fos = new FileOutputStream(convFile);
-        fos.write(file.getBytes());
+        fos.write(file.toByteArray());
         fos.close();
-        return convFile;
+        fileUrl = endpointUrl + "/" + bucketName + "/" + filename;
+        uploadFileTos3bucket(filename, convFile);
+        convFile.delete();
+        return fileUrl;
     }
 
-    private String generateFileName(MultipartFile multiPart) {
-        return new Date().getTime() + "-" + multiPart.getOriginalFilename().replace(" ", "_");
-    }
-
-    private void uploadFileTos3bucket(String fileName, File file) {
+    public void uploadFileTos3bucket(String fileName, File file) {
         s3client.putObject(new PutObjectRequest(bucketName, fileName, file)
             .withCannedAcl(CannedAccessControlList.PublicRead));
     }
 
-    public String uploadFile(MultipartFile multipartFile) {
+    public String uploadFile(MultipartFile multipartFile, String fileName) {
         String fileUrl = "";
         try {
             File file = convertMultiPartToFile(multipartFile);
-            String fileName = generateFileName(multipartFile);
-            fileUrl = endpointUrl + "/" + bucketName + "/" + fileName;
-            uploadFileTos3bucket(fileName, file);
-            file.delete();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return fileUrl;
-    }
-
-    public String uploadQr(MultipartFile multipartFile) {
-        String fileUrl = "";
-        try {
-            File file = convertMultiPartToFile(multipartFile);
-            String fileName = generateFileName(multipartFile);
             fileUrl = endpointUrl + "/" + bucketName + "/" + fileName;
             uploadFileTos3bucket(fileName, file);
             file.delete();

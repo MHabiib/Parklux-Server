@@ -18,7 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.activation.FileTypeMap;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -58,11 +60,7 @@ import static com.future.pms.Constants.*;
                 try {
                     filename = parkingZoneExist.getName().replaceAll("\\s+", "") + "-" + parkingSlot
                         .getName().replaceAll("\\s+", "") + ".png";
-                    OutputStream out = new FileOutputStream(FILE_LOCATION + filename);
-                    bout.writeTo(out);
-                    //todo
-                    out.flush();
-                    out.close();
+                    filename = amazonClient.convertMultiPartToFileQR(bout, filename);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

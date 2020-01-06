@@ -1,6 +1,7 @@
 package com.future.pms.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.pms.AmazonClient;
 import com.future.pms.model.Booking;
 import com.future.pms.model.User;
 import com.future.pms.model.parking.ParkingLevel;
@@ -36,7 +37,6 @@ import java.util.List;
 
 import static com.future.pms.Constants.*;
 import static com.future.pms.Utils.checkImageFile;
-import static com.future.pms.Utils.saveUploadedFile;
 
 @Service public class ParkingZoneServiceImpl implements ParkingZoneService {
     @Autowired ParkingZoneRepository parkingZoneRepository;
@@ -47,6 +47,7 @@ import static com.future.pms.Utils.saveUploadedFile;
     @Autowired UserRepository userRepository;
     @Autowired BookingRepository bookingRepository;
     @Autowired PasswordEncoder passwordEncoder;
+    @Autowired AmazonClient amazonClient;
 
     @Override public ResponseEntity loadAll(Integer page) {
         PageRequest request = new PageRequest(page, 10, new Sort(Sort.Direction.ASC, "name"));
@@ -497,21 +498,10 @@ import static com.future.pms.Utils.saveUploadedFile;
         ParkingZone parkingZoneExist =
             parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
         if (checkImageFile(file)) {
-            try {
-                if (parkingZoneExist.getImageUrl() != null && !parkingZoneExist.getImageUrl()
-                    .equals("")) {
-                    Path deletePath = Paths.get(UPLOADED_FOLDER + parkingZoneExist.getImageUrl());
-                    Files.delete(deletePath);
-                }
-                String fileName = parkingZoneExist.getEmailAdmin().replaceAll("\\s+", "") + ".png";
-                saveUploadedFile(file, fileName);
-                parkingZoneExist.setImageUrl(fileName);
-                parkingZoneRepository.save(parkingZoneExist);
-                return new ResponseEntity<>("Image saved", HttpStatus.OK);
-            } catch (IOException e) {
-                return new ResponseEntity<>("Some error occured. Failed to add image",
-                    HttpStatus.BAD_REQUEST);
-            }
+            String fileName = parkingZoneExist.getEmailAdmin().replaceAll("\\s+", "") + ".png";
+            parkingZoneExist.setImageUrl(amazonClient.uploadFile(file, fileName));
+            parkingZoneRepository.save(parkingZoneExist);
+            return new ResponseEntity<>("Image saved", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Some error occured. Failed to add image",
                 HttpStatus.BAD_REQUEST);
