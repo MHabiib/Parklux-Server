@@ -92,6 +92,12 @@
             <version>3.5.6-Final</version>
         </dependency>
 
+        <!--image S3 AMAZON -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk</artifactId>
+            <version>1.11.133</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

@@ -1,5 +1,6 @@
 package com.future.pms.service.impl;
 
+import com.future.pms.AmazonClient;
 import com.future.pms.model.QR;
 import com.future.pms.model.parking.ParkingLevel;
 import com.future.pms.model.parking.ParkingSlot;
@@ -33,6 +34,7 @@ import static com.future.pms.Constants.*;
     @Autowired ParkingZoneRepository parkingZoneRepository;
     @Autowired ParkingSlotRepository parkingSlotRepository;
     @Autowired ParkingLevelRepository parkingLevelRepository;
+    @Autowired AmazonClient amazonClient;
 
     @Override public ResponseEntity generateQR(Principal principal) {
         String filename = "";
@@ -58,6 +60,7 @@ import static com.future.pms.Constants.*;
                         .getName().replaceAll("\\s+", "") + ".png";
                     OutputStream out = new FileOutputStream(FILE_LOCATION + filename);
                     bout.writeTo(out);
+                    //todo
                     out.flush();
                     out.close();
                 } catch (IOException e) {
