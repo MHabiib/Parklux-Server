@@ -205,8 +205,6 @@ import static com.future.pms.Utils.checkImageFile;
         for (int i = 0; i < layout.size(); i++) {
             if (layout.get(i).contains(sectionNumber) && !layout.get(i).contains(SLOT_SCAN_ME)
                 && !layout.get(i).contains(SLOT_TAKEN)) {
-                layout.set(i, newLayoutValue + layout.get(i).substring(1));
-                totalUpdated++;
                 if (layout.get(i).contains(SLOT_EMPTY)) {
                     ParkingSlot parkingSlot = parkingSlotRepository
                         .findByIdParkingZoneAndSlotNumberInLayout(parkingLevel.getIdParkingZone(),
@@ -214,6 +212,8 @@ import static com.future.pms.Utils.checkImageFile;
                     parkingSlot.setStatus(SLOT_READY);
                     parkingSlotRepository.save(parkingSlot);
                 }
+                layout.set(i, newLayoutValue + layout.get(i).substring(1));
+                totalUpdated++;
                 if (totalUpdated == TOTAL_SLOT_IN_SECTION) {
                     i = layout.size() + 1;
                 }

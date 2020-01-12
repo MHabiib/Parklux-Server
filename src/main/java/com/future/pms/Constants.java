@@ -9,7 +9,7 @@ public class Constants {
     public static final String RESOURCE_ID = "resource_id";
 
     //Authorization Service
-    public static final String CLIEN_ID = "pms-client";
+    public static final String CLIENT_ID = "pms-client";
     public static final String CLIENT_SECRET = "pms-secret";
     public static final String GRANT_TYPE_PASSWORD = "password";
     public static final String AUTHORIZATION_CODE = "authorization_code";
