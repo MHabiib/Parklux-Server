@@ -183,7 +183,7 @@ import static com.future.pms.Utils.checkImageFile;
     private String slotName(Integer slotAt) {
         for (int i = 1; i <= TOTAL_SLOT_IN_ROW; i++) {
             if (slotAt < TOTAL_SLOT_IN_ROW * i) {
-                return "(" + LETTER.get(i - 1) + "-" + ((slotAt % 16) + 1) + ")";
+                return "(" + LETTER.get(i - 1) + "-" + ((slotAt % TOTAL_SLOT_IN_ROW) + 1) + ")";
             }
         }
         return "x";
@@ -207,6 +207,13 @@ import static com.future.pms.Utils.checkImageFile;
                 && !layout.get(i).contains(SLOT_TAKEN)) {
                 layout.set(i, newLayoutValue + layout.get(i).substring(1));
                 totalUpdated++;
+                if (layout.get(i).contains(SLOT_EMPTY)) {
+                    ParkingSlot parkingSlot = parkingSlotRepository
+                        .findByIdParkingZoneAndSlotNumberInLayout(parkingLevel.getIdParkingZone(),
+                            i);
+                    parkingSlot.setStatus(SLOT_READY);
+                    parkingSlotRepository.save(parkingSlot);
+                }
                 if (totalUpdated == TOTAL_SLOT_IN_SECTION) {
                     i = layout.size() + 1;
                 }

@@ -196,12 +196,7 @@ import static com.future.pms.Utils.getTotalTime;
     }
 
     private void setupParkingLayout(ParkingSlot parkingSlot, String slotEmpty) {
-        ParkingLevel parkingLevel = parkingLevelRepository.findByIdLevel(parkingSlot.getIdLevel());
-        ArrayList<String> layout = parkingLevel.getSlotsLayout();
-        layout.set(parkingSlot.getSlotNumberInLayout(),
-            slotEmpty + layout.get(parkingSlot.getSlotNumberInLayout()).substring(1));
-        parkingLevel.setSlotsLayout(layout);
-        parkingLevelRepository.save(parkingLevel);
+        GenerateQRServiceImpl.SetSlotsLayout(slotEmpty, parkingSlot, parkingLevelRepository);
     }
 
     @Override public ResponseEntity<Booking> updateBooking(String id, Booking booking) {

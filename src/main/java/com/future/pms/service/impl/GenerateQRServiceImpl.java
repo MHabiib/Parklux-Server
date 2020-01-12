@@ -88,6 +88,11 @@ import static com.future.pms.Constants.*;
     private void setLayout(String slotStatus, ParkingSlot parkingSlot) {
         parkingSlot.setStatus(slotStatus);
         parkingSlotRepository.save(parkingSlot);
+        SetSlotsLayout(slotStatus, parkingSlot, parkingLevelRepository);
+    }
+
+    static void SetSlotsLayout(String slotStatus, ParkingSlot parkingSlot,
+        ParkingLevelRepository parkingLevelRepository) {
         ParkingLevel parkingLevel = parkingLevelRepository.findByIdLevel(parkingSlot.getIdLevel());
         ArrayList<String> layout = parkingLevel.getSlotsLayout();
         layout.set(parkingSlot.getSlotNumberInLayout(),
