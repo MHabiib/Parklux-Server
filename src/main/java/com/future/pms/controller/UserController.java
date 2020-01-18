@@ -12,9 +12,8 @@ import java.security.Principal;
 @CrossOrigin("**") @RestController @RequestMapping public class UserController {
     @Autowired UserService userService;
 
-    @GetMapping("/api3/user")
-    public ResponseEntity loadAll(Integer page, Principal principal, String email) {
-        return ResponseEntity.ok(userService.loadAll(page, principal, email));
+    @GetMapping("/api3/user") public ResponseEntity loadAll(Integer page, Principal principal) {
+        return ResponseEntity.ok(userService.loadAll(page, principal));
     }
 
     @GetMapping("/api3/user/me") public ResponseEntity getUser() {

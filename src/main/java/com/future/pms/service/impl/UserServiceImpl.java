@@ -36,12 +36,10 @@ import static com.future.pms.Constants.*;
         return ResponseEntity.ok(userRepository.findAll());
     }
 
-    @Override public ResponseEntity loadAll(Integer page, Principal principal, String email) {
+    @Override public ResponseEntity loadAll(Integer page, Principal principal) {
         PageRequest request = PageRequest.of(page, 10, new Sort(Sort.Direction.ASC, "name"));
-        User user = userRepository.findByEmail(principal.getName());
         return ResponseEntity.ok(userRepository
-            .findAllByRoleAndEmailContainingAllIgnoreCaseAndIdUserIsNot(SUPER_ADMIN, email, request,
-                user.getIdUser()));
+            .findAllByRoleAndEmailIsNot(SUPER_ADMIN, request, principal.getName()));
     }
 
     @Override public ResponseEntity createUser(User user) {
