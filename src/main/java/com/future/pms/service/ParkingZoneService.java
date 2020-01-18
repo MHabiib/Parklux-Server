@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.security.Principal;
 
 public interface ParkingZoneService {
-    ResponseEntity loadAll(Integer page);
+    ResponseEntity loadAll(Integer page, String name);
 
     ResponseEntity getParkingZoneDetail(Principal principal);
 

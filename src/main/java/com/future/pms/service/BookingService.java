@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import java.security.Principal;
 
 public interface BookingService {
-    ResponseEntity loadAll(Integer page);
+    ResponseEntity loadAll(String filter, Integer page);
 
     ResponseEntity findBookingCustomer(Principal principal, Integer page);
 

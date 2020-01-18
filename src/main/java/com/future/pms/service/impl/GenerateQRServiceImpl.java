@@ -21,12 +21,14 @@ import javax.activation.FileTypeMap;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.future.pms.Constants.*;
 
@@ -46,42 +48,6 @@ import static com.future.pms.Constants.*;
         parkingLevelRepository.save(parkingLevel);
     }
 
-    @Override public ResponseEntity generateQR(Principal principal) {
-        String filename = "";
-        ParkingZone parkingZoneExist =
-            parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
-        List<ParkingSlot> listParkingSlot = parkingSlotRepository
-            .findAllByIdParkingZoneAndStatus(parkingZoneExist.getIdParkingZone(), SLOT_EMPTY);
-        if (null == listParkingSlot || listParkingSlot.size() == 0)
-            return new ResponseEntity<>(
-                "Parking Zone on " + parkingZoneExist.getName() + " already full !",
-                HttpStatus.BAD_REQUEST);
-        else {
-            ParkingSlot parkingSlot =
-                listParkingSlot.get((int) (Math.random() * listParkingSlot.size()));
-            if (SLOT_EMPTY.equals(parkingSlot.getStatus())) {
-                setLayout(SLOT_SCAN_ME, parkingSlot);
-                QR qr = new QR();
-                qr.setIdSlot(new String(Base64.getEncoder()
-                    .encode(parkingSlot.getIdSlot().getBytes(StandardCharsets.UTF_8))));
-                ByteArrayOutputStream bout =
-                    QRCode.from(String.valueOf(qr)).withSize(250, 250).to(ImageType.PNG).stream();
-                try {
-                    filename = parkingZoneExist.getName().replaceAll("\\s+", "") + "-" + parkingSlot
-                        .getName().replaceAll("\\s+", "") + ".png";
-                    filename = amazonClient.convertMultiPartToFileQR(bout, filename);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                return new ResponseEntity<>("Slot taken !", HttpStatus.BAD_REQUEST);
-            }
-            expiredQrCountdown(parkingSlot.getIdSlot());
-            return new ResponseEntity<>(filename, HttpStatus.OK);
-
-        }
-    }
-
     private void expiredQrCountdown(String idSlot) {
         new Timer().schedule(new TimerTask() {
             @Override public void run() {
@@ -98,6 +64,41 @@ import static com.future.pms.Constants.*;
         parkingSlot.setStatus(slotStatus);
         parkingSlotRepository.save(parkingSlot);
         SetSlotsLayout(slotStatus, parkingSlot, parkingLevelRepository);
+    }
+
+    @Override public ResponseEntity generateQR(Principal principal) {
+        String filename = "";
+        ParkingZone parkingZoneExist =
+            parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
+        List<ParkingSlot> listParkingSlot = parkingSlotRepository
+            .findAllByIdParkingZoneAndStatus(parkingZoneExist.getIdParkingZone(), SLOT_EMPTY);
+        if (null == listParkingSlot || listParkingSlot.size() == 0)
+            return new ResponseEntity<>(
+                "Parking Zone on " + parkingZoneExist.getName() + " already full !",
+                HttpStatus.BAD_REQUEST);
+        else {
+            ParkingSlot parkingSlot =
+                listParkingSlot.get((int) (Math.random() * listParkingSlot.size()));
+            if (SLOT_EMPTY.equals(parkingSlot.getStatus())) {
+                setLayout(SLOT_SCAN_ME, parkingSlot);
+                QR qr = new QR();
+                qr.setIdSlot(parkingSlot.getIdSlot());
+                ByteArrayOutputStream bout =
+                    QRCode.from(String.valueOf(qr)).withSize(250, 250).to(ImageType.PNG).stream();
+                try {
+                    filename = parkingZoneExist.getName().replaceAll("\\s+", "") + "-" + parkingSlot
+                        .getName().replaceAll("\\s+", "") + ".png";
+                    filename = amazonClient.convertMultiPartToFileQR(bout, filename);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                return new ResponseEntity<>("Slot taken !", HttpStatus.BAD_REQUEST);
+            }
+            expiredQrCountdown(parkingSlot.getIdSlot());
+            return new ResponseEntity<>(filename, HttpStatus.OK);
+
+        }
     }
 
     @Override public ResponseEntity getImage(String imageName) throws IOException {

@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.security.Principal;
 
 public interface CustomerService {
-    ResponseEntity loadAll(Integer page);
+    ResponseEntity loadAll(Integer page, String name);
 
     ResponseEntity getUserDetail(Principal principal);
 

@@ -9,6 +9,10 @@ import org.springframework.stereotype.Repository;
 @Repository public interface BookingRepository extends MongoRepository<Booking, String> {
     Page<Booking> findBookingBy(Pageable pageable);
 
+    Page<Booking> findBookingByDateOutNotNull(Pageable pageable);
+
+    Page<Booking> findBookingByDateOutNull(Pageable pageable);
+
     Booking findBookingByIdBooking(String idBooking);
 
     Page<Booking> findBookingByIdUserAndDateOutNotNull(String idUser, Pageable pageable);

@@ -14,8 +14,8 @@ import java.security.Principal;
 @CrossOrigin("**") @RestController @RequestMapping public class ParkingZoneController {
     @Autowired ParkingZoneService parkingZoneService;
 
-    @GetMapping("/api3/parking-zone") public ResponseEntity loadAll(Integer page) {
-        return parkingZoneService.loadAll(page);
+    @GetMapping("/api3/parking-zone") public ResponseEntity loadAll(Integer page, String name) {
+        return parkingZoneService.loadAll(page, name);
     }
 
     @GetMapping("/api2/parking-zone/detail")

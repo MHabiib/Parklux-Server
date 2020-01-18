@@ -32,9 +32,10 @@ import static com.future.pms.Constants.CUSTOMER_BANNED;
     @Autowired BookingService bookingService;
     @Autowired PasswordEncoder passwordEncoder;
 
-    @Override public ResponseEntity loadAll(Integer page) {
-        PageRequest request = new PageRequest(page, 10, new Sort(Sort.Direction.ASC, "name"));
-        return ResponseEntity.ok(customerRepository.findAllBy(request));
+    @Override public ResponseEntity loadAll(Integer page, String name) {
+        PageRequest request = PageRequest.of(page, 10, new Sort(Sort.Direction.ASC, "name"));
+        return ResponseEntity
+            .ok(customerRepository.findCustomerByNameContainingAllIgnoreCase(request, name));
     }
 
     @Override public ResponseEntity getUserDetail(Principal principal) {

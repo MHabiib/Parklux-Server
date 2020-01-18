@@ -37,7 +37,7 @@ import static com.future.pms.Constants.*;
     }
 
     @Override public ResponseEntity loadAll(Integer page, Principal principal) {
-        PageRequest request = new PageRequest(page, 10, new Sort(Sort.Direction.ASC, "name"));
+        PageRequest request = PageRequest.of(page, 10, new Sort(Sort.Direction.ASC, "name"));
         return ResponseEntity.ok(userRepository
             .findAllByRoleAndEmailIsNot(SUPER_ADMIN, request, principal.getName()));
     }

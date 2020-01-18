@@ -66,6 +66,10 @@ public class Constants {
     public static final String NOT_ACTIVE = "NOT_ACTIVE";
     public static final String ACTIVE = "ACTIVE";
 
+    public static final String ALL = "all";
+    public static final String ONGOING = "ongoing";
+    public static final String PAST = "past";
+
     public static final Integer TOTAL_SLOT_IN_ROW = 16;
     public static final Integer TOTAL_SLOT_IN_SECTION = 64;
     public static final Integer TOTAL_SLOT_IN_LEVEL = 4 * 64;

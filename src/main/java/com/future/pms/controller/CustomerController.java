@@ -13,8 +13,8 @@ import java.security.Principal;
 @CrossOrigin("**") @RestController @RequestMapping public class CustomerController {
     @Autowired CustomerService customerService;
 
-    @GetMapping("/api3/customer") public ResponseEntity loadAll(Integer page) {
-        return ResponseEntity.ok(customerService.loadAll(page));
+    @GetMapping("/api3/customer") public ResponseEntity loadAll(Integer page, String name) {
+        return ResponseEntity.ok(customerService.loadAll(page, name));
     }
 
     @GetMapping("/api/customer/detail") public ResponseEntity getUserDetail(Principal principal) {

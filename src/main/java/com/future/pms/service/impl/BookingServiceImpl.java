@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.util.Base64;
 import java.util.Calendar;
 
 import static com.future.pms.Constants.*;
@@ -32,16 +31,30 @@ import static com.future.pms.Utils.getTotalTime;
     @Autowired ParkingLevelRepository parkingLevelRepository;
 
 
-    @Override public ResponseEntity loadAll(Integer page) {
-        PageRequest request = new PageRequest(page, 10, new Sort(Sort.Direction.DESC, "dateIn"));
-        return ResponseEntity.ok(bookingRepository.findBookingBy(request));
+    @Override public ResponseEntity loadAll(String filter, Integer page) {
+        switch (filter) {
+            case ALL: {
+                PageRequest request =
+                    PageRequest.of(page, 10, new Sort(Sort.Direction.DESC, "dateIn"));
+                return ResponseEntity.ok(bookingRepository.findBookingBy(request));
+            }
+            case ONGOING: {
+                PageRequest request =
+                    PageRequest.of(page, 10, new Sort(Sort.Direction.DESC, "dateIn"));
+                return ResponseEntity.ok(bookingRepository.findBookingByDateOutNull(request));
+            }
+            default: {
+                PageRequest request =
+                    PageRequest.of(page, 10, new Sort(Sort.Direction.DESC, "dateIn"));
+                return ResponseEntity.ok(bookingRepository.findBookingByDateOutNotNull(request));
+            }
+        }
     }
 
     @Override public ResponseEntity findBookingCustomer(Principal principal, Integer page) {
         Customer customer = customerRepository.findByEmail(principal.getName());
         if (customer != null) {
-            PageRequest request =
-                new PageRequest(page, 10, new Sort(Sort.Direction.DESC, "dateIn"));
+            PageRequest request = PageRequest.of(page, 10, new Sort(Sort.Direction.DESC, "dateIn"));
             return ResponseEntity.ok(bookingRepository
                 .findBookingByIdUserAndDateOutNotNull(customer.getIdCustomer(), request));
         } else {
@@ -63,7 +76,7 @@ import static com.future.pms.Utils.getTotalTime;
     public ResponseEntity findOngoingBookingParkingZone(Principal principal, Integer page) {
         ParkingZone parkingZone =
             parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
-        PageRequest request = new PageRequest(page, 10, new Sort(Sort.Direction.DESC, "dateIn"));
+        PageRequest request = PageRequest.of(page, 10, new Sort(Sort.Direction.DESC, "dateIn"));
         return ResponseEntity.ok(bookingRepository
             .findBookingByIdParkingZoneAndDateOut(parkingZone.getIdParkingZone(), null, request));
     }
@@ -71,13 +84,13 @@ import static com.future.pms.Utils.getTotalTime;
     @Override public ResponseEntity findPastBookingParkingZone(Principal principal, Integer page) {
         ParkingZone parkingZone =
             parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
-        PageRequest request = new PageRequest(page, 10, new Sort(Sort.Direction.DESC, "dateOut"));
+        PageRequest request = PageRequest.of(page, 10, new Sort(Sort.Direction.DESC, "dateOut"));
         return ResponseEntity.ok(bookingRepository
             .findBookingByIdParkingZoneAndDateOutNotNull(parkingZone.getIdParkingZone(), request));
     }
 
     @Override public ResponseEntity createBooking(Principal principal, String idSlotStr) {
-        val idSlot = new String(Base64.getDecoder().decode(idSlotStr)).substring(1, 25);
+        val idSlot = idSlotStr.substring(1, 25);
         Customer customer = customerRepository.findByEmail(principal.getName());
         ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(idSlot);
         if (null != customer && null != parkingSlot && SLOT_SCAN_ME

@@ -49,9 +49,10 @@ import static com.future.pms.Utils.checkImageFile;
     @Autowired PasswordEncoder passwordEncoder;
     @Autowired AmazonClient amazonClient;
 
-    @Override public ResponseEntity loadAll(Integer page) {
-        PageRequest request = new PageRequest(page, 10, new Sort(Sort.Direction.ASC, "name"));
-        return ResponseEntity.ok(parkingZoneRepository.findAllBy(request));
+    @Override public ResponseEntity loadAll(Integer page, String name) {
+        PageRequest request = PageRequest.of(page, 10, new Sort(Sort.Direction.ASC, "name"));
+        return ResponseEntity
+            .ok(parkingZoneRepository.findParkingZoneByNameContainingAllIgnoreCase(request, name));
     }
 
     @Override public ResponseEntity getParkingZoneDetail(Principal principal) {

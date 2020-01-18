@@ -11,8 +11,8 @@ import java.security.Principal;
 @CrossOrigin("**") @RestController @RequestMapping public class BookingController {
     @Autowired private BookingService bookingService;
 
-    @GetMapping("/api3/booking") public ResponseEntity loadAll(Integer page) {
-        return bookingService.loadAll(page);
+    @GetMapping("/api3/booking") public ResponseEntity loadAll(String filter, Integer page) {
+        return bookingService.loadAll(filter, page);
     }
 
     @GetMapping("/api/booking/customer")
