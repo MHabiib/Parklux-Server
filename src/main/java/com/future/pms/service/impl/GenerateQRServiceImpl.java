@@ -21,14 +21,12 @@ import javax.activation.FileTypeMap;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import static com.future.pms.Constants.*;
 
@@ -37,6 +35,16 @@ import static com.future.pms.Constants.*;
     @Autowired ParkingSlotRepository parkingSlotRepository;
     @Autowired ParkingLevelRepository parkingLevelRepository;
     @Autowired AmazonClient amazonClient;
+
+    static void SetSlotsLayout(String slotStatus, ParkingSlot parkingSlot,
+        ParkingLevelRepository parkingLevelRepository) {
+        ParkingLevel parkingLevel = parkingLevelRepository.findByIdLevel(parkingSlot.getIdLevel());
+        ArrayList<String> layout = parkingLevel.getSlotsLayout();
+        layout.set(parkingSlot.getSlotNumberInLayout(),
+            slotStatus + layout.get(parkingSlot.getSlotNumberInLayout()).substring(1));
+        parkingLevel.setSlotsLayout(layout);
+        parkingLevelRepository.save(parkingLevel);
+    }
 
     @Override public ResponseEntity generateQR(Principal principal) {
         String filename = "";
@@ -54,7 +62,8 @@ import static com.future.pms.Constants.*;
             if (SLOT_EMPTY.equals(parkingSlot.getStatus())) {
                 setLayout(SLOT_SCAN_ME, parkingSlot);
                 QR qr = new QR();
-                qr.setIdSlot(parkingSlot.getIdSlot());
+                qr.setIdSlot(new String(Base64.getEncoder()
+                    .encode(parkingSlot.getIdSlot().getBytes(StandardCharsets.UTF_8))));
                 ByteArrayOutputStream bout =
                     QRCode.from(String.valueOf(qr)).withSize(250, 250).to(ImageType.PNG).stream();
                 try {
@@ -89,16 +98,6 @@ import static com.future.pms.Constants.*;
         parkingSlot.setStatus(slotStatus);
         parkingSlotRepository.save(parkingSlot);
         SetSlotsLayout(slotStatus, parkingSlot, parkingLevelRepository);
-    }
-
-    static void SetSlotsLayout(String slotStatus, ParkingSlot parkingSlot,
-        ParkingLevelRepository parkingLevelRepository) {
-        ParkingLevel parkingLevel = parkingLevelRepository.findByIdLevel(parkingSlot.getIdLevel());
-        ArrayList<String> layout = parkingLevel.getSlotsLayout();
-        layout.set(parkingSlot.getSlotNumberInLayout(),
-            slotStatus + layout.get(parkingSlot.getSlotNumberInLayout()).substring(1));
-        parkingLevel.setSlotsLayout(layout);
-        parkingLevelRepository.save(parkingLevel);
     }
 
     @Override public ResponseEntity getImage(String imageName) throws IOException {

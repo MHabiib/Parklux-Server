@@ -4,7 +4,6 @@ import com.future.pms.model.Booking;
 import com.future.pms.model.Customer;
 import com.future.pms.model.Receipt;
 import com.future.pms.model.User;
-import com.future.pms.model.parking.ParkingLevel;
 import com.future.pms.model.parking.ParkingSlot;
 import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.repository.*;
@@ -18,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Calendar;
 
 import static com.future.pms.Constants.*;
@@ -78,7 +77,7 @@ import static com.future.pms.Utils.getTotalTime;
     }
 
     @Override public ResponseEntity createBooking(Principal principal, String idSlotStr) {
-        val idSlot = idSlotStr.substring(1, 25);
+        val idSlot = new String(Base64.getDecoder().decode(idSlotStr)).substring(1, 25);
         Customer customer = customerRepository.findByEmail(principal.getName());
         ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(idSlot);
         if (null != customer && null != parkingSlot && SLOT_SCAN_ME

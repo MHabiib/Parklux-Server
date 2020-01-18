@@ -13,6 +13,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.common.OAuth2AccessToken;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
+import org.springframework.security.oauth2.provider.token.ConsumerTokenServices;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -24,6 +28,9 @@ import static com.future.pms.Constants.*;
     @Autowired CustomerRepository customerRepository;
     @Autowired ParkingZoneRepository parkingZoneRepository;
     @Autowired PasswordEncoder passwordEncoder;
+    @Autowired AuthorizationServerTokenServices authorizationServerTokenServices;
+    @Autowired ConsumerTokenServices consumerTokenServices;
+
 
     @Override public ResponseEntity loadAll() {
         return ResponseEntity.ok(userRepository.findAll());
@@ -69,6 +76,10 @@ import static com.future.pms.Constants.*;
             return new ResponseEntity<>("Email already registered !", HttpStatus.BAD_REQUEST);
 
         User userExist = userRepository.findByEmail(principal.getName());
+        OAuth2Authentication oAuth2Authentication = (OAuth2Authentication) principal;
+        OAuth2AccessToken accessToken =
+            authorizationServerTokenServices.getAccessToken(oAuth2Authentication);
+        consumerTokenServices.revokeToken(accessToken.getValue());
         return updateUser(user, userExist);
     }
 
