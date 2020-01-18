@@ -18,8 +18,8 @@ public class Constants {
     public static final String SCOPE_READ = "read";
     public static final String SCOPE_WRITE = "write";
     public static final String TRUST = "trust";
-    public static final Integer ACCESS_TOKEN_VALIDITY_SECONDS = 24 * 60 * 60;
-    public static final Integer REFRESH_TOKEN_VALIDITY_SECONDS = 7 * 24 * 60 * 60;
+    public static final Integer ACCESS_TOKEN_VALIDITY_SECONDS = 60 * 60;
+    public static final Integer REFRESH_TOKEN_VALIDITY_SECONDS = 30 * 24 * 60 * 60;
     public static final String MD_ALGORITHM_NOT_AVAILABLE =
         "MD5 algorithm not available.  Fatal (should be in the JDK).";
     public static final String ENCODING_NO_AVAILABLE =
