@@ -11,7 +11,8 @@ import java.util.List;
 @Repository public interface UserRepository extends MongoRepository<User, String> {
     List<User> findAll();
 
-    Page<User> findAllByRoleAndEmailIsNot(String role, Pageable pageable, String email);
+    Page<User> findAllByRoleAndEmailContainingAllIgnoreCaseAndIdUserIsNot(String role, String email,
+        Pageable pageable, String idUser);
 
     User findByEmail(String email);
 
