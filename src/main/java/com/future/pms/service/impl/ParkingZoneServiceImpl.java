@@ -55,8 +55,13 @@ import static com.future.pms.Utils.checkImageFile;
     }
 
     @Override public ResponseEntity getParkingZoneDetail(Principal principal) {
-        return ResponseEntity
-            .ok(parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName()));
+        if (parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName()) != null) {
+            return new ResponseEntity<>(
+                parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName()),
+                HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
     }
 
     @Override public ResponseEntity createParkingZone(ParkingZone parkingZone) {

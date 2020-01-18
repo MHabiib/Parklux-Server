@@ -25,7 +25,7 @@ import java.security.Principal;
     }
 
     @GetMapping("/api3/{id}/user") public ResponseEntity getUserSA(@PathVariable("id") String id) {
-        return ResponseEntity.ok(userService.getUserSA(id));
+        return userService.getUserSA(id);
     }
 
     @PostMapping("/api3/user") public ResponseEntity createUser(@RequestBody User user) {

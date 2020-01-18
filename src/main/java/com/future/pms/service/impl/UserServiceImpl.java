@@ -93,7 +93,7 @@ import static com.future.pms.Constants.*;
         return null;
     }
 
-    @Override public Object getUserSA(String id) {
+    @Override public ResponseEntity getUserSA(String id) {
         User user = userRepository.findByIdUser(id);
         if (user != null) {
             return new ResponseEntity<>(userRepository.findByIdUser(id), HttpStatus.OK);

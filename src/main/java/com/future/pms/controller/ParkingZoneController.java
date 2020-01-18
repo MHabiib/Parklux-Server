@@ -20,7 +20,7 @@ import java.security.Principal;
 
     @GetMapping("/api2/parking-zone/detail")
     public ResponseEntity getParkingZoneDetail(Principal principal) {
-        return ResponseEntity.ok(parkingZoneService.getParkingZoneDetail(principal));
+        return parkingZoneService.getParkingZoneDetail(principal);
     }
 
     @GetMapping("/api3/{id}/parking-zone")

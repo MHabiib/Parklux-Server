@@ -18,7 +18,7 @@ import java.security.Principal;
     }
 
     @GetMapping("/api/customer/detail") public ResponseEntity getUserDetail(Principal principal) {
-        return ResponseEntity.ok(customerService.getUserDetail(principal));
+        return customerService.getUserDetail(principal);
     }
 
     @GetMapping("/api3/customer/{id}/detail")

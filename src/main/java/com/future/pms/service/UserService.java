@@ -18,7 +18,7 @@ public interface UserService {
 
     ResponseEntity deleteUser(String id);
 
-    Object getUserSA(String id);
+    ResponseEntity getUserSA(String id);
 
     String deleteSuperAdmin(String id, Principal principal);
 }
