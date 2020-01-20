@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -27,6 +27,6 @@ import java.util.List;
     }
 
     private List<SimpleGrantedAuthority> getAuthority(String role) {
-        return Arrays.asList(new SimpleGrantedAuthority(role));
+        return Collections.singletonList(new SimpleGrantedAuthority(role));
     }
 }

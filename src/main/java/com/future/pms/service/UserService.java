@@ -16,8 +16,6 @@ public interface UserService {
 
     ResponseEntity updateUserFromList(String id, User user);
 
-    ResponseEntity deleteUser(String id);
-
     ResponseEntity getUserSA(String id);
 
     String deleteSuperAdmin(String id, Principal principal);

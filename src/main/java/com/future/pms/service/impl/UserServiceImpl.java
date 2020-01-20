@@ -100,10 +100,6 @@ import static com.future.pms.Constants.*;
         return new ResponseEntity<>("Update user successful !", HttpStatus.OK);
     }
 
-    @Override public ResponseEntity deleteUser(String id) {
-        return null;
-    }
-
     @Override public ResponseEntity getUserSA(String id) {
         User user = userRepository.findByIdUser(id);
         if (user != null) {
