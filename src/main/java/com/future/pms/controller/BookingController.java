@@ -1,6 +1,5 @@
 package com.future.pms.controller;
 
-import com.future.pms.model.Booking;
 import com.future.pms.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -63,11 +62,5 @@ import java.security.Principal;
     @PostMapping("/api3/booking/{id}/checkout")
     public ResponseEntity checkoutBookingSA(@PathVariable("id") String id) {
         return bookingService.checkoutBookingSA(id);
-    }
-
-    @PutMapping("/api/booking/{id}")
-    public ResponseEntity<Booking> updateBooking(@PathVariable("id") String id,
-        @RequestBody Booking booking) {
-        return bookingService.updateBooking(id, booking);
     }
 }

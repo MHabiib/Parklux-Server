@@ -3,7 +3,6 @@ package com.future.pms.service.impl;
 
 import com.future.pms.model.User;
 import com.future.pms.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,7 +14,11 @@ import java.util.List;
 
 
 @Service(value = "userService") public class UserDetailServiceImpl implements UserDetailsService {
-    @Autowired UserRepository userRepository;
+    final UserRepository userRepository;
+
+    public UserDetailServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email);

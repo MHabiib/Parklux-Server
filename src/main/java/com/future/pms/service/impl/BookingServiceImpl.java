@@ -8,7 +8,6 @@ import com.future.pms.model.parking.ParkingSlot;
 import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.repository.*;
 import com.future.pms.service.BookingService;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -90,7 +89,7 @@ import static com.future.pms.Utils.getTotalTime;
     }
 
     @Override public ResponseEntity createBooking(Principal principal, String idSlotStr) {
-        val idSlot = idSlotStr.substring(1, 25);
+        String idSlot = idSlotStr.substring(1, 25);
         Customer customer = customerRepository.findByEmail(principal.getName());
         ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(idSlot);
         if (null != customer && null != parkingSlot && SLOT_SCAN_ME
@@ -209,14 +208,6 @@ import static com.future.pms.Utils.getTotalTime;
 
     private void setupParkingLayout(ParkingSlot parkingSlot, String slotEmpty) {
         GenerateQRServiceImpl.SetSlotsLayout(slotEmpty, parkingSlot, parkingLevelRepository);
-    }
-
-    @Override public ResponseEntity<Booking> updateBooking(String id, Booking booking) {
-        return null;
-    }
-
-    @Override public ResponseEntity deleteBooking(String id) {
-        return null;
     }
 
     @Override public ResponseEntity findBookingById(String id) {

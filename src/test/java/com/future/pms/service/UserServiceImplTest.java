@@ -18,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.ConsumerTokenServices;
 
@@ -43,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         new PageRequest(0, 10, new Sort(Sort.Direction.ASC, "name"));
 
     @InjectMocks UserServiceImpl userServiceImpl;
+    @Mock OAuth2Authentication oAuth2Authentication;
     @Mock UserRepository userRepository;
     @Mock CustomerRepository customerRepository;
     @Mock ParkingZoneRepository parkingZoneRepository;
@@ -127,6 +129,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     }
 
     @Test public void createUserEmailNotNullAndRoleIsElse() {
+        USER.setRole(null);
         Mockito.when(userRepository.findByEmail(USER.getEmail())).thenReturn(null);
 
         ResponseEntity responseEntity = userServiceImpl.createUser(USER);
@@ -146,6 +149,21 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = userServiceImpl.updateUser(USER, principal);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(userRepository).findByEmail(USER.getEmail());
+        Mockito.verifyNoMoreInteractions(userRepository);
+    }
+
+    @Test public void updateUserEmailSuccess() {
+        USER.setEmail(EMAIL);
+        UsernamePasswordAuthenticationToken principal =
+            new UsernamePasswordAuthenticationToken(EMAIL, "password");
+
+        Mockito.when(userRepository.findByEmail(USER.getEmail())).thenReturn(USER);
+        //
+        //        ResponseEntity responseEntity = userServiceImpl.updateUser(USER, principal);
+        //TODO
+        //        assertThat(responseEntity).isNotNull();
 
         Mockito.verify(userRepository).findByEmail(USER.getEmail());
         Mockito.verifyNoMoreInteractions(userRepository);

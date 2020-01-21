@@ -31,7 +31,6 @@ import static com.future.pms.Constants.*;
     @Autowired AuthorizationServerTokenServices authorizationServerTokenServices;
     @Autowired ConsumerTokenServices consumerTokenServices;
 
-
     @Override public ResponseEntity loadAll() {
         return ResponseEntity.ok(userRepository.findAll());
     }
