@@ -348,7 +348,7 @@ import static com.future.pms.Utils.checkImageFile;
                     .findParkingSectionByIdLevel(parkingLevel.getIdLevel()));
                 parkingSlotRepository.deleteAll(parkingSlotList);
                 parkingLevelRepository.delete(parkingLevel);
-                return new ResponseEntity(HttpStatus.OK);
+                return new ResponseEntity<>("Success", HttpStatus.OK);
             }
         }
         return new ResponseEntity<>("Failed", HttpStatus.BAD_REQUEST);
