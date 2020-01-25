@@ -2,6 +2,7 @@ package com.future.pms.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.pms.AmazonClient;
+import com.future.pms.config.MongoTokenStore;
 import com.future.pms.model.Booking;
 import com.future.pms.model.User;
 import com.future.pms.model.parking.ParkingLevel;
@@ -48,6 +49,7 @@ import static com.future.pms.Utils.checkImageFile;
     @Autowired BookingRepository bookingRepository;
     @Autowired PasswordEncoder passwordEncoder;
     @Autowired AmazonClient amazonClient;
+    @Autowired MongoTokenStore mongoTokenStore;
 
     @Override public ResponseEntity loadAll(Integer page, String name) {
         PageRequest request = PageRequest.of(page, 10, new Sort(Sort.Direction.ASC, "name"));
@@ -262,9 +264,14 @@ import static com.future.pms.Utils.checkImageFile;
         if (!"".equals(parkingZone.getPassword())) {
             user.setPassword(passwordEncoder.encode(parkingZone.getPassword()));
         }
-        if (!parkingZoneExist.getEmailAdmin().equals(parkingZone.getEmailAdmin())
-            && userRepository.countByEmail(parkingZone.getEmailAdmin()) > 0) {
-            return new ResponseEntity<>(PARKING_ZONE_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        if (!parkingZoneExist.getEmailAdmin().equals(parkingZone.getEmailAdmin())) {
+            if (!parkingZoneExist.getEmailAdmin().equals(parkingZone.getEmailAdmin())
+                && userRepository.countByEmail(parkingZone.getEmailAdmin()) > 0) {
+                return new ResponseEntity<>(PARKING_ZONE_NOT_FOUND, HttpStatus.BAD_REQUEST);
+            } else {
+                mongoTokenStore.revokeToken(parkingZoneExist.getEmailAdmin());
+                parkingZoneExist.setEmailAdmin(parkingZone.getEmailAdmin());
+            }
         }
         if (parkingZone.getImageUrl().equals("")) {
             parkingZone.setImageUrl(parkingZoneDetail.getImageUrl());
@@ -279,7 +286,6 @@ import static com.future.pms.Utils.checkImageFile;
         parkingZoneExist.setAddress(parkingZone.getAddress());
         parkingZoneExist.setPhoneNumber(parkingZone.getPhoneNumber());
         parkingZoneExist.setImageUrl(parkingZone.getImageUrl());
-        parkingZoneExist.setEmailAdmin(parkingZone.getEmailAdmin());
         user.setEmail(parkingZone.getEmailAdmin());
         parkingZoneRepository.save(parkingZoneExist);
         userRepository.save(user);

@@ -18,12 +18,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import static com.future.pms.Constants.ENCODING_NO_AVAILABLE;
-import static com.future.pms.Constants.MD_ALGORITHM_NOT_AVAILABLE;
+import static com.future.pms.Constants.*;
 
 @Component public class MongoTokenStore implements TokenStore {
     private final AuthenticationKeyGenerator authenticationKeyGenerator;
@@ -148,19 +146,32 @@ import static com.future.pms.Constants.MD_ALGORITHM_NOT_AVAILABLE;
         return accessToken;
     }
 
-    @Override public Collection<OAuth2AccessToken> findTokensByClientIdAndUserName(String clientId,
+    @Override public List<OAuth2AccessToken> findTokensByClientIdAndUserName(String clientId,
         String username) {
         return findTokensByCriteria(
             Criteria.where(MongoAccessToken.CLIENT_ID).is(clientId).and(MongoAccessToken.USER_NAME)
                 .is(username));
     }
 
-    @Override public Collection<OAuth2AccessToken> findTokensByClientId(String clientId) {
+    @Override public List<OAuth2AccessToken> findTokensByClientId(String clientId) {
         return findTokensByCriteria(Criteria.where(MongoAccessToken.CLIENT_ID).is(clientId));
     }
 
-    private Collection<OAuth2AccessToken> findTokensByCriteria(Criteria criteria) {
-        Collection<OAuth2AccessToken> tokens = new ArrayList<>();
+    public void revokeToken(String email) {
+        List<OAuth2AccessToken> tokens = findTokensByClientIdAndUserName(CLIENT_ID, email);
+        if (tokens.size() > 0) {
+            OAuth2AccessToken accessToken = tokens.get(0);
+            if (accessToken != null) {
+                if (accessToken.getRefreshToken() != null) {
+                    removeRefreshToken(accessToken.getRefreshToken());
+                }
+                removeAccessToken(accessToken);
+            }
+        }
+    }
+
+    private List<OAuth2AccessToken> findTokensByCriteria(Criteria criteria) {
+        List<OAuth2AccessToken> tokens = new ArrayList<>();
         Query query = new Query();
         query.addCriteria(criteria);
         List<MongoAccessToken> accessTokens = mongoTemplate.find(query, MongoAccessToken.class);

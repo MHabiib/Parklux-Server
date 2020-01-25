@@ -1,5 +1,6 @@
 package com.future.pms.service.impl;
 
+import com.future.pms.config.MongoTokenStore;
 import com.future.pms.model.Customer;
 import com.future.pms.model.User;
 import com.future.pms.model.parking.ParkingZone;
@@ -13,10 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.common.OAuth2AccessToken;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
-import org.springframework.security.oauth2.provider.token.ConsumerTokenServices;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -28,8 +25,7 @@ import static com.future.pms.Constants.*;
     @Autowired CustomerRepository customerRepository;
     @Autowired ParkingZoneRepository parkingZoneRepository;
     @Autowired PasswordEncoder passwordEncoder;
-    @Autowired AuthorizationServerTokenServices authorizationServerTokenServices;
-    @Autowired ConsumerTokenServices consumerTokenServices;
+    @Autowired MongoTokenStore mongoTokenStore;
 
     @Override public ResponseEntity loadAll() {
         return ResponseEntity.ok(userRepository.findAll());
@@ -70,15 +66,14 @@ import static com.future.pms.Constants.*;
     }
 
     @Override public ResponseEntity updateUser(User user, Principal principal) {
-        if (null != userRepository.findByEmail(user.getEmail()) && !user.getEmail()
-            .equals(principal.getName()))
-            return new ResponseEntity<>("Email already registered !", HttpStatus.BAD_REQUEST);
-
+        if (null != userRepository.findByEmail(user.getEmail())) {
+            if (null != userRepository.findByEmail(user.getEmail()) && !user.getEmail()
+                .equals(principal.getName())) {
+                return new ResponseEntity<>("Email already registered !", HttpStatus.BAD_REQUEST);
+            }
+            mongoTokenStore.revokeToken(principal.getName());
+        }
         User userExist = userRepository.findByEmail(principal.getName());
-        OAuth2Authentication oAuth2Authentication = (OAuth2Authentication) principal;
-        OAuth2AccessToken accessToken =
-            authorizationServerTokenServices.getAccessToken(oAuth2Authentication);
-        consumerTokenServices.revokeToken(accessToken.getValue());
         return updateUser(user, userExist);
     }
 

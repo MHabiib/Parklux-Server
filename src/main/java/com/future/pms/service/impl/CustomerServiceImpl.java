@@ -1,6 +1,7 @@
 package com.future.pms.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.pms.config.MongoTokenStore;
 import com.future.pms.model.Booking;
 import com.future.pms.model.Customer;
 import com.future.pms.model.User;
@@ -31,6 +32,7 @@ import static com.future.pms.Constants.CUSTOMER_BANNED;
     @Autowired BookingRepository bookingRepository;
     @Autowired BookingService bookingService;
     @Autowired PasswordEncoder passwordEncoder;
+    @Autowired MongoTokenStore mongoTokenStore;
 
     @Override public ResponseEntity loadAll(Integer page, String name) {
         PageRequest request = PageRequest.of(page, 10, new Sort(Sort.Direction.ASC, "name"));
@@ -62,11 +64,15 @@ import static com.future.pms.Constants.CUSTOMER_BANNED;
             return new ResponseEntity<>("Error update customer", HttpStatus.BAD_REQUEST);
         customer.setName(updatedCustomer.getName());
         customer.setPhoneNumber(updatedCustomer.getPhoneNumber());
-        if (!customer.getEmail().equals(updatedCustomer.getEmail())
-            && userRepository.countByEmail(updatedCustomer.getEmail()) > 0) {
-            return new ResponseEntity<>("Error update customer", HttpStatus.BAD_REQUEST);
+        if (!customer.getEmail().equals(updatedCustomer.getEmail())) {
+            if (!customer.getEmail().equals(updatedCustomer.getEmail())
+                && userRepository.countByEmail(updatedCustomer.getEmail()) > 0) {
+                return new ResponseEntity<>("Error update customer", HttpStatus.BAD_REQUEST);
+            } else {
+                mongoTokenStore.revokeToken(customer.getEmail());
+                customer.setEmail(updatedCustomer.getEmail());
+            }
         }
-        customer.setEmail(updatedCustomer.getEmail());
         user.setEmail(updatedCustomer.getEmail());
         if (!"".equals(updatedCustomer.getPassword())) {
             user.setPassword(passwordEncoder.encode(updatedCustomer.getPassword()));
