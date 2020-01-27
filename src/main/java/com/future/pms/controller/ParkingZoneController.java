@@ -1,6 +1,5 @@
 package com.future.pms.controller;
 
-import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.model.request.LevelDetailsRequest;
 import com.future.pms.service.ParkingZoneService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +25,6 @@ import java.security.Principal;
     @GetMapping("/api3/{id}/parking-zone")
     public ResponseEntity getAdminSA(@PathVariable("id") String id) {
         return ResponseEntity.ok(parkingZoneService.getAdminSA(id));
-    }
-
-    @PostMapping("/api/parking-zone")
-    public ResponseEntity createParkingZone(@RequestBody ParkingZone parkingZone) {
-        return parkingZoneService.createParkingZone(parkingZone);
     }
 
     @PostMapping("/api2/parking-zone/add-level")

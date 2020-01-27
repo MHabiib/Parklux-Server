@@ -1,5 +1,6 @@
 package com.future.pms.service;
 
+import com.future.pms.config.MongoTokenStore;
 import com.future.pms.model.User;
 import com.future.pms.repository.CustomerRepository;
 import com.future.pms.repository.ParkingZoneRepository;
@@ -51,6 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     @Mock PasswordEncoder passwordEncoder;
     @Mock AuthorizationServerTokenServices authorizationServerTokenServices;
     @Mock ConsumerTokenServices consumerTokenServices;
+    @Mock MongoTokenStore mongoTokenStore;
     @Mock private Principal principal;
 
     @Test public void loadAll() {
@@ -65,8 +67,8 @@ import static org.assertj.core.api.Assertions.assertThat;
     }
 
     @Test public void loadAllPager() {
-        Mockito.when(
-            userRepository.findAllByRoleAndEmailIsNot(SUPER_ADMIN, PAGE_REQUEST, USER.getEmail()))
+        Mockito.when(userRepository
+            .findAllByRoleAndEmailIsNot(SUPER_ADMIN, PAGE_REQUEST, principal.getName()))
             .thenReturn(PAGE_OF_USERS);
 
         ResponseEntity responseEntity = userServiceImpl.loadAll(0, principal);
@@ -74,7 +76,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         assertThat(responseEntity).isNotNull();
 
         Mockito.verify(userRepository)
-            .findAllByRoleAndEmailIsNot(SUPER_ADMIN, PAGE_REQUEST, USER.getEmail());
+            .findAllByRoleAndEmailIsNot(SUPER_ADMIN, PAGE_REQUEST, principal.getName());
         Mockito.verifyNoMoreInteractions(userRepository);
     }
 
@@ -150,7 +152,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
         assertThat(responseEntity).isNotNull();
 
-        Mockito.verify(userRepository).findByEmail(USER.getEmail());
+        Mockito.verify(userRepository, Mockito.times(2)).findByEmail(USER.getEmail());
         Mockito.verifyNoMoreInteractions(userRepository);
     }
 
@@ -160,13 +162,10 @@ import static org.assertj.core.api.Assertions.assertThat;
             new UsernamePasswordAuthenticationToken(EMAIL, "password");
 
         Mockito.when(userRepository.findByEmail(USER.getEmail())).thenReturn(USER);
-        //
-        //        ResponseEntity responseEntity = userServiceImpl.updateUser(USER, principal);
-        //TODO
-        //        assertThat(responseEntity).isNotNull();
 
-        Mockito.verify(userRepository).findByEmail(USER.getEmail());
-        Mockito.verifyNoMoreInteractions(userRepository);
+        ResponseEntity responseEntity = userServiceImpl.updateUser(USER, principal);
+
+        assertThat(responseEntity).isNotNull();
     }
 
     @Test public void updateUserFromList() {

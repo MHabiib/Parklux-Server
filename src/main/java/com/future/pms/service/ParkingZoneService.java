@@ -1,6 +1,5 @@
 package com.future.pms.service;
 
-import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.model.request.LevelDetailsRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,8 +11,6 @@ public interface ParkingZoneService {
     ResponseEntity loadAll(Integer page, String name);
 
     ResponseEntity getParkingZoneDetail(Principal principal);
-
-    ResponseEntity createParkingZone(ParkingZone parkingZone);
 
     ResponseEntity addParkingLevel(String levelName, Principal principal);
 

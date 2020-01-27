@@ -6,7 +6,5 @@ import java.io.IOException;
 import java.security.Principal;
 
 public interface GenerateQRService {
-    ResponseEntity generateQR(Principal principal);
-
-    ResponseEntity getImage(String imageName) throws IOException;
+    ResponseEntity generateQR(Principal principal) throws IOException;
 }

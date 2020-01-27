@@ -13,24 +13,19 @@ import net.glxn.qrgen.core.image.ImageType;
 import net.glxn.qrgen.javase.QRCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.activation.FileTypeMap;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.future.pms.Constants.*;
+import static com.future.pms.Constants.SLOT_EMPTY;
+import static com.future.pms.Constants.SLOT_SCAN_ME;
 
 @Service public class GenerateQRServiceImpl implements GenerateQRService {
     @Autowired ParkingZoneRepository parkingZoneRepository;
@@ -66,7 +61,7 @@ import static com.future.pms.Constants.*;
         SetSlotsLayout(slotStatus, parkingSlot, parkingLevelRepository);
     }
 
-    @Override public ResponseEntity generateQR(Principal principal) {
+    @Override public ResponseEntity generateQR(Principal principal) throws IOException {
         String filename = "";
         ParkingZone parkingZoneExist =
             parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
@@ -85,13 +80,10 @@ import static com.future.pms.Constants.*;
                 qr.setIdSlot(parkingSlot.getIdSlot());
                 ByteArrayOutputStream bout =
                     QRCode.from(String.valueOf(qr)).withSize(250, 250).to(ImageType.PNG).stream();
-                try {
-                    filename = parkingZoneExist.getName().replaceAll("\\s+", "") + "-" + parkingSlot
-                        .getName().replaceAll("\\s+", "") + ".png";
-                    filename = amazonClient.convertMultiPartToFileQR(bout, filename);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                filename =
+                    parkingZoneExist.getName().replaceAll("\\s+", "") + "-" + parkingSlot.getName()
+                        .replaceAll("\\s+", "") + ".png";
+                filename = amazonClient.convertMultiPartToFileQR(bout, filename);
             } else {
                 return new ResponseEntity<>("Slot taken !", HttpStatus.BAD_REQUEST);
             }
@@ -99,13 +91,5 @@ import static com.future.pms.Constants.*;
             return new ResponseEntity<>(filename, HttpStatus.OK);
 
         }
-    }
-
-    @Override public ResponseEntity getImage(String imageName) throws IOException {
-        Path path = Paths.get(FILE_LOCATION + imageName);
-        File img = new File(String.valueOf(path));
-        String mimetype = FileTypeMap.getDefaultFileTypeMap().getContentType(img);
-        return ResponseEntity.ok().contentType(MediaType.valueOf(mimetype))
-            .body(Files.readAllBytes(img.toPath()));
     }
 }

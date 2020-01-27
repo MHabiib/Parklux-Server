@@ -67,10 +67,6 @@ import static com.future.pms.Utils.checkImageFile;
         }
     }
 
-    @Override public ResponseEntity createParkingZone(ParkingZone parkingZone) {
-        return null;
-    }
-
     @Override
     public ResponseEntity addParkingLevel(@RequestBody String levelName, Principal principal) {
         ParkingZone parkingZoneExist =
