@@ -33,8 +33,6 @@ public interface ParkingZoneService {
 
     ResponseEntity getSectionDetails(String idLevel);
 
-    ResponseEntity getImage(String imageName) throws IOException;
-
     ResponseEntity editModeParkingLevel(String idLevel, String mode);
 
     ResponseEntity updateParkingZonePicture(Principal principal, MultipartFile file);

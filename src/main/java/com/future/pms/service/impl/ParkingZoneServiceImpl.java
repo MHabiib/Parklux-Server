@@ -19,19 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.activation.FileTypeMap;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -469,14 +463,6 @@ import static com.future.pms.Utils.checkImageFile;
         } else {
             section.setStatus(NOT_ACTIVE);
         }
-    }
-
-    @Override public ResponseEntity getImage(String imageName) throws IOException {
-        Path path = Paths.get(UPLOADED_FOLDER + imageName);
-        File img = new File(String.valueOf(path));
-        String mimetype = FileTypeMap.getDefaultFileTypeMap().getContentType(img);
-        return ResponseEntity.ok().contentType(MediaType.valueOf(mimetype))
-            .body(Files.readAllBytes(img.toPath()));
     }
 
     @Override public ResponseEntity editModeParkingLevel(String idLevel, String mode) {

@@ -45,7 +45,6 @@ import static org.assertj.core.api.Assertions.assertThat;
         + "    \"email\": \"android2@mail.com\",\n" + "    \"phoneNumber\": \"14022\",\n"
         + "    \"password\": \"$2a$10$QBqnrD1L9SJ4dZ6DgLcxTO.bSvli2ujCW1jk2nSIEpqFGz0aPqOYi\"\n"
         + "}";
-    private static final String ID = "id";
     private static final UpdateCustomerRequest UPDATE_CUSTOMER_REQUEST =
         UpdateCustomerRequest.builder().build();
     private static final Pageable PAGEABLE =
