@@ -315,7 +315,7 @@ import static com.future.pms.Utils.checkImageFile;
                 if (levelDetailsRequest.getLevelName().equals("")) {
                     levelDetailsRequest.setLevelName(parkingLevel.getLevelName());
                 }
-                if (!parkingLevel.getLevelName().contains(" - Unavailable")) {
+                if (!levelDetailsRequest.getLevelName().contains(" - Unavailable")) {
                     parkingLevel
                         .setLevelName(levelDetailsRequest.getLevelName() + " - Unavailable");
                 } else {
