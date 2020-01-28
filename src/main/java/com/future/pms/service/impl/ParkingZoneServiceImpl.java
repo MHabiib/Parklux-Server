@@ -301,7 +301,8 @@ import static com.future.pms.Utils.checkImageFile;
                         parkingSlotRepository.save(parkingSlot);
                     }
                 }
-                if (levelDetailsRequest.getLevelName().equals(parkingLevel.getLevelName())) {
+                if (levelDetailsRequest.getLevelName().equals(parkingLevel.getLevelName())
+                    && parkingLevel.getLevelName().contains(" - Unavailable")) {
                     levelDetailsRequest.setLevelName(levelDetailsRequest.getLevelName()
                         .substring(0, levelDetailsRequest.getLevelName().length() - 14));
                 }
@@ -314,7 +315,12 @@ import static com.future.pms.Utils.checkImageFile;
                 if (levelDetailsRequest.getLevelName().equals("")) {
                     levelDetailsRequest.setLevelName(parkingLevel.getLevelName());
                 }
-                parkingLevel.setLevelName(levelDetailsRequest.getLevelName() + " - Unavailable");
+                if (!parkingLevel.getLevelName().contains(" - Unavailable")) {
+                    parkingLevel
+                        .setLevelName(levelDetailsRequest.getLevelName() + " - Unavailable");
+                } else {
+                    parkingLevel.setLevelName(levelDetailsRequest.getLevelName());
+                }
                 if (!parkingLevel.getStatus().equals(levelDetailsRequest.getStatus())
                     && null != parkingSlotList) {
                     for (ParkingSlot parkingSlot : parkingSlotList) {

@@ -302,6 +302,24 @@ import static org.assertj.core.api.Assertions.assertThat;
         LEVEL_DETAILS_REQUEST.setLevelName("");
         LEVEL_DETAILS_REQUEST.setStatus(LEVEL_UNAVAILABLE);
         PARKING_LEVEL.setStatus("");
+        PARKING_LEVEL.setLevelName("Level Name - Unavailable");
+        ResponseEntity responseEntity =
+            parkingZoneServiceImpl.updateParkingLevel(LEVEL_DETAILS_REQUEST, principal);
+
+        assertThat(responseEntity).isNotNull();
+    }
+
+    @Test
+    public void updateParkingLevelStatusUnavailableHaveOngoingLevelNameNotContainsUnavailable() {
+        Mockito.when(parkingLevelRepository.findByIdLevel(LEVEL_DETAILS_REQUEST.getIdLevel()))
+            .thenReturn(PARKING_LEVEL);
+        Mockito.when(parkingSlotRepository.findAllByIdLevel(PARKING_LEVEL.getIdLevel()))
+            .thenReturn(LIST_OF_PARKING_SLOT2);
+
+        LEVEL_DETAILS_REQUEST.setLevelName("");
+        LEVEL_DETAILS_REQUEST.setStatus(LEVEL_UNAVAILABLE);
+        PARKING_LEVEL.setStatus("");
+        PARKING_LEVEL.setLevelName("Level Name");
         ResponseEntity responseEntity =
             parkingZoneServiceImpl.updateParkingLevel(LEVEL_DETAILS_REQUEST, principal);
 
