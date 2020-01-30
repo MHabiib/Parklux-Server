@@ -1,5 +1,6 @@
 package com.future.pms.service;
 
+import org.json.JSONException;
 import org.springframework.http.ResponseEntity;
 
 import java.security.Principal;
@@ -15,7 +16,8 @@ public interface BookingService {
 
     ResponseEntity findOngoingBookingCustomer(Principal principal);
 
-    ResponseEntity createBooking(Principal principal, String idSlot);
+    ResponseEntity createBooking(Principal principal, String idSlot, String fcm)
+        throws JSONException;
 
     ResponseEntity bookingReceipt(String id);
 

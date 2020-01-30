@@ -8,6 +8,7 @@ import com.future.pms.model.parking.ParkingSlot;
 import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.repository.*;
 import com.future.pms.service.impl.BookingServiceImpl;
+import org.json.JSONException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -173,11 +174,11 @@ import static org.assertj.core.api.Assertions.assertThat;
         Mockito.verifyNoMoreInteractions(parkingZoneRepository);
     }
 
-    @Test public void createBookingFailed() {
+    @Test public void createBookingFailed() throws JSONException {
         Mockito.when(customerRepository.findByEmail(principal.getName())).thenReturn(null);
         Mockito.when(parkingSlotRepository.findByIdSlot(ID_SLOT)).thenReturn(null);
 
-        ResponseEntity responseEntity = bookingServiceImpl.createBooking(principal, ID_SLOT);
+        ResponseEntity responseEntity = bookingServiceImpl.createBooking(principal, ID_SLOT, "");
 
         assertThat(responseEntity).isNotNull();
 
@@ -185,7 +186,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         Mockito.verifyNoMoreInteractions(customerRepository);
     }
 
-    @Test public void createBookingSuccess() {
+    @Test public void createBookingSuccess() throws JSONException {
         PARKING_SLOT.setStatus(SLOT_SCAN_ME);
         Mockito.when(customerRepository.findByEmail(principal.getName())).thenReturn(CUSTOMER);
         Mockito.when(parkingSlotRepository.findByIdSlot(ID_SLOT.substring(1, 25)))
@@ -197,7 +198,7 @@ import static org.assertj.core.api.Assertions.assertThat;
             parkingZoneRepository.findParkingZoneByIdParkingZone(PARKING_SLOT.getIdParkingZone()))
             .thenReturn(PARKING_ZONE);
 
-        ResponseEntity responseEntity = bookingServiceImpl.createBooking(principal, ID_SLOT);
+        ResponseEntity responseEntity = bookingServiceImpl.createBooking(principal, ID_SLOT, "");
 
         assertThat(responseEntity).isNotNull();
 

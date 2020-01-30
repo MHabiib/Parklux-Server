@@ -52,7 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         Mockito.when(parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName()))
             .thenReturn(PARKING_ZONE);
 
-        ResponseEntity responseEntity = generateQRServiceImpl.generateQR(principal);
+        ResponseEntity responseEntity = generateQRServiceImpl.generateQR(principal, "");
 
         assertThat(responseEntity).isNotNull();
     }
@@ -68,7 +68,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         Mockito.when(parkingLevelRepository.findByIdLevel(PARKING_SLOT.getIdLevel()))
             .thenReturn(PARKING_LEVEL);
 
-        ResponseEntity responseEntity = generateQRServiceImpl.generateQR(principal);
+        ResponseEntity responseEntity = generateQRServiceImpl.generateQR(principal, "");
 
         assertThat(responseEntity).isNotNull();
     }
@@ -81,7 +81,7 @@ import static org.assertj.core.api.Assertions.assertThat;
             .findAllByIdParkingZoneAndStatus(PARKING_ZONE.getIdParkingZone(), SLOT_EMPTY))
             .thenReturn(LIST_OF_PARKING_SLOT);
 
-        ResponseEntity responseEntity = generateQRServiceImpl.generateQR(principal);
+        ResponseEntity responseEntity = generateQRServiceImpl.generateQR(principal, "");
 
         assertThat(responseEntity).isNotNull();
     }

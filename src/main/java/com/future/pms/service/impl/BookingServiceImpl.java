@@ -1,5 +1,6 @@
 package com.future.pms.service.impl;
 
+import com.future.pms.FcmClient;
 import com.future.pms.model.Booking;
 import com.future.pms.model.Customer;
 import com.future.pms.model.Receipt;
@@ -8,6 +9,7 @@ import com.future.pms.model.parking.ParkingSlot;
 import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.repository.*;
 import com.future.pms.service.BookingService;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -88,8 +90,8 @@ import static com.future.pms.Utils.getTotalTime;
             .findBookingByIdParkingZoneAndDateOutNotNull(parkingZone.getIdParkingZone(), request));
     }
 
-    @Override public ResponseEntity createBooking(Principal principal, String idSlotStr) {
-        String idSlot = idSlotStr.substring(1, 25);
+    @Override public ResponseEntity createBooking(Principal principal, String idSlot, String fcm)
+        throws JSONException {
         Customer customer = customerRepository.findByEmail(principal.getName());
         ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(idSlot);
         if (null != customer && null != parkingSlot && SLOT_SCAN_ME
@@ -97,6 +99,11 @@ import static com.future.pms.Utils.getTotalTime;
             User user = userRepository.findByEmail(customer.getEmail());
             if (1 > bookingRepository.countAllByDateOutAndIdUser(null, customer.getIdCustomer())
                 && !user.getRole().equals(CUSTOMER_BANNED)) {
+                FcmClient fcmClient;
+                fcmClient = new FcmClient();
+                fcmClient.sendPushNotification(fcm, "", "");
+
+                System.out.println(fcm);
                 parkingSlot.setStatus(SLOT_TAKEN);
                 parkingSlotRepository.save(parkingSlot);
                 setupParkingLayout(parkingSlot, SLOT_TAKEN);

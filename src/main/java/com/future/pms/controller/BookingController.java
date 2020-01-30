@@ -1,6 +1,7 @@
 package com.future.pms.controller;
 
 import com.future.pms.service.BookingService;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,9 +50,10 @@ import java.security.Principal;
         return bookingService.bookingReceipt(id);
     }
 
-    @PostMapping("/api/booking")
-    public ResponseEntity createBooking(Principal principal, @RequestBody String idSlot) {
-        return bookingService.createBooking(principal, idSlot);
+    @PostMapping("/api/booking/{id}/{fcm}")
+    public ResponseEntity createBooking(Principal principal, @PathVariable("id") String idSlot,
+        @PathVariable("fcm") String fcm) throws JSONException {
+        return bookingService.createBooking(principal, idSlot, fcm);
     }
 
     @PostMapping("/api/booking/checkout")

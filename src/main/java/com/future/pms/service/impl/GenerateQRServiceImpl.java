@@ -61,8 +61,8 @@ import static com.future.pms.Constants.SLOT_SCAN_ME;
         SetSlotsLayout(slotStatus, parkingSlot, parkingLevelRepository);
     }
 
-    @Override public ResponseEntity generateQR(Principal principal) throws IOException {
-        String filename = "";
+    @Override public ResponseEntity generateQR(Principal principal, String fcm) throws IOException {
+        String filename;
         ParkingZone parkingZoneExist =
             parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
         List<ParkingSlot> listParkingSlot = parkingSlotRepository
@@ -79,7 +79,7 @@ import static com.future.pms.Constants.SLOT_SCAN_ME;
                 QR qr = new QR();
                 qr.setIdSlot(parkingSlot.getIdSlot());
                 ByteArrayOutputStream bout =
-                    QRCode.from(String.valueOf(qr)).withSize(250, 250).to(ImageType.PNG).stream();
+                    QRCode.from(qr + fcm).withSize(250, 250).to(ImageType.PNG).stream();
                 filename =
                     parkingZoneExist.getName().replaceAll("\\s+", "") + "-" + parkingSlot.getName()
                         .replaceAll("\\s+", "") + ".png";
