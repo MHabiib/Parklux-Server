@@ -5,6 +5,7 @@ import com.future.pms.model.Booking;
 import com.future.pms.model.Customer;
 import com.future.pms.model.Receipt;
 import com.future.pms.model.User;
+import com.future.pms.model.parking.ParkingLevel;
 import com.future.pms.model.parking.ParkingSlot;
 import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.repository.*;
@@ -99,16 +100,19 @@ import static com.future.pms.Utils.getTotalTime;
             User user = userRepository.findByEmail(customer.getEmail());
             if (1 > bookingRepository.countAllByDateOutAndIdUser(null, customer.getIdCustomer())
                 && !user.getRole().equals(CUSTOMER_BANNED)) {
+                ParkingZone parkingZone = parkingZoneRepository
+                    .findParkingZoneByIdParkingZone(parkingSlot.getIdParkingZone());
+                ParkingLevel parkingLevel =
+                    parkingLevelRepository.findByIdLevel(parkingSlot.getIdLevel());
                 FcmClient fcmClient;
                 fcmClient = new FcmClient();
-                fcmClient.sendPushNotification(fcm, "", "");
+                fcmClient.sendPushNotification(fcm, customer.getName(), parkingZone.getName(),
+                    parkingLevel.getLevelName());
 
                 System.out.println(fcm);
                 parkingSlot.setStatus(SLOT_TAKEN);
                 parkingSlotRepository.save(parkingSlot);
                 setupParkingLayout(parkingSlot, SLOT_TAKEN);
-                ParkingZone parkingZone = parkingZoneRepository
-                    .findParkingZoneByIdParkingZone(parkingSlot.getIdParkingZone());
                 Booking bookingParking = new Booking();
                 bookingParking.setParkingZoneName(parkingZone.getName());
                 bookingParking.setAddress(parkingZone.getAddress());
@@ -116,8 +120,7 @@ import static com.future.pms.Utils.getTotalTime;
                 bookingParking.setImageUrl(parkingZone.getImageUrl());
                 bookingParking.setIdParkingZone(parkingSlot.getIdParkingZone());
                 bookingParking.setSlotName(parkingSlot.getName());
-                bookingParking.setLevelName(
-                    parkingLevelRepository.findByIdLevel(parkingSlot.getIdLevel()).getLevelName());
+                bookingParking.setLevelName(parkingLevel.getLevelName());
                 bookingParking.setIdUser(customer.getIdCustomer());
                 bookingParking.setCustomerName(customer.getName());
                 bookingParking.setCustomerPhone(customer.getPhoneNumber());
