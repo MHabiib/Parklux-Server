@@ -71,7 +71,6 @@ import static com.future.pms.Constants.*;
                 .equals(principal.getName())) {
                 return new ResponseEntity<>("Email already registered !", HttpStatus.BAD_REQUEST);
             }
-            mongoTokenStore.revokeToken(principal.getName());
         }
         User userExist = userRepository.findByEmail(principal.getName());
         return updateUser(user, userExist);
