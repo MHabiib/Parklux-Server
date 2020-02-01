@@ -189,7 +189,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     @Test public void createBookingSuccess() throws JSONException {
         PARKING_SLOT.setStatus(SLOT_SCAN_ME);
         Mockito.when(customerRepository.findByEmail(principal.getName())).thenReturn(CUSTOMER);
-        Mockito.when(parkingSlotRepository.findByIdSlot(ID_SLOT.substring(1, 25)))
+        Mockito.when(parkingSlotRepository.findByIdSlot(ID_SLOT))
             .thenReturn(PARKING_SLOT);
         Mockito.when(userRepository.findByEmail(CUSTOMER.getEmail())).thenReturn(USER);
         Mockito.when(parkingLevelRepository.findByIdLevel(PARKING_LEVEL.getIdLevel()))
