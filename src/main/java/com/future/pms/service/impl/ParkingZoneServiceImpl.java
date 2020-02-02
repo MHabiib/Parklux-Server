@@ -541,6 +541,7 @@ import static com.future.pms.Utils.checkImageFile;
             parkingZoneLatLng.setPrice(parkingZone.getPrice());
             parkingZoneLatLng.setLatitude(parkingZone.getLatitude());
             parkingZoneLatLng.setLongitude(parkingZone.getLongitude());
+            parkingZoneLatLng.setImageUrl(parkingZone.getImageUrl());
             parkingZoneLatLngList.add(parkingZoneLatLng);
         }
         return new ResponseEntity<>(parkingZoneLatLngList, HttpStatus.OK);

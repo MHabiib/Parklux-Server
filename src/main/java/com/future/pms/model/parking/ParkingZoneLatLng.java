@@ -15,5 +15,6 @@ import static com.future.pms.Constants.OPEN_HOUR;
     private String phoneNumber = "";
     private Double latitude = 0.0;
     private Double longitude = 0.0;
+    private String imageUrl = "";
 }
 
