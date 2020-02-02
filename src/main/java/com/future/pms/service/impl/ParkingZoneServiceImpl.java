@@ -5,10 +5,7 @@ import com.future.pms.AmazonClient;
 import com.future.pms.config.MongoTokenStore;
 import com.future.pms.model.Booking;
 import com.future.pms.model.User;
-import com.future.pms.model.parking.ParkingLevel;
-import com.future.pms.model.parking.ParkingSection;
-import com.future.pms.model.parking.ParkingSlot;
-import com.future.pms.model.parking.ParkingZone;
+import com.future.pms.model.parking.*;
 import com.future.pms.model.request.LevelDetailsRequest;
 import com.future.pms.model.request.ListLevelRequest;
 import com.future.pms.model.request.SectionDetailRequest;
@@ -122,7 +119,7 @@ import static com.future.pms.Utils.checkImageFile;
                 }
             }
         } else {
-            return new ResponseEntity<>("Slot not found !", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Section not found !", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -263,6 +260,10 @@ import static com.future.pms.Utils.checkImageFile;
                 parkingZoneExist.setEmailAdmin(parkingZone.getEmailAdmin());
             }
         }
+        if (0.0 != parkingZone.getLatitude()) {
+            parkingZoneExist.setLongitude(parkingZone.getLongitude());
+            parkingZoneExist.setLatitude(parkingZone.getLatitude());
+        }
         if (parkingZone.getImageUrl().equals("")) {
             parkingZone.setImageUrl(parkingZoneDetail.getImageUrl());
         }
@@ -276,6 +277,8 @@ import static com.future.pms.Utils.checkImageFile;
         parkingZoneExist.setAddress(parkingZone.getAddress());
         parkingZoneExist.setPhoneNumber(parkingZone.getPhoneNumber());
         parkingZoneExist.setImageUrl(parkingZone.getImageUrl());
+        parkingZoneExist.setLatitude(parkingZone.getLatitude());
+        parkingZoneExist.setLongitude(parkingZone.getLongitude());
         user.setEmail(parkingZone.getEmailAdmin());
         parkingZoneRepository.save(parkingZoneExist);
         userRepository.save(user);
@@ -523,5 +526,23 @@ import static com.future.pms.Utils.checkImageFile;
         } else {
             return new ResponseEntity<>("Admin not found", HttpStatus.NOT_FOUND);
         }
+    }
+
+    @Override public ResponseEntity getLatLng() {
+        List<ParkingZone> parkingZoneList =
+            parkingZoneRepository.findParkingZoneByLatitudeNotNullAndLongitudeNotLike(0.0);
+        List<ParkingZoneLatLng> parkingZoneLatLngList = new ArrayList<>();
+        for (ParkingZone parkingZone : parkingZoneList) {
+            ParkingZoneLatLng parkingZoneLatLng = new ParkingZoneLatLng();
+            parkingZoneLatLng.setName(parkingZone.getName());
+            parkingZoneLatLng.setAddress(parkingZone.getAddress());
+            parkingZoneLatLng.setPhoneNumber(parkingZone.getPhoneNumber());
+            parkingZoneLatLng.setOpenHour(parkingZone.getOpenHour());
+            parkingZoneLatLng.setPrice(parkingZone.getPrice());
+            parkingZoneLatLng.setLatitude(parkingZone.getLatitude());
+            parkingZoneLatLng.setLongitude(parkingZone.getLongitude());
+            parkingZoneLatLngList.add(parkingZoneLatLng);
+        }
+        return new ResponseEntity<>(parkingZoneLatLngList, HttpStatus.OK);
     }
 }

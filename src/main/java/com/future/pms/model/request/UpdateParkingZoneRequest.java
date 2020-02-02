@@ -14,4 +14,6 @@ import lombok.NoArgsConstructor;
     private String address;
     private String phoneNumber;
     private String imageUrl;
+    private Double latitude;
+    private Double longitude;
 }

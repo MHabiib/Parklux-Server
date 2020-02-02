@@ -54,15 +54,16 @@ import static org.assertj.core.api.Assertions.assertThat;
     private static final ParkingZone PARKING_ZONE =
         ParkingZone.builder().idParkingZone("idParkingZone").address("address")
             .emailAdmin("emailAdmin").imageUrl("imageUrl").name("name").phoneNumber("phoneNumber")
-            .imageUrl("").build();
+            .imageUrl("").latitude(0.1).build();
     private static final User USER =
         User.builder().idUser("idUser").email(null).password("passwordUser").role("roleUser")
             .build();
     private static final String PARKING_ZONE_JSON =
         "{\n" + "  \"address\": \"address\",\n" + "  \"emailAdmin\": \"sana2@mail.com\",\n"
-            + "  \"name\": \"Plaza Indonesia\",\n" + "  \"openHour\": \"string\",\n"
-            + "  \"phoneNumber\": \"string\",\n" + "  \"price\": 1000,\n"
-            + "  \"password\": \"password\",\n" + "  \"imageUrl\": \"\"\n" + "}";
+            + "  \"name\": \"Plaza Indonesia\",\n" + "  \"latitude\": 0.1,\n"
+            + "  \"openHour\": \"string\",\n" + "  \"phoneNumber\": \"string\",\n"
+            + "  \"price\": 1000,\n" + "  \"password\": \"password\",\n" + "  \"imageUrl\": \"\"\n"
+            + "}";
     private static final Booking BOOKING =
         Booking.builder().idBooking("idBooking").address("address").customerName("customerName")
             .customerPhone("customerPhone").dateIn(8L).dateOut(9L).idParkingZone("idParkingZone")
@@ -558,6 +559,15 @@ import static org.assertj.core.api.Assertions.assertThat;
         Mockito.when(parkingZoneRepository.findParkingZoneByIdParkingZone(ID)).thenReturn(null);
 
         ResponseEntity responseEntity = parkingZoneServiceImpl.getAdminSA(ID);
+
+        assertThat(responseEntity).isNotNull();
+    }
+
+    @Test public void getLatLng() {
+        Mockito.when(parkingZoneRepository.findParkingZoneByLatitudeNotNullAndLongitudeNotLike(0.0))
+            .thenReturn(LIST_OF_PARKING_ZONE);
+
+        ResponseEntity responseEntity = parkingZoneServiceImpl.getLatLng();
 
         assertThat(responseEntity).isNotNull();
     }
