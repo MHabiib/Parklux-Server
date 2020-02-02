@@ -1,27 +1,29 @@
 package com.future.pms.service;
 
-import com.future.pms.model.Booking;
+import org.json.JSONException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.security.Principal;
 
 public interface BookingService {
-    ResponseEntity loadAll(Integer page);
+    ResponseEntity loadAll(String filter, Integer page);
 
     ResponseEntity findBookingCustomer(Principal principal, Integer page);
 
+    ResponseEntity findOngoingBookingParkingZone(Principal principal, Integer page);
+
+    ResponseEntity findPastBookingParkingZone(Principal principal, Integer page);
+
     ResponseEntity findOngoingBookingCustomer(Principal principal);
 
-    ResponseEntity createBooking(Principal principal, @RequestBody String idSlot);
+    ResponseEntity createBooking(Principal principal, String idSlot, String fcm)
+        throws JSONException;
 
-    ResponseEntity bookingReceipt(@PathVariable("id") String id);
+    ResponseEntity bookingReceipt(String id);
 
     ResponseEntity checkoutBooking(Principal principal);
 
-    ResponseEntity<Booking> updateBooking(@PathVariable("id") String id,
-        @RequestBody Booking booking);
+    ResponseEntity checkoutBookingSA(String id);
 
-    ResponseEntity deleteBooking(@PathVariable("id") String id);
+    ResponseEntity findBookingById(String id);
 }

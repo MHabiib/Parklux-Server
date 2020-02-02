@@ -19,7 +19,11 @@ import static com.future.pms.Constants.RESOURCE_ID;
     @Override public void configure(HttpSecurity http) throws Exception {
         http.
             anonymous().disable().authorizeRequests().antMatchers("/api/**")
-            .access("hasRole('ADMIN')").and().exceptionHandling()
+            .access("hasRole('ROLE_CUSTOMER')").and().
+            anonymous().disable().authorizeRequests().antMatchers("/api2/**")
+            .access("hasRole('ROLE_ADMIN')").and().
+            anonymous().disable().authorizeRequests().antMatchers("/api3/**")
+            .access("hasRole('ROLE_SUPER_ADMIN')").and().exceptionHandling()
             .accessDeniedHandler(new OAuth2AccessDeniedHandler());
     }
 

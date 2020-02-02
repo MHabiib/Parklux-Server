@@ -7,7 +7,9 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository public interface CustomerRepository extends MongoRepository<Customer, String> {
-    Page<Customer> findAllBy(Pageable pageable);
+    Page<Customer> findCustomerByNameContainingAllIgnoreCase(Pageable pageable, String name);
 
     Customer findByEmail(String email);
+
+    Customer findByIdCustomer(String idCustomer);
 }

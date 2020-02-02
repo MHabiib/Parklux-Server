@@ -1,31 +1,41 @@
 package com.future.pms.service;
 
-import com.future.pms.model.parking.ParkingLevel;
-import com.future.pms.model.parking.ParkingSection;
-import com.future.pms.model.parking.ParkingZone;
+import com.future.pms.model.request.LevelDetailsRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.Principal;
 
 public interface ParkingZoneService {
-    ResponseEntity loadAll(Integer page);
+    ResponseEntity loadAll(Integer page, String name);
 
-    ResponseEntity createParkingZone(@RequestBody ParkingZone parkingZone);
+    ResponseEntity getParkingZoneDetail(Principal principal);
 
-    ResponseEntity addParkingLevel(@RequestBody ParkingLevel parkingLevel);
+    ResponseEntity addParkingLevel(String levelName, Principal principal);
 
-    ResponseEntity addParkingSection(@RequestBody ParkingSection parkingSection);
+    ResponseEntity updateParkingSection(String idSection);
 
-    ResponseEntity updateParkingSlot(@RequestBody String idParkingSlot, @RequestBody String status);
+    ResponseEntity updateLevel(String idLevel, String slotsLayout);
 
-    ResponseEntity deleteParkingZone(@PathVariable("id") String id);
+    ResponseEntity updateParkingZone(Principal principal, String parkingZoneJSON)
+        throws IOException;
 
-    ResponseEntity updateParkingZone(Principal principal, MultipartFile file,
-        String parkingZoneJSON) throws IOException;
+    ResponseEntity updateAdmin(String id, String parkingZoneJSON) throws IOException;
 
-    ResponseEntity getImage(String imageName) throws IOException;
+    ResponseEntity updateParkingLevel(LevelDetailsRequest levelDetailsRequest, Principal principal);
+
+    ResponseEntity getLevels(Principal principal);
+
+    ResponseEntity getParkingBookingLayout(String idBooking);
+
+    ResponseEntity getParkingLevelLayout(String idLevel);
+
+    ResponseEntity getSectionDetails(String idLevel);
+
+    ResponseEntity editModeParkingLevel(String idLevel, String mode);
+
+    ResponseEntity updateParkingZonePicture(Principal principal, MultipartFile file);
+
+    ResponseEntity getAdminSA(String id);
 }

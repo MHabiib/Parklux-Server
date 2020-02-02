@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 
 @Data @Builder @AllArgsConstructor @NoArgsConstructor public class Receipt {
     @Id private String idBooking;
+    private String customerName;
     private String parkingZoneName;
     private String address;
     private String slotName;
@@ -17,4 +18,5 @@ import org.springframework.data.annotation.Id;
     private Long dateIn;
     private Long dateOut;
     private String totalPrice;
+    private String status;
 }

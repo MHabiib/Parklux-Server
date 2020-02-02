@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository public interface ParkingZoneRepository extends MongoRepository<ParkingZone, String> {
-    Page<ParkingZone> findAllBy(Pageable pageable);
+    Page<ParkingZone> findParkingZoneByNameContainingAllIgnoreCase(Pageable pageable, String name);
 
     ParkingZone findParkingZoneByEmailAdmin(String email);
 
