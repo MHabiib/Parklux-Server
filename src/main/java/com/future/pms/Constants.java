@@ -74,6 +74,12 @@ public class Constants {
     public static final Integer TOTAL_SLOT_IN_SECTION = 64;
     public static final Integer TOTAL_SLOT_IN_LEVEL = 4 * 64;
 
+    static final String FIREBASE_API_URL = "https://fcm.googleapis.com/fcm/send";
+    static final String FIREBASE_SERVER_KEY =
+        "AAAAqj5yPX8:APA91bHsms0YAbeQ8p6Mwlk-AJSdMfA_T7GzLik5DtZUyeb8V5Bz_JpCnYsyTOf7PGYFC3ON1LuBL0qN5y4M5i3IwEetyQ8RM6bvb2JiOzGGN2cJJ0AYLutswycprUY3_jiUwyQCjFJW";
+
+
+
     public static final ArrayList<String> LETTER = new ArrayList<>(Arrays
         .asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"));
 
