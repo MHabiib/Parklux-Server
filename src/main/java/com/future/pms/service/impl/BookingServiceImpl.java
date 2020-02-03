@@ -144,6 +144,7 @@ import static com.future.pms.Utils.getTotalTime;
         receipt.setAddress(parkingZone.getAddress());
         receipt.setSlotName(booking.getSlotName());
         receipt.setPrice(booking.getPrice());
+        receipt.setStatus("Completed");
         if (booking.getTotalTime() == null) {
             booking.setTotalTime(Long.toString(
                 getTotalTime(booking.getDateIn(), Calendar.getInstance().getTimeInMillis())));
