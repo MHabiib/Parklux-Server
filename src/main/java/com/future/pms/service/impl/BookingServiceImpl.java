@@ -221,10 +221,11 @@ import static com.future.pms.Utils.getTotalTime;
     }
 
     private ResponseEntity checkoutBooking(Customer customer) {
-        Booking bookingExist = bookingRepository.findBookingByIdBooking(
-            bookingRepository.findBookingByIdUserAndDateOut(customer.getIdCustomer(), null)
-                .getIdBooking());
-        if (null != bookingExist) {
+        Booking ongoingBooking =
+            bookingRepository.findBookingByIdUserAndDateOut(customer.getIdCustomer(), null);
+        if (null != ongoingBooking) {
+            Booking bookingExist =
+                bookingRepository.findBookingByIdBooking(ongoingBooking.getIdBooking());
             ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(bookingExist.getIdSlot());
             if (SLOT_TAKEN.equals(parkingSlot.getStatus()) || SLOT_TAKEN
                 .equals(parkingSlot.getStatus().substring(parkingSlot.getStatus().length() - 1))) {
@@ -262,15 +263,18 @@ import static com.future.pms.Utils.getTotalTime;
         Customer customer = customerRepository.findByIdCustomer(idCustomer);
         Booking bookingExist = bookingRepository.findBookingByIdUserAndDateOut(idCustomer, null);
         checkoutBooking(customer);
-        String bookingId = bookingExist.getIdBooking();
-        bookingExist = bookingRepository.findBookingByIdBooking(bookingId);
-        if (fcmToken != null) {
-            FcmClient fcmClient;
-            fcmClient = new FcmClient();
-            fcmClient
-                .sendPushNotificationCheckoutBooking(fcmToken, bookingExist.getParkingZoneName(),
-                    bookingExist.getTotalPrice());
+        if (bookingExist != null) {
+            String bookingId = bookingExist.getIdBooking();
+            bookingExist = bookingRepository.findBookingByIdBooking(bookingId);
+            if (fcmToken != null) {
+                FcmClient fcmClient;
+                fcmClient = new FcmClient();
+                fcmClient.sendPushNotificationCheckoutBooking(fcmToken,
+                    bookingExist.getParkingZoneName(), bookingExist.getTotalPrice());
+            }
+            return ResponseEntity.ok().body(bookingExist);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return ResponseEntity.ok().body(bookingExist);
     }
 }
