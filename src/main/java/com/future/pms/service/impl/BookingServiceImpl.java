@@ -1,15 +1,15 @@
 package com.future.pms.service.impl;
 
+import com.future.pms.AmazonClient;
 import com.future.pms.FcmClient;
-import com.future.pms.model.Booking;
-import com.future.pms.model.Customer;
-import com.future.pms.model.Receipt;
-import com.future.pms.model.User;
+import com.future.pms.model.*;
 import com.future.pms.model.parking.ParkingLevel;
 import com.future.pms.model.parking.ParkingSlot;
 import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.repository.*;
 import com.future.pms.service.BookingService;
+import net.glxn.qrgen.core.image.ImageType;
+import net.glxn.qrgen.javase.QRCode;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -18,8 +18,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.security.Principal;
 import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.future.pms.Constants.*;
 import static com.future.pms.Utils.getTotalTime;
@@ -31,6 +35,7 @@ import static com.future.pms.Utils.getTotalTime;
     @Autowired UserRepository userRepository;
     @Autowired ParkingZoneRepository parkingZoneRepository;
     @Autowired ParkingLevelRepository parkingLevelRepository;
+    @Autowired AmazonClient amazonClient;
 
 
     @Override public ResponseEntity loadAll(String filter, Integer page) {
@@ -176,15 +181,43 @@ import static com.future.pms.Utils.getTotalTime;
         return (String.valueOf(totalHours * price)).split("\\.")[0];
     }
 
-    @Override public ResponseEntity checkoutBooking(Principal principal) {
+    @Override public ResponseEntity checkoutBookingStepOne(Principal principal, String fcmToken)
+        throws IOException {
         Customer customer = customerRepository.findByEmail(principal.getName());
-        return checkoutBooking(customer);
+        String filename;
+        QR qr = new QR();
+        qr.setIdSlot(customer.getIdCustomer());
+        ByteArrayOutputStream bout =
+            QRCode.from(qr + fcmToken).withSize(250, 250).to(ImageType.PNG).stream();
+        filename = customer.getName().replaceAll("\\s+", "").replaceAll("\\s+", "") + ".png";
+        filename = amazonClient.convertMultiPartToFileQR(bout, filename);
+        expiredQrCountdown(fcmToken, customer.getIdCustomer());
+        return new ResponseEntity<>(filename, HttpStatus.OK);
+    }
+
+    private void expiredQrCountdown(String fcmToken, String id) {
+        new Timer().schedule(new TimerTask() {
+            @Override public void run() {
+                Booking bookingExist = bookingRepository.findBookingByIdUserAndDateOut(id, null);
+                if (bookingExist != null) {
+                    FcmClient fcmClient;
+                    fcmClient = new FcmClient();
+                    try {
+                        fcmClient.sendPushNotificationCheckoutBooking(fcmToken, "fAILEDDDDD",
+                            "fAILEDDDDD");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }, 22000);
     }
 
     @Override public ResponseEntity checkoutBookingSA(String id) {
         Booking booking = bookingRepository.findBookingByIdBooking(id);
         Customer customer = customerRepository.findByIdCustomer(booking.getIdUser());
-        return checkoutBooking(customer);
+        checkoutBooking(customer);
+        return ResponseEntity.ok().body(booking);
     }
 
     private ResponseEntity checkoutBooking(Customer customer) {
@@ -198,7 +231,6 @@ import static com.future.pms.Utils.getTotalTime;
                 bookingCheckoutSetup(bookingExist, parkingSlot, parkingSlotRepository,
                     bookingRepository);
                 setupParkingLayout(parkingSlot, SLOT_EMPTY);
-                return ResponseEntity.ok().body(bookingExist);
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -223,5 +255,22 @@ import static com.future.pms.Utils.getTotalTime;
 
     @Override public ResponseEntity findBookingById(String id) {
         return ResponseEntity.ok(bookingRepository.findBookingByIdBooking(id));
+    }
+
+    @Override public ResponseEntity checkoutBookingStepTwo(String fcmToken, String idCustomer)
+        throws JSONException {
+        Customer customer = customerRepository.findByIdCustomer(idCustomer);
+        Booking bookingExist = bookingRepository.findBookingByIdUserAndDateOut(idCustomer, null);
+        String bookingId = bookingExist.getIdBooking();
+        checkoutBooking(customer);
+        bookingExist = bookingRepository.findBookingByIdBooking(bookingId);
+        if (fcmToken != null) {
+            FcmClient fcmClient;
+            fcmClient = new FcmClient();
+            fcmClient
+                .sendPushNotificationCheckoutBooking(fcmToken, bookingExist.getParkingZoneName(),
+                    bookingExist.getTotalPrice());
+        }
+        return ResponseEntity.ok().body(bookingExist);
     }
 }

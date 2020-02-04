@@ -3,6 +3,7 @@ package com.future.pms.service;
 import org.json.JSONException;
 import org.springframework.http.ResponseEntity;
 
+import java.io.IOException;
 import java.security.Principal;
 
 public interface BookingService {
@@ -21,9 +22,11 @@ public interface BookingService {
 
     ResponseEntity bookingReceipt(String id);
 
-    ResponseEntity checkoutBooking(Principal principal);
+    ResponseEntity checkoutBookingStepOne(Principal principal, String fcmToken) throws IOException;
 
     ResponseEntity checkoutBookingSA(String id);
 
     ResponseEntity findBookingById(String id);
+
+    ResponseEntity checkoutBookingStepTwo(String fcmToken, String idCustomer) throws JSONException;
 }

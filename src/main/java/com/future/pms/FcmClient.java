@@ -10,9 +10,9 @@ import org.springframework.web.client.RestTemplate;
 import static com.future.pms.Constants.FIREBASE_API_URL;
 import static com.future.pms.Constants.FIREBASE_SERVER_KEY;
 
+@Async
 public class FcmClient {
-    @Async public void sendPushNotification(String key, String customerName, String parkingZoneName,
-        String levelName) throws JSONException {
+    public void sendPushNotification(String key, String customerName, String parkingZoneName, String levelName) throws JSONException {
         JSONObject msg = new JSONObject();
 
         msg.put("customerName", customerName);
@@ -34,5 +34,14 @@ public class FcmClient {
 
         HttpEntity<String> httpEntity = new HttpEntity<>(json.toString(), httpHeaders);
         restTemplate.postForObject(FIREBASE_API_URL, httpEntity, String.class);
+    }
+
+    public void sendPushNotificationCheckoutBooking(String key, String parkingZoneName,
+        String totalPrice) throws JSONException {
+        JSONObject msg = new JSONObject();
+
+        msg.put("parkingZoneName", parkingZoneName);
+        msg.put("totalPrice", totalPrice);
+        callToFcmServer(msg, key);
     }
 }

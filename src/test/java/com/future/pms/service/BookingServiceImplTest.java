@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.ConsumerTokenServices;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -222,7 +223,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         Mockito.verifyNoMoreInteractions(parkingZoneRepository);
     }
 
-    @Test public void checkoutBooking() {
+    @Test public void checkoutBooking() throws IOException {
         PARKING_SLOT.setStatus(SLOT_TAKEN);
         Mockito.when(customerRepository.findByEmail(principal.getName())).thenReturn(CUSTOMER);
         Mockito
@@ -235,7 +236,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         Mockito.when(parkingLevelRepository.findByIdLevel(PARKING_LEVEL.getIdLevel()))
             .thenReturn(PARKING_LEVEL);
 
-        ResponseEntity responseEntity = bookingServiceImpl.checkoutBooking(principal);
+        ResponseEntity responseEntity = bookingServiceImpl.checkoutBookingStepOne(principal, "");
 
         assertThat(responseEntity).isNotNull();
 
@@ -243,7 +244,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         Mockito.verifyNoMoreInteractions(customerRepository);
     }
 
-    @Test public void checkoutBookingNotSlotTaken() {
+    @Test public void checkoutBookingNotSlotTaken() throws IOException {
         Mockito.when(customerRepository.findByEmail(principal.getName())).thenReturn(CUSTOMER);
         Mockito
             .when(bookingRepository.findBookingByIdUserAndDateOut(CUSTOMER.getIdCustomer(), null))
@@ -255,7 +256,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         Mockito.when(parkingLevelRepository.findByIdLevel(PARKING_LEVEL.getIdLevel()))
             .thenReturn(PARKING_LEVEL);
 
-        ResponseEntity responseEntity = bookingServiceImpl.checkoutBooking(principal);
+        ResponseEntity responseEntity = bookingServiceImpl.checkoutBookingStepOne(principal, "");
 
         assertThat(responseEntity).isNotNull();
 
@@ -263,7 +264,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         Mockito.verifyNoMoreInteractions(customerRepository);
     }
 
-    @Test public void checkoutBookingFailed() {
+    @Test public void checkoutBookingFailed() throws IOException {
         PARKING_SLOT.setStatus(SLOT_TAKEN);
         Mockito.when(customerRepository.findByEmail(principal.getName())).thenReturn(CUSTOMER);
         Mockito
@@ -274,7 +275,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         Mockito.when(parkingLevelRepository.findByIdLevel(PARKING_LEVEL.getIdLevel()))
             .thenReturn(PARKING_LEVEL);
 
-        ResponseEntity responseEntity = bookingServiceImpl.checkoutBooking(principal);
+        ResponseEntity responseEntity = bookingServiceImpl.checkoutBookingStepOne(principal, "");
 
         assertThat(responseEntity).isNotNull();
 
