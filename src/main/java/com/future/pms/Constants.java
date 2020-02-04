@@ -75,8 +75,10 @@ public class Constants {
     public static final Integer TOTAL_SLOT_IN_LEVEL = 4 * 64;
 
     static final String FIREBASE_API_URL = "https://fcm.googleapis.com/fcm/send";
-    static final String FIREBASE_SERVER_KEY =
+    static final String FIREBASE_SERVER_KEY_ADMIN =
         "AAAAqj5yPX8:APA91bHsms0YAbeQ8p6Mwlk-AJSdMfA_T7GzLik5DtZUyeb8V5Bz_JpCnYsyTOf7PGYFC3ON1LuBL0qN5y4M5i3IwEetyQ8RM6bvb2JiOzGGN2cJJ0AYLutswycprUY3_jiUwyQCjFJW";
+    static final String FIREBASE_SERVER_KEY_CUSTOMER =
+        "AAAAMdMmVV8:APA91bEnBJ4rgGcQWburtJwrkB7ISg4D1CxjLC16pW7X9ifn8hSltzsmJmrzJGTSYKjRtM_asMAX5FvRk6NoPI564PrehajNVTTvut-co-TsXsuZMRDzltCc0dH_FMht29fhTdLGFMhr";
 
 
 

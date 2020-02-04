@@ -7,8 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.client.RestTemplate;
 
-import static com.future.pms.Constants.FIREBASE_API_URL;
-import static com.future.pms.Constants.FIREBASE_SERVER_KEY;
+import static com.future.pms.Constants.*;
 
 @Async
 public class FcmClient {
@@ -18,13 +17,14 @@ public class FcmClient {
         msg.put("customerName", customerName);
         msg.put("parkingZoneName", parkingZoneName);
         msg.put("levelName", levelName);
-        callToFcmServer(msg, key);
+        callToFcmServer(msg, key, FIREBASE_SERVER_KEY_ADMIN);
     }
 
-    private void callToFcmServer(JSONObject message, String receiverFcmKey) throws JSONException {
+    private void callToFcmServer(JSONObject message, String receiverFcmKey, String key)
+        throws JSONException {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set("Authorization", "key=" + FIREBASE_SERVER_KEY);
+        httpHeaders.set("Authorization", "key=" + key);
         httpHeaders.set("Content-Type", "application/json");
 
         JSONObject json = new JSONObject();
@@ -42,6 +42,6 @@ public class FcmClient {
 
         msg.put("parkingZoneName", parkingZoneName);
         msg.put("totalPrice", totalPrice);
-        callToFcmServer(msg, key);
+        callToFcmServer(msg, key, FIREBASE_SERVER_KEY_CUSTOMER);
     }
 }

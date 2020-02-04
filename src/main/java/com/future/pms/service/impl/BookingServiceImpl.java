@@ -261,8 +261,8 @@ import static com.future.pms.Utils.getTotalTime;
         throws JSONException {
         Customer customer = customerRepository.findByIdCustomer(idCustomer);
         Booking bookingExist = bookingRepository.findBookingByIdUserAndDateOut(idCustomer, null);
-        String bookingId = bookingExist.getIdBooking();
         checkoutBooking(customer);
+        String bookingId = bookingExist.getIdBooking();
         bookingExist = bookingRepository.findBookingByIdBooking(bookingId);
         if (fcmToken != null) {
             FcmClient fcmClient;
