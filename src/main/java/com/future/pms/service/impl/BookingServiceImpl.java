@@ -229,21 +229,19 @@ import static com.future.pms.Utils.getTotalTime;
         return ResponseEntity.ok().body(booking);
     }
 
-    private ResponseEntity checkoutBooking(Customer customer) {
+    private void checkoutBooking(Customer customer) {
         Booking ongoingBooking =
             bookingRepository.findBookingByIdUserAndTotalPrice(customer.getIdCustomer(), null);
         if (null != ongoingBooking) {
-            Booking bookingExist =
-                bookingRepository.findBookingByIdBooking(ongoingBooking.getIdBooking());
-            ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(bookingExist.getIdSlot());
+            ParkingSlot parkingSlot =
+                parkingSlotRepository.findByIdSlot(ongoingBooking.getIdSlot());
             if (SLOT_TAKEN.equals(parkingSlot.getStatus()) || SLOT_TAKEN
                 .equals(parkingSlot.getStatus().substring(parkingSlot.getStatus().length() - 1))) {
-                bookingCheckoutSetup(bookingExist, parkingSlot, parkingSlotRepository,
+                bookingCheckoutSetup(ongoingBooking, parkingSlot, parkingSlotRepository,
                     bookingRepository);
                 setupParkingLayout(parkingSlot, SLOT_EMPTY);
             }
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     void bookingCheckoutSetup(Booking bookingExist, ParkingSlot parkingSlot,
