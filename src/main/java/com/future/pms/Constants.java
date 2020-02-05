@@ -49,14 +49,11 @@ public class Constants {
     public static final String EDIT_MODE = "EditMode";
     public static final String EXIT_EDIT_MODE = "ExitEditMode";
 
-    public static final String UPLOADED_FOLDER = "../assets/";
-
     public static final String CUSTOMER = "ROLE_CUSTOMER";
     public static final String CUSTOMER_BANNED = "ROLE_CUSTOMER (BANNED)";
     public static final String ADMIN = "ROLE_ADMIN";
     public static final String SUPER_ADMIN = "ROLE_SUPER_ADMIN";
     public static final String OPEN_HOUR = "00:00 - 00:00";
-    public static final String FILE_LOCATION = "../qr/";
     public static final String SLOT_UPDATED = "Slot Updated";
     public static final String PARKING_ZONE_NOT_FOUND = "Parking zone not found !";
 
@@ -70,17 +67,15 @@ public class Constants {
     public static final String ONGOING = "ongoing";
     public static final String PAST = "past";
 
-    public static final Integer TOTAL_SLOT_IN_ROW = 16;
-    public static final Integer TOTAL_SLOT_IN_SECTION = 64;
-    public static final Integer TOTAL_SLOT_IN_LEVEL = 4 * 64;
+    public static final Integer TOTAL_SLOT_IN_ROW = 26;
+    public static final Integer TOTAL_SLOT_IN_SECTION = 13 * 13;
+    public static final Integer TOTAL_SLOT_IN_LEVEL = 4 * 13 * 13;
 
     static final String FIREBASE_API_URL = "https://fcm.googleapis.com/fcm/send";
     static final String FIREBASE_SERVER_KEY_ADMIN =
         "AAAAqj5yPX8:APA91bHsms0YAbeQ8p6Mwlk-AJSdMfA_T7GzLik5DtZUyeb8V5Bz_JpCnYsyTOf7PGYFC3ON1LuBL0qN5y4M5i3IwEetyQ8RM6bvb2JiOzGGN2cJJ0AYLutswycprUY3_jiUwyQCjFJW";
     static final String FIREBASE_SERVER_KEY_CUSTOMER =
         "AAAAMdMmVV8:APA91bEnBJ4rgGcQWburtJwrkB7ISg4D1CxjLC16pW7X9ifn8hSltzsmJmrzJGTSYKjRtM_asMAX5FvRk6NoPI564PrehajNVTTvut-co-TsXsuZMRDzltCc0dH_FMht29fhTdLGFMhr";
-
-
 
     public static final ArrayList<String> LETTER = new ArrayList<>(Arrays
         .asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"));

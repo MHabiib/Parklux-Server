@@ -4,12 +4,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.client.RestTemplate;
 
 import static com.future.pms.Constants.*;
 
-@Async
 public class FcmClient {
     public void sendPushNotification(String key, String customerName, String parkingZoneName, String levelName) throws JSONException {
         JSONObject msg = new JSONObject();
