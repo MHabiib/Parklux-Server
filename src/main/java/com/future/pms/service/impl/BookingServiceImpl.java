@@ -191,20 +191,25 @@ import static com.future.pms.Utils.getTotalTime;
             QRCode.from(qr + fcmToken).withSize(250, 250).to(ImageType.PNG).stream();
         filename = customer.getName().replaceAll("\\s+", "").replaceAll("\\s+", "") + ".png";
         filename = amazonClient.convertMultiPartToFileQR(bout, filename);
-        expiredQrCountdown(fcmToken, customer.getIdCustomer());
+        Booking bookingExist =
+            bookingRepository.findBookingByIdUserAndDateOut(customer.getIdCustomer(), null);
+        bookingExist.setDateOut(Calendar.getInstance().getTimeInMillis());
+        bookingRepository.save(bookingExist);
+        expiredQrCountdown(fcmToken, bookingExist);
         return new ResponseEntity<>(filename, HttpStatus.OK);
     }
 
-    private void expiredQrCountdown(String fcmToken, String id) {
+    private void expiredQrCountdown(String fcmToken, Booking bookingExist) {
         new Timer().schedule(new TimerTask() {
             @Override public void run() {
-                Booking bookingExist = bookingRepository.findBookingByIdUserAndDateOut(id, null);
                 if (bookingExist != null) {
+                    bookingExist.setDateOut(null);
+                    bookingRepository.save(bookingExist);
                     FcmClient fcmClient;
                     fcmClient = new FcmClient();
                     try {
-                        fcmClient.sendPushNotificationCheckoutBooking(fcmToken, "fAILEDDDDD",
-                            "fAILEDDDDD");
+                        fcmClient.sendPushNotificationCheckoutBooking(fcmToken, "Timeout !",
+                            "Please show the barcode to to exit gate guard within 15 minutes");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -239,7 +244,9 @@ import static com.future.pms.Utils.getTotalTime;
 
     void bookingCheckoutSetup(Booking bookingExist, ParkingSlot parkingSlot,
         ParkingSlotRepository parkingSlotRepository, BookingRepository bookingRepository) {
-        bookingExist.setDateOut(Calendar.getInstance().getTimeInMillis());
+        if (bookingExist.getDateOut() == null) {
+            bookingExist.setDateOut(Calendar.getInstance().getTimeInMillis());
+        }
         bookingExist.setTotalTime(
             Long.toString(getTotalTime(bookingExist.getDateIn(), bookingExist.getDateOut())));
         bookingExist.setTotalPrice(getTotalPrice(getTotalMinute(bookingExist.getTotalTime()),
