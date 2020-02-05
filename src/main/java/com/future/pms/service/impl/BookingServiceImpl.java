@@ -227,7 +227,7 @@ import static com.future.pms.Utils.getTotalTime;
 
     private ResponseEntity checkoutBooking(Customer customer) {
         Booking ongoingBooking =
-            bookingRepository.findBookingByIdUserAndDateOut(customer.getIdCustomer(), null);
+            bookingRepository.findBookingByIdUserAndTotalPrice(customer.getIdCustomer(), null);
         if (null != ongoingBooking) {
             Booking bookingExist =
                 bookingRepository.findBookingByIdBooking(ongoingBooking.getIdBooking());
@@ -268,7 +268,7 @@ import static com.future.pms.Utils.getTotalTime;
     @Override public ResponseEntity checkoutBookingStepTwo(String fcmToken, String idCustomer)
         throws JSONException {
         Customer customer = customerRepository.findByIdCustomer(idCustomer);
-        Booking bookingExist = bookingRepository.findBookingByIdUserAndDateOut(idCustomer, null);
+        Booking bookingExist = bookingRepository.findBookingByIdUserAndTotalPrice(idCustomer, null);
         checkoutBooking(customer);
         if (bookingExist != null) {
             String bookingId = bookingExist.getIdBooking();

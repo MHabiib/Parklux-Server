@@ -25,6 +25,8 @@ import org.springframework.stereotype.Repository;
 
     Booking findBookingByIdUserAndDateOut(String idUser, Long dateOut);
 
+    Booking findBookingByIdUserAndTotalPrice(String idUser, String totalPrice);
+
     Booking findBookingByIdSlotAndDateOutNull(String idSlot);
 
     Integer countAllByDateOutAndIdUser(Long dateOut, String idUser);
