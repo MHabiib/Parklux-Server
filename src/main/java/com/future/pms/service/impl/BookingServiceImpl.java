@@ -193,16 +193,19 @@ import static com.future.pms.Utils.getTotalTime;
         filename = amazonClient.convertMultiPartToFileQR(bout, filename);
         Booking bookingExist =
             bookingRepository.findBookingByIdUserAndDateOut(customer.getIdCustomer(), null);
-        bookingExist.setDateOut(Calendar.getInstance().getTimeInMillis());
-        bookingRepository.save(bookingExist);
-        expiredQrCountdown(fcmToken, customer.getIdCustomer());
-        return new ResponseEntity<>(filename, HttpStatus.OK);
+        if (bookingExist != null) {
+            bookingExist.setDateOut(Calendar.getInstance().getTimeInMillis());
+            bookingRepository.save(bookingExist);
+            expiredQrCountdown(fcmToken, customer.getIdCustomer());
+            return new ResponseEntity<>(filename, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     private void expiredQrCountdown(String fcmToken, String id) {
         new Timer().schedule(new TimerTask() {
             @Override public void run() {
-                Booking bookingExist = bookingRepository.findBookingByIdUserAndDateOut(id, null);
+                Booking bookingExist = bookingRepository.findBookingByIdUserAndTotalPrice(id, null);
                 if (bookingExist != null) {
                     bookingExist.setDateOut(null);
                     bookingRepository.save(bookingExist);
