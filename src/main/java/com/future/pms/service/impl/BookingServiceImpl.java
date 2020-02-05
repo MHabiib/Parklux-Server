@@ -195,13 +195,14 @@ import static com.future.pms.Utils.getTotalTime;
             bookingRepository.findBookingByIdUserAndDateOut(customer.getIdCustomer(), null);
         bookingExist.setDateOut(Calendar.getInstance().getTimeInMillis());
         bookingRepository.save(bookingExist);
-        expiredQrCountdown(fcmToken, bookingExist);
+        expiredQrCountdown(fcmToken, customer.getIdCustomer());
         return new ResponseEntity<>(filename, HttpStatus.OK);
     }
 
-    private void expiredQrCountdown(String fcmToken, Booking bookingExist) {
+    private void expiredQrCountdown(String fcmToken, String id) {
         new Timer().schedule(new TimerTask() {
             @Override public void run() {
+                Booking bookingExist = bookingRepository.findBookingByIdUserAndDateOut(id, null);
                 if (bookingExist != null) {
                     bookingExist.setDateOut(null);
                     bookingRepository.save(bookingExist);
@@ -209,7 +210,7 @@ import static com.future.pms.Utils.getTotalTime;
                     fcmClient = new FcmClient();
                     try {
                         fcmClient.sendPushNotificationCheckoutBooking(fcmToken, "Timeout !",
-                            "Please show the barcode to to exit gate guard within 15 minutes");
+                            "Please show the barcode to exit gate guard within 15 minutes");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
