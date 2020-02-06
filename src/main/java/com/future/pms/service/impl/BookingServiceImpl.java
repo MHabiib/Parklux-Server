@@ -194,8 +194,6 @@ import static com.future.pms.Utils.getTotalTime;
         Booking bookingExist =
             bookingRepository.findBookingByIdUserAndDateOut(customer.getIdCustomer(), null);
         if (bookingExist != null) {
-            bookingExist.setDateOut(Calendar.getInstance().getTimeInMillis());
-            bookingRepository.save(bookingExist);
             return new ResponseEntity<>(filename, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
