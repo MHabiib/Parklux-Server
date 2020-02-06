@@ -36,11 +36,6 @@ import java.security.Principal;
         return bookingService.findOngoingBookingCustomer(principal);
     }
 
-    @GetMapping("/api/booking/customer/checkoutStepOne")
-    public ResponseEntity findCheckoutStepOneCustomer(Principal principal) {
-        return bookingService.findCheckoutStepOneCustomer(principal);
-    }
-
     @GetMapping("/api/booking/{id}/receipt")
     public ResponseEntity bookingReceipt(@PathVariable("id") String id) {
         return bookingService.bookingReceipt(id);

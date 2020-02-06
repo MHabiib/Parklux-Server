@@ -17,8 +17,6 @@ public interface BookingService {
 
     ResponseEntity findOngoingBookingCustomer(Principal principal);
 
-    ResponseEntity findCheckoutStepOneCustomer(Principal principal);
-
     ResponseEntity createBooking(Principal principal, String idSlot, String fcm)
         throws JSONException;
 

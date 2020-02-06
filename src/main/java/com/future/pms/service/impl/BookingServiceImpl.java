@@ -73,16 +73,6 @@ import static com.future.pms.Utils.getTotalTime;
         Customer customer = customerRepository.findByEmail(principal.getName());
         if (customer != null) {
             return ResponseEntity.ok(bookingRepository
-                .findBookingByIdUserAndDateOut(customer.getIdCustomer(), null));
-        } else {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @Override public ResponseEntity findCheckoutStepOneCustomer(Principal principal) {
-        Customer customer = customerRepository.findByEmail(principal.getName());
-        if (customer != null) {
-            return ResponseEntity.ok(bookingRepository
                 .findBookingByIdUserAndTotalPrice(customer.getIdCustomer(), null));
         } else {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
