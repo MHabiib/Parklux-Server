@@ -63,7 +63,7 @@ import static com.future.pms.Utils.getTotalTime;
         if (customer != null) {
             PageRequest request = PageRequest.of(page, 10, new Sort(Sort.Direction.DESC, "dateIn"));
             return ResponseEntity.ok(bookingRepository
-                .findBookingByIdUserAndDateOutNotNull(customer.getIdCustomer(), request));
+                .findBookingByIdUserAndTotalPriceNotNull(customer.getIdCustomer(), request));
         } else {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
@@ -189,7 +189,7 @@ import static com.future.pms.Utils.getTotalTime;
         qr.setIdSlot(customer.getIdCustomer());
         ByteArrayOutputStream bout =
             QRCode.from(qr + fcmToken).withSize(250, 250).to(ImageType.PNG).stream();
-        filename = customer.getName().replaceAll("\\s+", "").replaceAll("\\s+", "") + ".png";
+        filename = customer.getIdCustomer() + ".png";
         filename = amazonClient.convertMultiPartToFileQR(bout, filename);
         Booking bookingExist =
             bookingRepository.findBookingByIdUserAndDateOut(customer.getIdCustomer(), null);
