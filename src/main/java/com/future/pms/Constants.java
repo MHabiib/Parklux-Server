@@ -58,10 +58,6 @@ public class Constants {
             "_4", "_4", "_4", "_4", "_4", "_4", "_3", "_3", "_3", "_3", "_3", "_3", "_3", "_3",
             "_3", "_3", "_3", "_3", "_3", "_4", "_4", "_4", "_4", "_4", "_4", "_4", "_4", "_4",
             "_4", "_4", "_4", "_4"));
-    static final String FIREBASE_API_URL = "https://fcm.googleapis.com/fcm/send";
-    static final String FIREBASE_SERVER_KEY_ADMIN =
-        "AAAAqj5yPX8:APA91bHsms0YAbeQ8p6Mwlk-AJSdMfA_T7GzLik5DtZUyeb8V5Bz_JpCnYsyTOf7PGYFC3ON1LuBL0qN5y4M5i3IwEetyQ8RM6bvb2JiOzGGN2cJJ0AYLutswycprUY3_jiUwyQCjFJW";
-
     //Authorization Service
     public static final String CLIENT_ID = "pms-client";
     public static final String CLIENT_SECRET = "pms-secret";
@@ -78,7 +74,6 @@ public class Constants {
         "MD5 algorithm not available.  Fatal (should be in the JDK).";
     public static final String ENCODING_NO_AVAILABLE =
         "UTF-8 encoding not available.  Fatal (should be in the JDK).";
-
     //Parking zone service
     public static final String SLOT_TAKEN = "T";
     public static final Character SLOT_TAKEN_CHAR = 'T';
@@ -89,20 +84,16 @@ public class Constants {
     public static final String SLOT_NULL = "_";
     public static final String SLOT_READY = "O";
     public static final String SLOT_SCAN_ME = "S";
-
     public static final String LEVEL_ON_EDIT = "X";
     public static final String LEVEL_AVAILABLE = "A";
     public static final String LEVEL_UNAVAILABLE = "U";
     public static final String LEVEL_TAKE_OUT = "Z";
-
     public static final String SECTION_ONE = "Section 1";
     public static final String SECTION_TWO = "Section 2";
     public static final String SECTION_THREE = "Section 3";
     public static final String SECTION_FOUR = "Section 4";
-
     public static final String EDIT_MODE = "EditMode";
     public static final String EXIT_EDIT_MODE = "ExitEditMode";
-
     public static final String CUSTOMER = "ROLE_CUSTOMER";
     public static final String CUSTOMER_BANNED = "ROLE_CUSTOMER (BANNED)";
     public static final String ADMIN = "ROLE_ADMIN";
@@ -110,22 +101,22 @@ public class Constants {
     public static final String OPEN_HOUR = "00:00 - 00:00";
     public static final String SLOT_UPDATED = "Slot Updated";
     public static final String PARKING_ZONE_NOT_FOUND = "Parking zone not found !";
-
     public static final String SUCCESS = "Success";
     public static final String FAILED = "Failed";
-
     public static final String NOT_ACTIVE = "NOT_ACTIVE";
     public static final String ACTIVE = "ACTIVE";
-
     public static final String ALL = "all";
     public static final String ONGOING = "ongoing";
     public static final String PAST = "past";
-
     public static final Integer TOTAL_SLOT_IN_ROW = 26;
     public static final Integer TOTAL_SLOT_IN_SECTION = 13 * 13;
     public static final Integer TOTAL_SLOT_IN_LEVEL = 4 * 13 * 13;
     public static final ArrayList<String> LETTER = new ArrayList<>(Arrays
-        .asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"));
+        .asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q",
+            "R", "S", "T", "U", "V", "W", "X", "Y", "Z"));
+    static final String FIREBASE_API_URL = "https://fcm.googleapis.com/fcm/send";
+    static final String FIREBASE_SERVER_KEY_ADMIN =
+        "AAAAqj5yPX8:APA91bHsms0YAbeQ8p6Mwlk-AJSdMfA_T7GzLik5DtZUyeb8V5Bz_JpCnYsyTOf7PGYFC3ON1LuBL0qN5y4M5i3IwEetyQ8RM6bvb2JiOzGGN2cJJ0AYLutswycprUY3_jiUwyQCjFJW";
     static final String FIREBASE_SERVER_KEY_CUSTOMER =
         "AAAAMdMmVV8:APA91bEnBJ4rgGcQWburtJwrkB7ISg4D1CxjLC16pW7X9ifn8hSltzsmJmrzJGTSYKjRtM_asMAX5FvRk6NoPI564PrehajNVTTvut-co-TsXsuZMRDzltCc0dH_FMht29fhTdLGFMhr";
 }
