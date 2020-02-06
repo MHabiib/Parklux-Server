@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 
     Booking findBookingByIdBooking(String idBooking);
 
-    Page<Booking> findBookingByIdUserAndDateOutNotNull(String idUser, Pageable pageable);
+    Page<Booking> findBookingByIdUserAndTotalPriceNotNull(String idUser, Pageable pageable);
 
     Page<Booking> findBookingByIdParkingZoneAndDateOut(String idParkingZone, Long dateOut,
         Pageable pageable);
@@ -24,6 +24,8 @@ import org.springframework.stereotype.Repository;
         Pageable pageable);
 
     Booking findBookingByIdUserAndDateOut(String idUser, Long dateOut);
+
+    Booking findBookingByIdUserAndTotalPrice(String idUser, String totalPrice);
 
     Booking findBookingByIdSlotAndDateOutNull(String idSlot);
 
