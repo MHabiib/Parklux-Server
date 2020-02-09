@@ -247,9 +247,9 @@ import static com.future.pms.Utils.getTotalTime;
             parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
         Customer customer = customerRepository.findByIdCustomer(idCustomer);
         Booking bookingExist = bookingRepository.findBookingByIdUserAndTotalPrice(idCustomer, null);
-        checkoutBooking(customer);
         if (bookingExist != null && parkingZone.getIdParkingZone()
             .equals(bookingExist.getIdParkingZone())) {
+            checkoutBooking(customer);
             String bookingId = bookingExist.getIdBooking();
             bookingExist = bookingRepository.findBookingByIdBooking(bookingId);
             if (fcmToken != null) {
