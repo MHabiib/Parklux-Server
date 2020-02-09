@@ -10,7 +10,10 @@ import com.future.pms.model.parking.ParkingSlot;
 import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.repository.*;
 import com.future.pms.service.impl.BookingServiceImpl;
+import org.joda.time.DateTimeUtils;
 import org.json.JSONException;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -25,10 +28,8 @@ import org.springframework.security.oauth2.provider.token.ConsumerTokenServices;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static com.future.pms.Constants.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -81,6 +82,17 @@ import static org.assertj.core.api.Assertions.assertThat;
     @Mock AuthorizationServerTokenServices authorizationServerTokenServices;
     @Mock ConsumerTokenServices consumerTokenServices;
     @Mock private Principal principal;
+
+    private SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss:SSS");
+
+    @Before public void before() throws Exception {
+        Date fixedDateTime = DATE_FORMATTER.parse("01/07/2016 16:45:00:000");
+        DateTimeUtils.setCurrentMillisFixed(fixedDateTime.getTime());
+    }
+
+    @After public void after() {
+        DateTimeUtils.setCurrentMillisSystem();
+    }
 
     @Test public void loadAllAll() {
         Mockito.when(bookingRepository.findBookingBy(PAGEABLE)).thenReturn(PAGE_OF_BOOKING);
@@ -195,7 +207,9 @@ import static org.assertj.core.api.Assertions.assertThat;
         assertThat(responseEntity).isNotNull();
 
         Mockito.verify(customerRepository).findByEmail(principal.getName());
+        Mockito.verify(parkingSlotRepository).findByIdSlot(ID_SLOT);
         Mockito.verifyNoMoreInteractions(customerRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
     }
 
     @Test public void createBookingSuccess() throws JSONException {
@@ -214,7 +228,19 @@ import static org.assertj.core.api.Assertions.assertThat;
         assertThat(responseEntity).isNotNull();
 
         Mockito.verify(customerRepository).findByEmail(principal.getName());
+        Mockito.verify(parkingSlotRepository).findByIdSlot(ID_SLOT);
+        Mockito.verify(parkingSlotRepository).save(PARKING_SLOT);
+        Mockito.verify(userRepository).findByEmail(CUSTOMER.getEmail());
+        Mockito.verify(parkingLevelRepository, Mockito.times(2))
+            .findByIdLevel(PARKING_LEVEL.getIdLevel());
+        Mockito.verify(parkingZoneRepository)
+            .findParkingZoneByIdParkingZone(PARKING_SLOT.getIdParkingZone());
+        Mockito.verify(parkingLevelRepository).save(PARKING_LEVEL);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
         Mockito.verifyNoMoreInteractions(customerRepository);
+        Mockito.verifyNoMoreInteractions(userRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
     }
 
     @Test public void bookingReceipt() {
@@ -230,6 +256,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
         Mockito.verify(parkingZoneRepository)
             .findParkingZoneByIdParkingZone(BOOKING.getIdParkingZone());
+        Mockito.verify(bookingRepository).findBookingByIdBooking(BOOKING.getIdBooking());
+        Mockito.verifyNoMoreInteractions(bookingRepository);
         Mockito.verifyNoMoreInteractions(parkingZoneRepository);
     }
 
@@ -251,7 +279,12 @@ import static org.assertj.core.api.Assertions.assertThat;
         assertThat(responseEntity).isNotNull();
 
         Mockito.verify(customerRepository).findByEmail(principal.getName());
+        Mockito.verify(bookingRepository)
+            .findBookingByIdUserAndDateOut(CUSTOMER.getIdCustomer(), null);
         Mockito.verifyNoMoreInteractions(customerRepository);
+        Mockito.verifyNoMoreInteractions(bookingRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
     }
 
     @Test public void checkoutBookingNotSlotTaken() throws IOException {
@@ -271,7 +304,12 @@ import static org.assertj.core.api.Assertions.assertThat;
         assertThat(responseEntity).isNotNull();
 
         Mockito.verify(customerRepository).findByEmail(principal.getName());
+        Mockito.verify(bookingRepository)
+            .findBookingByIdUserAndDateOut(CUSTOMER.getIdCustomer(), null);
         Mockito.verifyNoMoreInteractions(customerRepository);
+        Mockito.verifyNoMoreInteractions(bookingRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
     }
 
     @Test public void checkoutBookingFailed() throws IOException {
@@ -290,7 +328,12 @@ import static org.assertj.core.api.Assertions.assertThat;
         assertThat(responseEntity).isNotNull();
 
         Mockito.verify(customerRepository).findByEmail(principal.getName());
+        Mockito.verify(bookingRepository)
+            .findBookingByIdUserAndDateOut(CUSTOMER.getIdCustomer(), null);
         Mockito.verifyNoMoreInteractions(customerRepository);
+        Mockito.verifyNoMoreInteractions(bookingRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
     }
 
     @Test public void checkoutBookingFailedNull() throws IOException {
@@ -309,7 +352,12 @@ import static org.assertj.core.api.Assertions.assertThat;
         assertThat(responseEntity).isNotNull();
 
         Mockito.verify(customerRepository).findByEmail(principal.getName());
+        Mockito.verify(bookingRepository)
+            .findBookingByIdUserAndDateOut(CUSTOMER.getIdCustomer(), null);
         Mockito.verifyNoMoreInteractions(customerRepository);
+        Mockito.verifyNoMoreInteractions(bookingRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
     }
 
     @Test public void checkoutBookingSA() {
@@ -333,7 +381,18 @@ import static org.assertj.core.api.Assertions.assertThat;
         assertThat(responseEntity).isNotNull();
 
         Mockito.verify(customerRepository).findByIdCustomer(BOOKING.getIdUser());
+        Mockito.verify(bookingRepository)
+            .findBookingByIdUserAndTotalPrice(CUSTOMER.getIdCustomer(), null);
+        Mockito.verify(bookingRepository).findBookingByIdBooking(BOOKING.getIdBooking());
+        Mockito.verify(bookingRepository).save(BOOKING);
+        Mockito.verify(parkingSlotRepository).findByIdSlot(BOOKING.getIdSlot());
+        Mockito.verify(parkingSlotRepository).save(PARKING_SLOT);
+        Mockito.verify(parkingLevelRepository).findByIdLevel(PARKING_LEVEL.getIdLevel());
+        Mockito.verify(parkingLevelRepository).save(PARKING_LEVEL);
         Mockito.verifyNoMoreInteractions(customerRepository);
+        Mockito.verifyNoMoreInteractions(bookingRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
     }
 
     @Test public void checkoutBookingSABookingDateoutNull() {
@@ -357,7 +416,17 @@ import static org.assertj.core.api.Assertions.assertThat;
         assertThat(responseEntity).isNotNull();
 
         Mockito.verify(customerRepository).findByIdCustomer(BOOKING.getIdUser());
+        Mockito.verify(bookingRepository).findBookingByIdBooking(BOOKING.getIdBooking());
+        Mockito.verify(bookingRepository)
+            .findBookingByIdUserAndTotalPrice(CUSTOMER.getIdCustomer(), null);
+        Mockito.verify(parkingSlotRepository).findByIdSlot(BOOKING.getIdSlot());
+        Mockito.verify(parkingSlotRepository).save(PARKING_SLOT);
+        Mockito.verify(parkingLevelRepository).findByIdLevel(PARKING_LEVEL.getIdLevel());
+        Mockito.verify(parkingLevelRepository).save(PARKING_LEVEL);
+        //        Mockito.verify(bookingRepository).save(BOOKING); different timestamp
         Mockito.verifyNoMoreInteractions(customerRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
     }
 
     @Test public void findBookingById() {
@@ -390,6 +459,17 @@ import static org.assertj.core.api.Assertions.assertThat;
             .checkoutBookingStepTwo(principal, FCM_TOKEN, CUSTOMER.getIdCustomer());
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(customerRepository).findByIdCustomer(CUSTOMER.getIdCustomer());
+        Mockito.verify(parkingSlotRepository).findByIdSlot(BOOKING.getIdSlot());
+        Mockito.verify(bookingRepository, Mockito.times(2))
+            .findBookingByIdUserAndTotalPrice(CUSTOMER.getIdCustomer(), null);
+        Mockito.verify(bookingRepository).findBookingByIdBooking(BOOKING.getIdBooking());
+        Mockito.verify(parkingZoneRepository).findParkingZoneByEmailAdmin(principal.getName());
+        Mockito.verifyNoMoreInteractions(customerRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
+        Mockito.verifyNoMoreInteractions(bookingRepository);
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
     }
 
     @Test public void checkoutBookingStepTwoBookingNull() throws JSONException {
@@ -408,5 +488,14 @@ import static org.assertj.core.api.Assertions.assertThat;
             .checkoutBookingStepTwo(principal, FCM_TOKEN, CUSTOMER.getIdCustomer());
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(customerRepository).findByIdCustomer(CUSTOMER.getIdCustomer());
+        Mockito.verify(bookingRepository)
+            .findBookingByIdUserAndTotalPrice(CUSTOMER.getIdCustomer(), null);
+        Mockito.verify(parkingZoneRepository).findParkingZoneByEmailAdmin(principal.getName());
+        Mockito.verifyNoMoreInteractions(customerRepository);
+        Mockito.verifyNoMoreInteractions(bookingRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
     }
 }
