@@ -57,7 +57,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         assertThat(responseEntity).isNotNull();
     }
 
-    @Test public void generateQRSlotFull() throws IOException {
+    @Test public void generateQRSlotFull() throws IOException, InterruptedException {
         PARKING_SLOT.setStatus(SLOT_EMPTY);
         Mockito.when(parkingSlotRepository.findByIdSlot(ID)).thenReturn(PARKING_SLOT);
         Mockito.when(parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName()))
@@ -67,8 +67,12 @@ import static org.assertj.core.api.Assertions.assertThat;
             .thenReturn(LIST_OF_PARKING_SLOT);
         Mockito.when(parkingLevelRepository.findByIdLevel(PARKING_SLOT.getIdLevel()))
             .thenReturn(PARKING_LEVEL);
+        Mockito.when(parkingSlotRepository.findByIdSlot(PARKING_SLOT.getIdSlot()))
+            .thenReturn(PARKING_SLOT);
 
         ResponseEntity responseEntity = generateQRServiceImpl.generateQR(principal, "");
+
+        Thread.sleep(22000);
 
         assertThat(responseEntity).isNotNull();
     }

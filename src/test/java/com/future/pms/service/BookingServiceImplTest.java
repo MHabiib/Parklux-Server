@@ -1,5 +1,7 @@
 package com.future.pms.service;
 
+import com.future.pms.AmazonClient;
+import com.future.pms.FcmClient;
 import com.future.pms.model.Booking;
 import com.future.pms.model.Customer;
 import com.future.pms.model.User;
@@ -38,6 +40,12 @@ import static org.assertj.core.api.Assertions.assertThat;
             .idSlot("idSlot").idUser("isUser").imageUrl("imageUrl").levelName("levelName")
             .parkingZoneName("parkingZoneName").price(100D).slotName("slotName").totalPrice("1000")
             .totalTime(null).build();
+    private static final Booking BOOKING2 =
+        Booking.builder().idBooking("idBooking").address("address").customerName("customerName")
+            .customerPhone("customerPhone").dateIn(8L).dateOut(null).idParkingZone("idParkingZone")
+            .idSlot("idSlot").idUser("isUser").imageUrl("imageUrl").levelName("levelName")
+            .parkingZoneName("parkingZoneName").price(100D).slotName("slotName").totalPrice("1000")
+            .totalTime(null).build();
     private static final Customer CUSTOMER =
         Customer.builder().idCustomer("idCustomer").email("email").name("name")
             .phoneNumber("phoneNumber").build();
@@ -57,6 +65,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     private static final Pageable PAGEABLE =
         new PageRequest(0, 10, new Sort(Sort.Direction.DESC, "dateIn"));
     private static String FILTER = "filter";
+    private static String FCM_TOKEN = "fcmToken";
     private static String ID_SLOT = "05e22ea963516c80004e3efe80";
 
     @InjectMocks BookingServiceImpl bookingServiceImpl;
@@ -67,6 +76,8 @@ import static org.assertj.core.api.Assertions.assertThat;
     @Mock UserRepository userRepository;
     @Mock ParkingLevelRepository parkingLevelRepository;
     @Mock PasswordEncoder passwordEncoder;
+    @Mock AmazonClient amazonClient;
+    @Mock FcmClient fcmClient;
     @Mock AuthorizationServerTokenServices authorizationServerTokenServices;
     @Mock ConsumerTokenServices consumerTokenServices;
     @Mock private Principal principal;
@@ -190,8 +201,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     @Test public void createBookingSuccess() throws JSONException {
         PARKING_SLOT.setStatus(SLOT_SCAN_ME);
         Mockito.when(customerRepository.findByEmail(principal.getName())).thenReturn(CUSTOMER);
-        Mockito.when(parkingSlotRepository.findByIdSlot(ID_SLOT))
-            .thenReturn(PARKING_SLOT);
+        Mockito.when(parkingSlotRepository.findByIdSlot(ID_SLOT)).thenReturn(PARKING_SLOT);
         Mockito.when(userRepository.findByEmail(CUSTOMER.getEmail())).thenReturn(USER);
         Mockito.when(parkingLevelRepository.findByIdLevel(PARKING_LEVEL.getIdLevel()))
             .thenReturn(PARKING_LEVEL);
@@ -283,14 +293,57 @@ import static org.assertj.core.api.Assertions.assertThat;
         Mockito.verifyNoMoreInteractions(customerRepository);
     }
 
+    @Test public void checkoutBookingFailedNull() throws IOException {
+        PARKING_SLOT.setStatus(SLOT_TAKEN);
+        Mockito.when(customerRepository.findByEmail(principal.getName())).thenReturn(CUSTOMER);
+        Mockito
+            .when(bookingRepository.findBookingByIdUserAndDateOut(CUSTOMER.getIdCustomer(), null))
+            .thenReturn(null);
+        Mockito.when(parkingSlotRepository.findByIdSlot(BOOKING.getIdSlot()))
+            .thenReturn(PARKING_SLOT);
+        Mockito.when(parkingLevelRepository.findByIdLevel(PARKING_LEVEL.getIdLevel()))
+            .thenReturn(PARKING_LEVEL);
+
+        ResponseEntity responseEntity = bookingServiceImpl.checkoutBookingStepOne(principal, "");
+
+        assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(customerRepository).findByEmail(principal.getName());
+        Mockito.verifyNoMoreInteractions(customerRepository);
+    }
+
     @Test public void checkoutBookingSA() {
         PARKING_SLOT.setStatus(SLOT_TAKEN);
         Mockito.when(customerRepository.findByIdCustomer(BOOKING.getIdUser())).thenReturn(CUSTOMER);
         Mockito.when(bookingRepository.findBookingByIdBooking(BOOKING.getIdBooking()))
             .thenReturn(BOOKING);
-        Mockito
-            .when(bookingRepository.findBookingByIdUserAndDateOut(CUSTOMER.getIdCustomer(), null))
+        Mockito.when(
+            bookingRepository.findBookingByIdUserAndTotalPrice(CUSTOMER.getIdCustomer(), null))
             .thenReturn(BOOKING);
+        Mockito.when(bookingRepository.findBookingByIdBooking(BOOKING.getIdBooking()))
+            .thenReturn(BOOKING);
+        Mockito.when(parkingSlotRepository.findByIdSlot(BOOKING.getIdSlot()))
+            .thenReturn(PARKING_SLOT);
+        Mockito.when(parkingLevelRepository.findByIdLevel(PARKING_LEVEL.getIdLevel()))
+            .thenReturn(PARKING_LEVEL);
+
+        ResponseEntity responseEntity =
+            bookingServiceImpl.checkoutBookingSA(BOOKING.getIdBooking());
+
+        assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(customerRepository).findByIdCustomer(BOOKING.getIdUser());
+        Mockito.verifyNoMoreInteractions(customerRepository);
+    }
+
+    @Test public void checkoutBookingSABookingDateoutNull() {
+        PARKING_SLOT.setStatus(SLOT_TAKEN);
+        Mockito.when(customerRepository.findByIdCustomer(BOOKING.getIdUser())).thenReturn(CUSTOMER);
+        Mockito.when(bookingRepository.findBookingByIdBooking(BOOKING.getIdBooking()))
+            .thenReturn(BOOKING);
+        Mockito.when(
+            bookingRepository.findBookingByIdUserAndTotalPrice(CUSTOMER.getIdCustomer(), null))
+            .thenReturn(BOOKING2);
         Mockito.when(bookingRepository.findBookingByIdBooking(BOOKING.getIdBooking()))
             .thenReturn(BOOKING);
         Mockito.when(parkingSlotRepository.findByIdSlot(BOOKING.getIdSlot()))
@@ -317,5 +370,43 @@ import static org.assertj.core.api.Assertions.assertThat;
 
         Mockito.verify(bookingRepository).findBookingByIdBooking(BOOKING.getIdBooking());
         Mockito.verifyNoMoreInteractions(bookingRepository);
+    }
+
+    @Test public void checkoutBookingStepTwoBookingNotNull() throws JSONException {
+        Mockito.when(customerRepository.findByIdCustomer(CUSTOMER.getIdCustomer()))
+            .thenReturn(CUSTOMER);
+        Mockito.when(
+            bookingRepository.findBookingByIdUserAndTotalPrice(CUSTOMER.getIdCustomer(), null))
+            .thenReturn(BOOKING);
+        Mockito.when(parkingSlotRepository.findByIdSlot(BOOKING.getIdSlot()))
+            .thenReturn(PARKING_SLOT);
+        Mockito.when(bookingRepository.findBookingByIdBooking(BOOKING.getIdBooking()))
+            .thenReturn(BOOKING);
+
+        Mockito.when(parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName()))
+            .thenReturn(PARKING_ZONE);
+
+        ResponseEntity responseEntity = bookingServiceImpl
+            .checkoutBookingStepTwo(principal, FCM_TOKEN, CUSTOMER.getIdCustomer());
+
+        assertThat(responseEntity).isNotNull();
+    }
+
+    @Test public void checkoutBookingStepTwoBookingNull() throws JSONException {
+        Mockito.when(customerRepository.findByIdCustomer(CUSTOMER.getIdCustomer()))
+            .thenReturn(CUSTOMER);
+        Mockito.when(
+            bookingRepository.findBookingByIdUserAndTotalPrice(CUSTOMER.getIdCustomer(), null))
+            .thenReturn(null);
+        Mockito.when(parkingSlotRepository.findByIdSlot(BOOKING.getIdSlot()))
+            .thenReturn(PARKING_SLOT);
+
+        Mockito.when(parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName()))
+            .thenReturn(PARKING_ZONE);
+
+        ResponseEntity responseEntity = bookingServiceImpl
+            .checkoutBookingStepTwo(principal, FCM_TOKEN, CUSTOMER.getIdCustomer());
+
+        assertThat(responseEntity).isNotNull();
     }
 }

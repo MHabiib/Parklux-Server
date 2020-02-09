@@ -28,5 +28,6 @@ public interface BookingService {
 
     ResponseEntity findBookingById(String id);
 
-    ResponseEntity checkoutBookingStepTwo(String fcmToken, String idCustomer) throws JSONException;
+    ResponseEntity checkoutBookingStepTwo(Principal principal, String fcmToken, String idCustomer)
+        throws JSONException;
 }

@@ -22,8 +22,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Calendar;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import static com.future.pms.Constants.*;
 import static com.future.pms.Utils.getTotalTime;
@@ -212,8 +210,7 @@ import static com.future.pms.Utils.getTotalTime;
         if (null != ongoingBooking) {
             ParkingSlot parkingSlot =
                 parkingSlotRepository.findByIdSlot(ongoingBooking.getIdSlot());
-            if (SLOT_TAKEN.equals(parkingSlot.getStatus()) || SLOT_TAKEN
-                .equals(parkingSlot.getStatus().substring(parkingSlot.getStatus().length() - 1))) {
+            if (SLOT_TAKEN.equals(parkingSlot.getStatus())) {
                 bookingCheckoutSetup(ongoingBooking, parkingSlot, parkingSlotRepository,
                     bookingRepository);
                 setupParkingLayout(parkingSlot, SLOT_EMPTY);
@@ -244,12 +241,15 @@ import static com.future.pms.Utils.getTotalTime;
         return ResponseEntity.ok(bookingRepository.findBookingByIdBooking(id));
     }
 
-    @Override public ResponseEntity checkoutBookingStepTwo(String fcmToken, String idCustomer)
-        throws JSONException {
+    @Override public ResponseEntity checkoutBookingStepTwo(Principal principal, String fcmToken,
+        String idCustomer) throws JSONException {
+        ParkingZone parkingZone =
+            parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
         Customer customer = customerRepository.findByIdCustomer(idCustomer);
         Booking bookingExist = bookingRepository.findBookingByIdUserAndTotalPrice(idCustomer, null);
         checkoutBooking(customer);
-        if (bookingExist != null) {
+        if (bookingExist != null && parkingZone.getIdParkingZone()
+            .equals(bookingExist.getIdParkingZone())) {
             String bookingId = bookingExist.getIdBooking();
             bookingExist = bookingRepository.findBookingByIdBooking(bookingId);
             if (fcmToken != null) {

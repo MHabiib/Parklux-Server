@@ -1,5 +1,6 @@
 package com.future.pms.service;
 
+import com.future.pms.AmazonClient;
 import com.future.pms.config.MongoTokenStore;
 import com.future.pms.model.Booking;
 import com.future.pms.model.User;
@@ -18,10 +19,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -93,6 +96,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     @Mock BookingService bookingService;
     @Mock PasswordEncoder passwordEncoder;
     @Mock MongoTokenStore mongoTokenStore;
+    @Mock AmazonClient amazonClient;
     @Mock MultipartFile multipartFile;
     @Mock Principal principal;
 
@@ -178,8 +182,30 @@ import static org.assertj.core.api.Assertions.assertThat;
 
     @Test public void updateParkingSectionActive() {
         PARKING_SECTION.setStatus(ACTIVE);
-        PARKING_SECTION.setIdLevel(ID);
         PARKING_SECTION.setSectionName("1");
+        PARKING_SECTION.setIdLevel(ID);
+        Mockito.when(parkingSectionRepository
+            .findParkingSectionByIdSection(ID.substring(1, ID.length() - 1)))
+            .thenReturn(PARKING_SECTION);
+        ArrayList<String> SLOTS2 = SLOTS;
+        for (int i = 0; i < SLOTS2.size(); i++) {
+            SLOTS2.set(i, SLOTS2.get(0).replace('S', '_'));
+        }
+        PARKING_LEVEL.setSlotsLayout(SLOTS2);
+        Mockito.when(parkingLevelRepository.findByIdLevel(ID)).thenReturn(PARKING_LEVEL);
+        Mockito.when(parkingSlotRepository
+            .findByIdParkingZoneAndSlotNumberInLayout(PARKING_LEVEL.getIdParkingZone(), 0))
+            .thenReturn(PARKING_SLOT);
+
+        ResponseEntity responseEntity = parkingZoneServiceImpl.updateParkingSection(ID);
+
+        assertThat(responseEntity).isNotNull();
+    }
+
+    @Test public void updateParkingSectionActiveFailed() {
+        PARKING_SECTION.setStatus(ACTIVE);
+        PARKING_SECTION.setSectionName("A");
+        PARKING_SECTION.setIdLevel(ID);
         Mockito.when(parkingSectionRepository
             .findParkingSectionByIdSection(ID.substring(1, ID.length() - 1)))
             .thenReturn(PARKING_SECTION);
@@ -211,7 +237,11 @@ import static org.assertj.core.api.Assertions.assertThat;
     }
 
     @Test public void updateLevel() {
-        PARKING_LEVEL.setSlotsLayout(SLOTS);
+        ArrayList<String> SLOTS2 = SLOTS;
+        SLOTS2.set(0, SLOTS2.get(0).replace('O', 'T'));
+
+        PARKING_LEVEL.setSlotsLayout(SLOTS2);
+
         Mockito.when(parkingLevelRepository.findByIdLevel(ID)).thenReturn(PARKING_LEVEL);
         Mockito.when(parkingSlotRepository
             .findByIdParkingZoneAndSlotNumberInLayout(PARKING_LEVEL.getIdParkingZone(), 0))
@@ -221,10 +251,14 @@ import static org.assertj.core.api.Assertions.assertThat;
             .thenReturn(PARKING_SLOT);
         Mockito.when(bookingRepository.findBookingByIdSlotAndDateOutNull(PARKING_SLOT.getIdSlot()))
             .thenReturn(BOOKING);
-        SLOTS.set(0, SLOTS.get(0).replace('O', 'T'));
 
-        ResponseEntity responseEntity = parkingZoneServiceImpl.updateLevel(ID,
-            "T__TD_TTTE__EE____TT______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________");
+        StringBuilder slotLayout = new StringBuilder("T__TD_TTTE__EE____TT");
+        for (int i = 0; i < TOTAL_SLOT_IN_LEVEL - 18; i++) {
+            slotLayout.append("T");
+        }
+
+        ResponseEntity responseEntity =
+            parkingZoneServiceImpl.updateLevel(ID, slotLayout.toString());
 
         assertThat(responseEntity).isNotNull();
     }
@@ -250,6 +284,21 @@ import static org.assertj.core.api.Assertions.assertThat;
         assertThat(responseEntity).isNotNull();
     }
 
+    @Test public void updateParkingZoneDetailNull() throws IOException {
+        UsernamePasswordAuthenticationToken principal =
+            new UsernamePasswordAuthenticationToken(PARKING_ZONE.getEmailAdmin(), "password");
+        Mockito.when(parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName()))
+            .thenReturn(null);
+        Mockito.when(parkingZoneRepository.findParkingZoneByIdParkingZone("idParkingZone"))
+            .thenReturn(null);
+        Mockito.when(userRepository.findByEmail(PARKING_ZONE.getEmailAdmin())).thenReturn(USER);
+
+        ResponseEntity responseEntity =
+            parkingZoneServiceImpl.updateParkingZone(principal, PARKING_ZONE_JSON);
+
+        assertThat(responseEntity).isNotNull();
+    }
+
     @Test public void updateAdmin() throws IOException {
         Mockito.when(parkingZoneRepository.findParkingZoneByIdParkingZone(ID))
             .thenReturn(PARKING_ZONE);
@@ -257,6 +306,18 @@ import static org.assertj.core.api.Assertions.assertThat;
         Mockito.when(userRepository.countByEmail("sana2@mail.com")).thenReturn(1);
         Mockito.when(parkingZoneRepository.findParkingZoneByIdParkingZone("idParkingZone"))
             .thenReturn(PARKING_ZONE);
+
+        ResponseEntity responseEntity = parkingZoneServiceImpl.updateAdmin(ID, PARKING_ZONE_JSON);
+
+        assertThat(responseEntity).isNotNull();
+    }
+
+    @Test public void updateAdminParkingZoneDetailNull() throws IOException {
+        Mockito.when(parkingZoneRepository.findParkingZoneByIdParkingZone(ID)).thenReturn(null);
+        Mockito.when(userRepository.findByEmail(PARKING_ZONE.getEmailAdmin())).thenReturn(USER);
+        Mockito.when(userRepository.countByEmail("sana2@mail.com")).thenReturn(1);
+        Mockito.when(parkingZoneRepository.findParkingZoneByIdParkingZone("idParkingZone"))
+            .thenReturn(null);
 
         ResponseEntity responseEntity = parkingZoneServiceImpl.updateAdmin(ID, PARKING_ZONE_JSON);
 
@@ -482,6 +543,28 @@ import static org.assertj.core.api.Assertions.assertThat;
         assertThat(responseEntity).isNotNull();
     }
 
+    @Test public void getSectionDetailsSlotScanMe() {
+        Mockito.when(
+            parkingSectionRepository.findParkingSectionBySectionNameAndIdLevel(SECTION_ONE, ID))
+            .thenReturn(PARKING_SECTION);
+        Mockito.when(
+            parkingSectionRepository.findParkingSectionBySectionNameAndIdLevel(SECTION_TWO, ID))
+            .thenReturn(PARKING_SECTION);
+        Mockito.when(
+            parkingSectionRepository.findParkingSectionBySectionNameAndIdLevel(SECTION_THREE, ID))
+            .thenReturn(PARKING_SECTION);
+        Mockito.when(
+            parkingSectionRepository.findParkingSectionBySectionNameAndIdLevel(SECTION_FOUR, ID))
+            .thenReturn(PARKING_SECTION);
+        SLOTS.set(0, SLOTS.get(0).replace('_', 'S'));
+        PARKING_LEVEL.setSlotsLayout(SLOTS);
+        Mockito.when(parkingLevelRepository.findByIdLevel(ID)).thenReturn(PARKING_LEVEL);
+
+        ResponseEntity responseEntity = parkingZoneServiceImpl.getSectionDetails(ID);
+
+        assertThat(responseEntity).isNotNull();
+    }
+
     @Test public void getSectionDetailsSlotDisable() {
         Mockito.when(
             parkingSectionRepository.findParkingSectionBySectionNameAndIdLevel(SECTION_ONE, ID))
@@ -534,6 +617,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
         ResponseEntity responseEntity =
             parkingZoneServiceImpl.editModeParkingLevel(ID, EXIT_EDIT_MODE);
+
+        assertThat(responseEntity).isNotNull();
+    }
+
+    @Test public void updateParkingZonePictureSuccess() throws IOException {
+        Mockito.when(parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName()))
+            .thenReturn(PARKING_ZONE);
+
+        FileInputStream inputFile = new FileInputStream("./erd.png");
+        MockMultipartFile file =
+            new MockMultipartFile("file", "NameOfTheFile.png", "image/png", inputFile);
+
+        ResponseEntity responseEntity =
+            parkingZoneServiceImpl.updateParkingZonePicture(principal, file);
 
         assertThat(responseEntity).isNotNull();
     }

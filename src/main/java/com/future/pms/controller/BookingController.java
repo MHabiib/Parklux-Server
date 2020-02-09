@@ -64,9 +64,10 @@ import java.security.Principal;
     }
 
     @PostMapping("/api2/booking/checkoutStepTwo/{id}/{fcmToken}")
-    public ResponseEntity checkoutBookingStepTwo(@PathVariable("id") String idCustomer,
-        @PathVariable("fcmToken") String fcmToken) throws JSONException {
-        return bookingService.checkoutBookingStepTwo(fcmToken, idCustomer);
+    public ResponseEntity checkoutBookingStepTwo(Principal principal,
+        @PathVariable("id") String idCustomer, @PathVariable("fcmToken") String fcmToken)
+        throws JSONException {
+        return bookingService.checkoutBookingStepTwo(principal, fcmToken, idCustomer);
     }
 
     @PostMapping("/api3/booking/{id}/checkout")

@@ -181,7 +181,7 @@ import static com.future.pms.Utils.checkImageFile;
                 return "(" + LETTER.get(i - 1) + "-" + ((slotAt % TOTAL_SLOT_IN_ROW) + 1) + ")";
             }
         }
-        return "x";
+        return "";
     }
 
     private String updateSlot(ParkingSection parkingSection, String status) {
@@ -229,6 +229,9 @@ import static com.future.pms.Utils.checkImageFile;
             new ObjectMapper().readValue(parkingZoneJSON, UpdateParkingZoneRequest.class);
         ParkingZone parkingZoneDetail =
             parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
+        if (parkingZoneDetail == null) {
+            return new ResponseEntity<>(PARKING_ZONE_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
         return updateParkingZone(parkingZone, parkingZoneDetail, principal.getName());
     }
 
@@ -237,14 +240,14 @@ import static com.future.pms.Utils.checkImageFile;
         UpdateParkingZoneRequest parkingZone =
             new ObjectMapper().readValue(parkingZoneJSON, UpdateParkingZoneRequest.class);
         ParkingZone parkingZoneDetail = parkingZoneRepository.findParkingZoneByIdParkingZone(id);
+        if (parkingZoneDetail == null) {
+            return new ResponseEntity<>(PARKING_ZONE_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
         return updateParkingZone(parkingZone, parkingZoneDetail, parkingZoneDetail.getEmailAdmin());
     }
 
     private ResponseEntity updateParkingZone(UpdateParkingZoneRequest parkingZone,
         ParkingZone parkingZoneDetail, String emailAdmin) {
-        if (parkingZoneDetail == null) {
-            return new ResponseEntity<>(PARKING_ZONE_NOT_FOUND, HttpStatus.BAD_REQUEST);
-        }
         ParkingZone parkingZoneExist = parkingZoneRepository
             .findParkingZoneByIdParkingZone(parkingZoneDetail.getIdParkingZone());
         User user = userRepository.findByEmail(emailAdmin);

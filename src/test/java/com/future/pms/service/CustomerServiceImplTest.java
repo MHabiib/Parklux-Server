@@ -195,8 +195,8 @@ import static org.assertj.core.api.Assertions.assertThat;
     @Test public void banCustomerCustomer() {
         CUSTOMER.setEmail("email");
         USER.setRole(Constants.CUSTOMER);
-        Mockito
-            .when(bookingRepository.findBookingByIdUserAndDateOut(CUSTOMER.getIdCustomer(), null))
+        Mockito.when(
+            bookingRepository.findBookingByIdUserAndTotalPrice(CUSTOMER.getIdCustomer(), null))
             .thenReturn(BOOKING);
         Mockito.when(customerRepository.findByIdCustomer(CUSTOMER.getIdCustomer()))
             .thenReturn(CUSTOMER);
@@ -209,8 +209,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
     @Test public void banCustomerNotCustomer() {
         CUSTOMER.setEmail("email");
-        Mockito
-            .when(bookingRepository.findBookingByIdUserAndDateOut(CUSTOMER.getIdCustomer(), null))
+        Mockito.when(
+            bookingRepository.findBookingByIdUserAndTotalPrice(CUSTOMER.getIdCustomer(), null))
             .thenReturn(BOOKING);
         Mockito.when(customerRepository.findByIdCustomer(CUSTOMER.getIdCustomer()))
             .thenReturn(CUSTOMER);
