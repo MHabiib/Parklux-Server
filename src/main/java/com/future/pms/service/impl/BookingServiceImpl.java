@@ -256,7 +256,7 @@ import static com.future.pms.Utils.getTotalTime;
                 FcmClient fcmClient;
                 fcmClient = new FcmClient();
                 fcmClient.sendPushNotificationCheckoutBooking(fcmToken,
-                    bookingExist.getParkingZoneName(), bookingExist.getTotalPrice());
+                    bookingExist.getParkingZoneName(), bookingExist.getIdBooking());
             }
             return ResponseEntity.ok().body(bookingExist);
         } else {
