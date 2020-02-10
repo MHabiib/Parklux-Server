@@ -105,6 +105,9 @@ import static com.future.pms.Utils.getTotalTime;
                 && !user.getRole().equals(CUSTOMER_BANNED)) {
                 ParkingZone parkingZone = parkingZoneRepository
                     .findParkingZoneByIdParkingZone(parkingSlot.getIdParkingZone());
+                parkingSlot.setStatus(SLOT_TAKEN);
+                parkingSlotRepository.save(parkingSlot);
+
                 ParkingLevel parkingLevel =
                     parkingLevelRepository.findByIdLevel(parkingSlot.getIdLevel());
                 FcmClient fcmClient;
@@ -113,8 +116,6 @@ import static com.future.pms.Utils.getTotalTime;
                     parkingLevel.getLevelName());
 
                 System.out.println(fcm);
-                parkingSlot.setStatus(SLOT_TAKEN);
-                parkingSlotRepository.save(parkingSlot);
                 setupParkingLayout(parkingSlot, SLOT_TAKEN);
                 Booking bookingParking = new Booking();
                 bookingParking.setParkingZoneName(parkingZone.getName());
