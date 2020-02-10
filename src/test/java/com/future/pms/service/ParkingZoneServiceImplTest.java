@@ -342,16 +342,16 @@ import static org.assertj.core.api.Assertions.assertThat;
         Mockito.when(parkingZoneRepository.findParkingZoneByIdParkingZone("idParkingZone"))
             .thenReturn(PARKING_ZONE);
         Mockito.when(userRepository.findByEmail(PARKING_ZONE.getEmailAdmin())).thenReturn(USER);
-        Mockito.when(userRepository.countByEmail("sana2@mail.com")).thenReturn(1);
+        Mockito.when(userRepository.countByEmail("sana2@mail.com")).thenReturn(0);
 
         ResponseEntity responseEntity =
             parkingZoneServiceImpl.updateParkingZone(principal, PARKING_ZONE_JSON);
 
         assertThat(responseEntity).isNotNull();
 
-        PARKING_ZONE.setEmailAdmin("emailAdmin");
-        Mockito.verify(userRepository).findByEmail(PARKING_ZONE.getEmailAdmin());
+        Mockito.verify(userRepository).findByEmail("emailAdmin");
         Mockito.verify(userRepository).countByEmail("sana2@mail.com");
+        Mockito.verify(userRepository).save(USER);
         Mockito.verifyNoMoreInteractions(userRepository);
     }
 
