@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.security.Principal;
 
 @CrossOrigin("**") @RestController @RequestMapping public class BookingController {
@@ -56,9 +57,17 @@ import java.security.Principal;
         return bookingService.createBooking(principal, idSlot, fcm);
     }
 
-    @PostMapping("/api/booking/checkout")
-    public ResponseEntity checkoutBooking(Principal principal) {
-        return bookingService.checkoutBooking(principal);
+    @PostMapping("/api/booking/checkoutStepOne/{fcmToken}")
+    public ResponseEntity checkoutBookingStepOne(Principal principal,
+        @PathVariable("fcmToken") String fcmToken) throws IOException {
+        return bookingService.checkoutBookingStepOne(principal, fcmToken);
+    }
+
+    @PostMapping("/api2/booking/checkoutStepTwo/{id}/{fcmToken}")
+    public ResponseEntity checkoutBookingStepTwo(Principal principal,
+        @PathVariable("id") String idCustomer, @PathVariable("fcmToken") String fcmToken)
+        throws JSONException {
+        return bookingService.checkoutBookingStepTwo(principal, fcmToken, idCustomer);
     }
 
     @PostMapping("/api3/booking/{id}/checkout")

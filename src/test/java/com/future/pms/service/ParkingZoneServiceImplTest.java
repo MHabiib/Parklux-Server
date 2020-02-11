@@ -1,5 +1,6 @@
 package com.future.pms.service;
 
+import com.future.pms.AmazonClient;
 import com.future.pms.config.MongoTokenStore;
 import com.future.pms.model.Booking;
 import com.future.pms.model.User;
@@ -18,10 +19,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -35,9 +38,9 @@ import static org.assertj.core.api.Assertions.assertThat;
     private static final String NAME = "name";
     private static final String ID = "123456789ASDGHJQWE";
     private static final Pageable PAGEABLE =
-        new PageRequest(0, 10, new Sort(Sort.Direction.DESC, "dateIn"));
-    private static final ParkingLevel PARKING_LEVEL =
-        ParkingLevel.builder().idLevel("idLevel").slotsLayout(new ArrayList<>(SLOTS)).build();
+        new PageRequest(0, 10, new Sort(Sort.Direction.ASC, "dateIn"));
+    private static final Pageable PAGEABLE_NAME =
+        new PageRequest(0, 10, new Sort(Sort.Direction.ASC, "name"));
     private static final LevelDetailsRequest LEVEL_DETAILS_REQUEST =
         LevelDetailsRequest.builder().levelName("levelName - Unavailable").idLevel("idLevel")
             .build();
@@ -54,15 +57,16 @@ import static org.assertj.core.api.Assertions.assertThat;
     private static final ParkingZone PARKING_ZONE =
         ParkingZone.builder().idParkingZone("idParkingZone").address("address")
             .emailAdmin("emailAdmin").imageUrl("imageUrl").name("name").phoneNumber("phoneNumber")
-            .imageUrl("").build();
+            .imageUrl("").latitude(0.1).build();
     private static final User USER =
         User.builder().idUser("idUser").email(null).password("passwordUser").role("roleUser")
             .build();
     private static final String PARKING_ZONE_JSON =
         "{\n" + "  \"address\": \"address\",\n" + "  \"emailAdmin\": \"sana2@mail.com\",\n"
-            + "  \"name\": \"Plaza Indonesia\",\n" + "  \"openHour\": \"string\",\n"
-            + "  \"phoneNumber\": \"string\",\n" + "  \"price\": 1000,\n"
-            + "  \"password\": \"password\",\n" + "  \"imageUrl\": \"\"\n" + "}";
+            + "  \"name\": \"Plaza Indonesia\",\n" + "  \"latitude\": 0.1,\n"
+            + "  \"openHour\": \"string\",\n" + "  \"phoneNumber\": \"string\",\n"
+            + "  \"price\": 1000,\n" + "  \"password\": \"password\",\n" + "  \"imageUrl\": \"\"\n"
+            + "}";
     private static final Booking BOOKING =
         Booking.builder().idBooking("idBooking").address("address").customerName("customerName")
             .customerPhone("customerPhone").dateIn(8L).dateOut(9L).idParkingZone("idParkingZone")
@@ -81,7 +85,8 @@ import static org.assertj.core.api.Assertions.assertThat;
     private static final List<ParkingSlot> LIST_OF_PARKING_SLOT4 = new ArrayList<>();
     private static final Page<ParkingZone> PAGE_OF_PARKING_ZONE =
         new PageImpl<>(LIST_OF_PARKING_ZONE);
-
+    private static ParkingLevel PARKING_LEVEL =
+        ParkingLevel.builder().idLevel("idLevel").slotsLayout(new ArrayList<>(SLOTS)).build();
     @InjectMocks ParkingZoneServiceImpl parkingZoneServiceImpl;
     @Mock ParkingZoneRepository parkingZoneRepository;
     @Mock ParkingLevelRepository parkingLevelRepository;
@@ -92,17 +97,22 @@ import static org.assertj.core.api.Assertions.assertThat;
     @Mock BookingService bookingService;
     @Mock PasswordEncoder passwordEncoder;
     @Mock MongoTokenStore mongoTokenStore;
+    @Mock AmazonClient amazonClient;
     @Mock MultipartFile multipartFile;
     @Mock Principal principal;
 
     @Test public void loadAll() {
         Mockito.when(
-            parkingZoneRepository.findParkingZoneByNameContainingAllIgnoreCase(PAGEABLE, NAME))
+            parkingZoneRepository.findParkingZoneByNameContainingAllIgnoreCase(PAGEABLE_NAME, NAME))
             .thenReturn(PAGE_OF_PARKING_ZONE);
 
         ResponseEntity responseEntity = parkingZoneServiceImpl.loadAll(0, NAME);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingZoneRepository)
+            .findParkingZoneByNameContainingAllIgnoreCase(PAGEABLE_NAME, NAME);
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
     }
 
     @Test public void getParkingZoneDetailSuccess() {
@@ -112,6 +122,9 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.getParkingZoneDetail(principal);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingZoneRepository).findParkingZoneByEmailAdmin(principal.getName());
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
     }
 
     @Test public void getParkingZoneDetailUserNotFound() {
@@ -121,6 +134,10 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.getParkingZoneDetail(principal);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingZoneRepository, Mockito.times(2))
+            .findParkingZoneByEmailAdmin(principal.getName());
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
     }
 
     @Test public void addParkingLevel() {
@@ -131,6 +148,16 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.addParkingLevel(NAME, principal);
 
         assertThat(responseEntity).isNotNull();
+
+        PARKING_LEVEL.setIdLevel(null);
+        PARKING_LEVEL.setIdParkingZone("idParkingZone");
+        PARKING_LEVEL.setLevelName("am");
+        PARKING_LEVEL.setStatus("A");
+        Mockito.verify(parkingZoneRepository).findParkingZoneByEmailAdmin(principal.getName());
+        Mockito.verify(parkingLevelRepository).save(PARKING_LEVEL);
+        Mockito.verify(parkingLevelRepository).findByIdLevel(null);
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
     }
 
     @Test public void addParkingLevelParkingZoneNotFound() {
@@ -140,6 +167,9 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.addParkingLevel(NAME, principal);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingZoneRepository).findParkingZoneByEmailAdmin(principal.getName());
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
     }
 
     @Test public void updateParkingSectionNotActiveFailed() {
@@ -154,6 +184,12 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.updateParkingSection(ID);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingLevelRepository).findByIdLevel(ID);
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionByIdSection(ID.substring(1, ID.length() - 1));
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
+        Mockito.verifyNoMoreInteractions(parkingSectionRepository);
     }
 
     @Test public void updateParkingSectionNotActive() {
@@ -173,12 +209,51 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.updateParkingSection(ID);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionByIdSection(ID.substring(1, ID.length() - 1));
+        Mockito.verify(parkingSectionRepository).save(PARKING_SECTION);
+        Mockito.verify(parkingLevelRepository).findByIdLevel(ID);
+        Mockito.verify(parkingLevelRepository).save(PARKING_LEVEL);
+        Mockito.verify(parkingSlotRepository)
+            .findByIdParkingZoneAndSlotNumberInLayout(PARKING_LEVEL.getIdParkingZone(), 0);
+        Mockito.verify(parkingSlotRepository).save(PARKING_SLOT);
+        Mockito.verifyNoMoreInteractions(parkingSectionRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
     }
 
     @Test public void updateParkingSectionActive() {
         PARKING_SECTION.setStatus(ACTIVE);
-        PARKING_SECTION.setIdLevel(ID);
         PARKING_SECTION.setSectionName("1");
+        PARKING_SECTION.setIdLevel(ID);
+        Mockito.when(parkingSectionRepository
+            .findParkingSectionByIdSection(ID.substring(1, ID.length() - 1)))
+            .thenReturn(PARKING_SECTION);
+        ArrayList<String> SLOTS2 = SLOTS;
+        for (int i = 0; i < SLOTS2.size(); i++) {
+            SLOTS2.set(i, SLOTS2.get(0).replace('S', '_'));
+        }
+        PARKING_LEVEL.setSlotsLayout(SLOTS2);
+        Mockito.when(parkingLevelRepository.findByIdLevel(ID)).thenReturn(PARKING_LEVEL);
+        Mockito.when(parkingSlotRepository
+            .findByIdParkingZoneAndSlotNumberInLayout(PARKING_LEVEL.getIdParkingZone(), 0))
+            .thenReturn(PARKING_SLOT);
+
+        ResponseEntity responseEntity = parkingZoneServiceImpl.updateParkingSection(ID);
+
+        assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingLevelRepository).findByIdLevel(ID);
+        Mockito.verify(parkingLevelRepository).save(PARKING_LEVEL);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
+    }
+
+    @Test public void updateParkingSectionActiveFailed() {
+        PARKING_SECTION.setStatus(ACTIVE);
+        PARKING_SECTION.setSectionName("A");
+        PARKING_SECTION.setIdLevel(ID);
         Mockito.when(parkingSectionRepository
             .findParkingSectionByIdSection(ID.substring(1, ID.length() - 1)))
             .thenReturn(PARKING_SECTION);
@@ -187,6 +262,12 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.updateParkingSection(ID);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionByIdSection(ID.substring(1, ID.length() - 1));
+        Mockito.verify(parkingLevelRepository).findByIdLevel(ID);
+        Mockito.verifyNoMoreInteractions(parkingSectionRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
     }
 
     @Test public void updateParkingSectionDefault() {
@@ -198,6 +279,10 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.updateParkingSection(ID);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionByIdSection(ID.substring(1, ID.length() - 1));
+        Mockito.verifyNoMoreInteractions(parkingSectionRepository);
     }
 
     @Test public void updateParkingSectionSlotNotFound() {
@@ -207,10 +292,16 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.updateParkingSection(ID);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
     }
 
     @Test public void updateLevel() {
-        PARKING_LEVEL.setSlotsLayout(SLOTS);
+        ArrayList<String> SLOTS2 = SLOTS;
+        SLOTS2.set(0, SLOTS2.get(0).replace('O', 'T'));
+
+        PARKING_LEVEL.setSlotsLayout(SLOTS2);
+
         Mockito.when(parkingLevelRepository.findByIdLevel(ID)).thenReturn(PARKING_LEVEL);
         Mockito.when(parkingSlotRepository
             .findByIdParkingZoneAndSlotNumberInLayout(PARKING_LEVEL.getIdParkingZone(), 0))
@@ -220,12 +311,21 @@ import static org.assertj.core.api.Assertions.assertThat;
             .thenReturn(PARKING_SLOT);
         Mockito.when(bookingRepository.findBookingByIdSlotAndDateOutNull(PARKING_SLOT.getIdSlot()))
             .thenReturn(BOOKING);
-        SLOTS.set(0, SLOTS.get(0).replace('O', 'T'));
 
-        ResponseEntity responseEntity = parkingZoneServiceImpl.updateLevel(ID,
-            "T__TD_TTTE__EE____TT______________________________________________________________________________________________________________________________________________________________________________________________________________________________________________");
+        StringBuilder slotLayout = new StringBuilder("T__TD_TTTE__EE____TT");
+        for (int i = 0; i < TOTAL_SLOT_IN_LEVEL - 18; i++) {
+            slotLayout.append("T");
+        }
+
+        ResponseEntity responseEntity =
+            parkingZoneServiceImpl.updateLevel(ID, slotLayout.toString());
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(bookingRepository)
+            .findBookingByIdSlotAndDateOutNull(PARKING_SLOT.getIdSlot());
+        Mockito.verify(bookingRepository).save(BOOKING);
+        Mockito.verifyNoMoreInteractions(bookingRepository);
     }
 
     @Test public void updateLevelNotFound() {
@@ -242,11 +342,36 @@ import static org.assertj.core.api.Assertions.assertThat;
         Mockito.when(parkingZoneRepository.findParkingZoneByIdParkingZone("idParkingZone"))
             .thenReturn(PARKING_ZONE);
         Mockito.when(userRepository.findByEmail(PARKING_ZONE.getEmailAdmin())).thenReturn(USER);
+        Mockito.when(userRepository.countByEmail("sana2@mail.com")).thenReturn(0);
 
         ResponseEntity responseEntity =
             parkingZoneServiceImpl.updateParkingZone(principal, PARKING_ZONE_JSON);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(userRepository).findByEmail("emailAdmin");
+        Mockito.verify(userRepository).countByEmail("sana2@mail.com");
+        Mockito.verify(userRepository).save(USER);
+        Mockito.verifyNoMoreInteractions(userRepository);
+    }
+
+    @Test public void updateParkingZoneDetailNull() throws IOException {
+        UsernamePasswordAuthenticationToken principal =
+            new UsernamePasswordAuthenticationToken(PARKING_ZONE.getEmailAdmin(), "password");
+        Mockito.when(parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName()))
+            .thenReturn(null);
+        Mockito.when(parkingZoneRepository.findParkingZoneByIdParkingZone("idParkingZone"))
+            .thenReturn(null);
+        Mockito.when(userRepository.findByEmail(PARKING_ZONE.getEmailAdmin())).thenReturn(USER);
+
+        ResponseEntity responseEntity =
+            parkingZoneServiceImpl.updateParkingZone(principal, PARKING_ZONE_JSON);
+
+        assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingZoneRepository).findParkingZoneByEmailAdmin(principal.getName());
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void updateAdmin() throws IOException {
@@ -260,6 +385,29 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.updateAdmin(ID, PARKING_ZONE_JSON);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingZoneRepository).findParkingZoneByIdParkingZone(ID);
+        Mockito.verify(parkingZoneRepository).findParkingZoneByIdParkingZone("idParkingZone");
+        Mockito.verify(userRepository).findByEmail(PARKING_ZONE.getEmailAdmin());
+        Mockito.verify(userRepository).countByEmail("sana2@mail.com");
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
+        Mockito.verifyNoMoreInteractions(userRepository);
+    }
+
+    @Test public void updateAdminParkingZoneDetailNull() throws IOException {
+        Mockito.when(parkingZoneRepository.findParkingZoneByIdParkingZone(ID)).thenReturn(null);
+        Mockito.when(userRepository.findByEmail(PARKING_ZONE.getEmailAdmin())).thenReturn(USER);
+        Mockito.when(userRepository.countByEmail("sana2@mail.com")).thenReturn(1);
+        Mockito.when(parkingZoneRepository.findParkingZoneByIdParkingZone("idParkingZone"))
+            .thenReturn(null);
+
+        ResponseEntity responseEntity = parkingZoneServiceImpl.updateAdmin(ID, PARKING_ZONE_JSON);
+
+        assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingZoneRepository).findParkingZoneByIdParkingZone(ID);
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void updateParkingLevelStatusAvailable() {
@@ -276,6 +424,13 @@ import static org.assertj.core.api.Assertions.assertThat;
             parkingZoneServiceImpl.updateParkingLevel(LEVEL_DETAILS_REQUEST, principal);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingLevelRepository).findByIdLevel(LEVEL_DETAILS_REQUEST.getIdLevel());
+        Mockito.verify(parkingLevelRepository).save(PARKING_LEVEL);
+        Mockito.verify(parkingSlotRepository).findAllByIdLevel(PARKING_LEVEL.getIdLevel());
+        Mockito.verify(parkingSlotRepository).save(PARKING_SLOT);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
     }
 
     @Test public void updateParkingLevelStatusUnavailable() {
@@ -291,6 +446,13 @@ import static org.assertj.core.api.Assertions.assertThat;
             parkingZoneServiceImpl.updateParkingLevel(LEVEL_DETAILS_REQUEST, principal);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingLevelRepository).findByIdLevel(LEVEL_DETAILS_REQUEST.getIdLevel());
+        Mockito.verify(parkingLevelRepository).save(PARKING_LEVEL);
+        Mockito.verify(parkingSlotRepository).findAllByIdLevel(PARKING_LEVEL.getIdLevel());
+        Mockito.verify(parkingSlotRepository).save(PARKING_SLOT);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
     }
 
     @Test public void updateParkingLevelStatusUnavailableHaveOngoing() {
@@ -307,6 +469,11 @@ import static org.assertj.core.api.Assertions.assertThat;
             parkingZoneServiceImpl.updateParkingLevel(LEVEL_DETAILS_REQUEST, principal);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingLevelRepository).findByIdLevel(LEVEL_DETAILS_REQUEST.getIdLevel());
+        Mockito.verify(parkingSlotRepository).findAllByIdLevel(PARKING_LEVEL.getIdLevel());
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
     }
 
     @Test
@@ -324,6 +491,11 @@ import static org.assertj.core.api.Assertions.assertThat;
             parkingZoneServiceImpl.updateParkingLevel(LEVEL_DETAILS_REQUEST, principal);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingLevelRepository).findByIdLevel(LEVEL_DETAILS_REQUEST.getIdLevel());
+        Mockito.verify(parkingSlotRepository).findAllByIdLevel(PARKING_LEVEL.getIdLevel());
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
     }
 
     @Test public void updateParkingLevelStatusTakeOut() {
@@ -338,6 +510,13 @@ import static org.assertj.core.api.Assertions.assertThat;
             parkingZoneServiceImpl.updateParkingLevel(LEVEL_DETAILS_REQUEST, principal);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingLevelRepository).findByIdLevel(LEVEL_DETAILS_REQUEST.getIdLevel());
+        Mockito.verify(parkingLevelRepository).delete(PARKING_LEVEL);
+        Mockito.verify(parkingSlotRepository).findAllByIdLevel(PARKING_LEVEL.getIdLevel());
+        Mockito.verify(parkingSlotRepository).deleteAll(LIST_OF_PARKING_SLOT3);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
     }
 
     @Test public void updateParkingLevelStatusTakeOutHaveOngoing() {
@@ -352,6 +531,11 @@ import static org.assertj.core.api.Assertions.assertThat;
             parkingZoneServiceImpl.updateParkingLevel(LEVEL_DETAILS_REQUEST, principal);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingLevelRepository).findByIdLevel(LEVEL_DETAILS_REQUEST.getIdLevel());
+        Mockito.verify(parkingSlotRepository).findAllByIdLevel(PARKING_LEVEL.getIdLevel());
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
     }
 
     @Test public void updateParkingLevelStatusFailed() {
@@ -365,6 +549,11 @@ import static org.assertj.core.api.Assertions.assertThat;
             parkingZoneServiceImpl.updateParkingLevel(LEVEL_DETAILS_REQUEST, principal);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingLevelRepository).findByIdLevel(LEVEL_DETAILS_REQUEST.getIdLevel());
+        Mockito.verify(parkingSlotRepository).findAllByIdLevel(PARKING_LEVEL.getIdLevel());
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
     }
 
     @Test public void getLevels() {
@@ -384,6 +573,12 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.getLevels(principal);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingZoneRepository).findParkingZoneByEmailAdmin(principal.getName());
+        Mockito.verify(parkingLevelRepository)
+            .findByIdParkingZoneOrderByLevelName(PARKING_ZONE.getIdParkingZone());
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
     }
 
     @Test public void getParkingBookingLayout() {
@@ -395,6 +590,13 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.getParkingBookingLayout(ID);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(bookingRepository).findBookingByIdBooking(ID);
+        Mockito.verify(parkingSlotRepository).findByIdSlot(BOOKING.getIdSlot());
+        Mockito.verify(parkingLevelRepository).findByIdLevel(PARKING_SLOT.getIdLevel());
+        Mockito.verifyNoMoreInteractions(bookingRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
     }
 
     @Test public void getParkingBookingLayoutFailed() {
@@ -409,6 +611,9 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.getParkingLevelLayout(ID);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingLevelRepository).findByIdLevel(ID);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
     }
 
     @Test public void getParkingLevelLayoutFailed() {
@@ -435,6 +640,18 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.getSectionDetails(ID);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_ONE, ID);
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_TWO, ID);
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_THREE, ID);
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_FOUR, ID);
+        Mockito.verify(parkingLevelRepository).findByIdLevel(ID);
+        Mockito.verifyNoMoreInteractions(parkingSectionRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
     }
 
     @Test public void getSectionDetailsSlotTaken() {
@@ -457,6 +674,18 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.getSectionDetails(ID);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_ONE, ID);
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_TWO, ID);
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_THREE, ID);
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_FOUR, ID);
+        Mockito.verify(parkingLevelRepository).findByIdLevel(ID);
+        Mockito.verifyNoMoreInteractions(parkingSectionRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
     }
 
     @Test public void getSectionDetailsSlotEmpty() {
@@ -479,6 +708,53 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.getSectionDetails(ID);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_ONE, ID);
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_TWO, ID);
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_THREE, ID);
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_FOUR, ID);
+        Mockito.verify(parkingLevelRepository).findByIdLevel(ID);
+        Mockito.verifyNoMoreInteractions(parkingSectionRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
+    }
+
+    @Test public void getSectionDetailsSlotScanMe() {
+        Mockito.when(
+            parkingSectionRepository.findParkingSectionBySectionNameAndIdLevel(SECTION_ONE, ID))
+            .thenReturn(PARKING_SECTION);
+        Mockito.when(
+            parkingSectionRepository.findParkingSectionBySectionNameAndIdLevel(SECTION_TWO, ID))
+            .thenReturn(PARKING_SECTION);
+        Mockito.when(
+            parkingSectionRepository.findParkingSectionBySectionNameAndIdLevel(SECTION_THREE, ID))
+            .thenReturn(PARKING_SECTION);
+        Mockito.when(
+            parkingSectionRepository.findParkingSectionBySectionNameAndIdLevel(SECTION_FOUR, ID))
+            .thenReturn(PARKING_SECTION);
+        SLOTS.set(0, SLOTS.get(0).replace('_', 'S'));
+        PARKING_LEVEL.setSlotsLayout(SLOTS);
+        Mockito.when(parkingLevelRepository.findByIdLevel(ID)).thenReturn(PARKING_LEVEL);
+
+        ResponseEntity responseEntity = parkingZoneServiceImpl.getSectionDetails(ID);
+
+        assertThat(responseEntity).isNotNull();
+
+
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_ONE, ID);
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_TWO, ID);
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_THREE, ID);
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_FOUR, ID);
+        Mockito.verify(parkingLevelRepository).findByIdLevel(ID);
+        Mockito.verifyNoMoreInteractions(parkingSectionRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
     }
 
     @Test public void getSectionDetailsSlotDisable() {
@@ -501,6 +777,18 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.getSectionDetails(ID);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_ONE, ID);
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_TWO, ID);
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_THREE, ID);
+        Mockito.verify(parkingSectionRepository)
+            .findParkingSectionBySectionNameAndIdLevel(SECTION_FOUR, ID);
+        Mockito.verify(parkingLevelRepository).findByIdLevel(ID);
+        Mockito.verifyNoMoreInteractions(parkingSectionRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
     }
 
     @Test public void editModeParkingLevelEditMode() {
@@ -512,6 +800,14 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.editModeParkingLevel(ID, EDIT_MODE);
 
         assertThat(responseEntity).isNotNull();
+        PARKING_SLOT.setStatus("X-X-X-E");
+
+        Mockito.verify(parkingLevelRepository).findByIdLevel(ID);
+        Mockito.verify(parkingLevelRepository).save(PARKING_LEVEL);
+        Mockito.verify(parkingSlotRepository).findAllByIdLevel(ID);
+        Mockito.verify(parkingSlotRepository, Mockito.times(3)).save(PARKING_SLOT);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
     }
 
     @Test public void editModeParkingLevelAvailable() {
@@ -526,6 +822,14 @@ import static org.assertj.core.api.Assertions.assertThat;
             parkingZoneServiceImpl.editModeParkingLevel(ID, EXIT_EDIT_MODE);
 
         assertThat(responseEntity).isNotNull();
+
+        PARKING_SLOT.setStatus("E");
+        Mockito.verify(parkingLevelRepository).findByIdLevel(ID);
+        Mockito.verify(parkingLevelRepository).save(PARKING_LEVEL);
+        Mockito.verify(parkingSlotRepository).findAllByIdLevel(ID);
+        Mockito.verify(parkingSlotRepository, Mockito.times(6)).save(PARKING_SLOT);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
     }
 
     @Test public void editModeParkingNullParkingZone() {
@@ -535,10 +839,30 @@ import static org.assertj.core.api.Assertions.assertThat;
             parkingZoneServiceImpl.editModeParkingLevel(ID, EXIT_EDIT_MODE);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingLevelRepository).findByIdLevel(ID);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
+    }
+
+    @Test public void updateParkingZonePictureSuccess() throws IOException {
+        Mockito.when(parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName()))
+            .thenReturn(PARKING_ZONE);
+
+        FileInputStream inputFile = new FileInputStream("./erd.png");
+        MockMultipartFile file =
+            new MockMultipartFile("file", "NameOfTheFile.png", "image/png", inputFile);
+
+        ResponseEntity responseEntity =
+            parkingZoneServiceImpl.updateParkingZonePicture(principal, file);
+
+        assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingZoneRepository).findParkingZoneByEmailAdmin(principal.getName());
+        Mockito.verify(parkingZoneRepository).save(PARKING_ZONE);
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
     }
 
     @Test public void updateParkingZonePictureFailed() {
-
         ResponseEntity responseEntity =
             parkingZoneServiceImpl.updateParkingZonePicture(principal, multipartFile);
 
@@ -552,6 +876,9 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.getAdminSA(ID);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingZoneRepository, Mockito.times(2)).findParkingZoneByIdParkingZone(ID);
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
     }
 
     @Test public void getAdminSAFailed() {
@@ -560,6 +887,22 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = parkingZoneServiceImpl.getAdminSA(ID);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingZoneRepository).findParkingZoneByIdParkingZone(ID);
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
+    }
+
+    @Test public void getLatLng() {
+        Mockito.when(parkingZoneRepository.findParkingZoneByLatitudeNotNullAndLongitudeNotLike(0.0))
+            .thenReturn(LIST_OF_PARKING_ZONE);
+
+        ResponseEntity responseEntity = parkingZoneServiceImpl.getLatLng();
+
+        assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingZoneRepository)
+            .findParkingZoneByLatitudeNotNullAndLongitudeNotLike(0.0);
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
     }
 
 }

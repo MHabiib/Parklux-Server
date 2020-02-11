@@ -120,7 +120,7 @@ import static com.future.pms.Constants.CUSTOMER_BANNED;
     }
 
     @Override public ResponseEntity banCustomer(String id) {
-        Booking booking = bookingRepository.findBookingByIdUserAndDateOut(id, null);
+        Booking booking = bookingRepository.findBookingByIdUserAndTotalPrice(id, null);
         if (booking != null) {
             bookingService.checkoutBookingSA(booking.getIdBooking());
         }

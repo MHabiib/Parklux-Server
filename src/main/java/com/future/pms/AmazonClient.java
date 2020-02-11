@@ -40,7 +40,7 @@ import java.io.IOException;
 
     public String convertMultiPartToFileQR(ByteArrayOutputStream file, String filename)
         throws IOException {
-        String fileUrl = "";
+        String fileUrl;
         File convFile = new File(filename);
         FileOutputStream fos = new FileOutputStream(convFile);
         fos.write(file.toByteArray());
@@ -51,7 +51,7 @@ import java.io.IOException;
         return fileUrl;
     }
 
-    public void uploadFileTos3bucket(String fileName, File file) {
+    private void uploadFileTos3bucket(String fileName, File file) {
         s3client.putObject(new PutObjectRequest(bucketName, fileName, file)
             .withCannedAcl(CannedAccessControlList.PublicRead));
     }

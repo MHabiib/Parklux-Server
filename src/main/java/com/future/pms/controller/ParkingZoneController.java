@@ -91,4 +91,8 @@ import java.security.Principal;
         @PathVariable("mode") String mode) {
         return parkingZoneService.editModeParkingLevel(idLevel, mode);
     }
+
+    @GetMapping("/api/parking-zone/latlng") public ResponseEntity getLatLng() {
+        return parkingZoneService.getLatLng();
+    }
 }

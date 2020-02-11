@@ -40,6 +40,8 @@ import static org.assertj.core.api.Assertions.assertThat;
     private static final User USER =
         User.builder().idUser("idUser").email(null).password("passwordUser").role("roleUser")
             .build();
+    private static final User USER_CUSTOMER_REQUEST =
+        User.builder().idUser(null).email("email").password(null).role("ROLE_CUSTOMER").build();
     private static final Booking BOOKING = Booking.builder().idBooking("idBooking").build();
     private static final String CUSTOMER_JSON = "{\n" + "    \"name\": \"Ryujin (Android 2)\",\n"
         + "    \"email\": \"android2@mail.com\",\n" + "    \"phoneNumber\": \"14022\",\n"
@@ -110,6 +112,12 @@ import static org.assertj.core.api.Assertions.assertThat;
             customerServiceImpl.updateCustomerSA(CUSTOMER.getIdCustomer(), CUSTOMER_JSON);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(customerRepository).findByIdCustomer(CUSTOMER.getIdCustomer());
+        Mockito.verify(userRepository).findByEmail(CUSTOMER.getEmail());
+        Mockito.verify(userRepository).countByEmail("android2@mail.com");
+        Mockito.verifyNoMoreInteractions(customerRepository);
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void updateCustomerSAFailed() throws IOException {
@@ -123,6 +131,11 @@ import static org.assertj.core.api.Assertions.assertThat;
             customerServiceImpl.updateCustomerSA(CUSTOMER.getIdCustomer(), CUSTOMER_JSON);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(customerRepository).findByIdCustomer(CUSTOMER.getIdCustomer());
+        Mockito.verify(userRepository).findByEmail(CUSTOMER.getEmail());
+        Mockito.verifyNoMoreInteractions(customerRepository);
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void updateCustomerFailedEmailAlreadyRegistered() throws IOException {
@@ -133,6 +146,11 @@ import static org.assertj.core.api.Assertions.assertThat;
             customerServiceImpl.updateCustomer(principal, CUSTOMER_JSON);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(customerRepository).findByEmail(principal.getName());
+        Mockito.verify(userRepository).findByEmail(principal.getName());
+        Mockito.verifyNoMoreInteractions(customerRepository);
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void updateCustomer() throws IOException {
@@ -143,6 +161,14 @@ import static org.assertj.core.api.Assertions.assertThat;
             customerServiceImpl.updateCustomer(principal, CUSTOMER_JSON);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(customerRepository).findByEmail(principal.getName());
+        Mockito.verify(customerRepository).save(CUSTOMER);
+        Mockito.verify(userRepository).findByEmail(principal.getName());
+        Mockito.verify(userRepository).countByEmail("android2@mail.com");
+        Mockito.verify(userRepository).save(USER);
+        Mockito.verifyNoMoreInteractions(customerRepository);
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void updateCustomerFailed() throws IOException {
@@ -153,6 +179,11 @@ import static org.assertj.core.api.Assertions.assertThat;
             customerServiceImpl.updateCustomer(principal, CUSTOMER_JSON);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(customerRepository).findByEmail(principal.getName());
+        Mockito.verify(userRepository).findByEmail(principal.getName());
+        Mockito.verifyNoMoreInteractions(customerRepository);
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void createCustomerEmailAlreadyRegistered() {
@@ -162,14 +193,22 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = customerServiceImpl.createCustomer(CREATE_CUSTOMER_REQUEST);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(userRepository).findByEmail(USER.getEmail());
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void createCustomerEmailSuccess() {
-        Mockito.when(userRepository.findByEmail(USER.getEmail())).thenReturn(null);
+        Mockito.when(userRepository.findByEmail(CREATE_CUSTOMER_REQUEST.getEmail()))
+            .thenReturn(null);
 
         ResponseEntity responseEntity = customerServiceImpl.createCustomer(CREATE_CUSTOMER_REQUEST);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(userRepository).findByEmail(CREATE_CUSTOMER_REQUEST.getEmail());
+        Mockito.verify(userRepository).save(USER_CUSTOMER_REQUEST);
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void getUserDetailSASuccess() {
@@ -180,6 +219,10 @@ import static org.assertj.core.api.Assertions.assertThat;
             customerServiceImpl.getUserDetailSA(CUSTOMER.getIdCustomer());
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(customerRepository, Mockito.times(2))
+            .findByIdCustomer(CUSTOMER.getIdCustomer());
+        Mockito.verifyNoMoreInteractions(customerRepository);
     }
 
     @Test public void getUserDetailSAFailed() {
@@ -190,13 +233,16 @@ import static org.assertj.core.api.Assertions.assertThat;
             customerServiceImpl.getUserDetailSA(CUSTOMER.getIdCustomer());
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(customerRepository).findByIdCustomer(CUSTOMER.getIdCustomer());
+        Mockito.verifyNoMoreInteractions(customerRepository);
     }
 
     @Test public void banCustomerCustomer() {
         CUSTOMER.setEmail("email");
         USER.setRole(Constants.CUSTOMER);
-        Mockito
-            .when(bookingRepository.findBookingByIdUserAndDateOut(CUSTOMER.getIdCustomer(), null))
+        Mockito.when(
+            bookingRepository.findBookingByIdUserAndTotalPrice(CUSTOMER.getIdCustomer(), null))
             .thenReturn(BOOKING);
         Mockito.when(customerRepository.findByIdCustomer(CUSTOMER.getIdCustomer()))
             .thenReturn(CUSTOMER);
@@ -205,12 +251,22 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = customerServiceImpl.banCustomer(CUSTOMER.getIdCustomer());
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(bookingRepository)
+            .findBookingByIdUserAndTotalPrice(CUSTOMER.getIdCustomer(), null);
+        Mockito.verify(customerRepository).findByIdCustomer(CUSTOMER.getIdCustomer());
+        Mockito.verify(customerRepository).save(CUSTOMER);
+        Mockito.verify(userRepository).findByEmail(CUSTOMER.getEmail());
+        Mockito.verify(userRepository).save(USER);
+        Mockito.verifyNoMoreInteractions(bookingRepository);
+        Mockito.verifyNoMoreInteractions(customerRepository);
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void banCustomerNotCustomer() {
         CUSTOMER.setEmail("email");
-        Mockito
-            .when(bookingRepository.findBookingByIdUserAndDateOut(CUSTOMER.getIdCustomer(), null))
+        Mockito.when(
+            bookingRepository.findBookingByIdUserAndTotalPrice(CUSTOMER.getIdCustomer(), null))
             .thenReturn(BOOKING);
         Mockito.when(customerRepository.findByIdCustomer(CUSTOMER.getIdCustomer()))
             .thenReturn(CUSTOMER);
@@ -219,5 +275,15 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = customerServiceImpl.banCustomer(CUSTOMER.getIdCustomer());
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(bookingRepository)
+            .findBookingByIdUserAndTotalPrice(CUSTOMER.getIdCustomer(), null);
+        Mockito.verify(customerRepository).findByIdCustomer(CUSTOMER.getIdCustomer());
+        Mockito.verify(customerRepository).save(CUSTOMER);
+        Mockito.verify(userRepository).findByEmail(CUSTOMER.getEmail());
+        Mockito.verify(userRepository).save(USER);
+        Mockito.verifyNoMoreInteractions(bookingRepository);
+        Mockito.verifyNoMoreInteractions(customerRepository);
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 }

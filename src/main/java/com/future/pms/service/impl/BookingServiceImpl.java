@@ -1,15 +1,15 @@
 package com.future.pms.service.impl;
 
+import com.future.pms.AmazonClient;
 import com.future.pms.FcmClient;
-import com.future.pms.model.Booking;
-import com.future.pms.model.Customer;
-import com.future.pms.model.Receipt;
-import com.future.pms.model.User;
+import com.future.pms.model.*;
 import com.future.pms.model.parking.ParkingLevel;
 import com.future.pms.model.parking.ParkingSlot;
 import com.future.pms.model.parking.ParkingZone;
 import com.future.pms.repository.*;
 import com.future.pms.service.BookingService;
+import net.glxn.qrgen.core.image.ImageType;
+import net.glxn.qrgen.javase.QRCode;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.security.Principal;
 import java.util.Calendar;
 
@@ -31,6 +33,7 @@ import static com.future.pms.Utils.getTotalTime;
     @Autowired UserRepository userRepository;
     @Autowired ParkingZoneRepository parkingZoneRepository;
     @Autowired ParkingLevelRepository parkingLevelRepository;
+    @Autowired AmazonClient amazonClient;
 
 
     @Override public ResponseEntity loadAll(String filter, Integer page) {
@@ -58,7 +61,7 @@ import static com.future.pms.Utils.getTotalTime;
         if (customer != null) {
             PageRequest request = PageRequest.of(page, 10, new Sort(Sort.Direction.DESC, "dateIn"));
             return ResponseEntity.ok(bookingRepository
-                .findBookingByIdUserAndDateOutNotNull(customer.getIdCustomer(), request));
+                .findBookingByIdUserAndTotalPriceNotNull(customer.getIdCustomer(), request));
         } else {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
@@ -68,7 +71,7 @@ import static com.future.pms.Utils.getTotalTime;
         Customer customer = customerRepository.findByEmail(principal.getName());
         if (customer != null) {
             return ResponseEntity.ok(bookingRepository
-                .findBookingByIdUserAndDateOut(customer.getIdCustomer(), null));
+                .findBookingByIdUserAndTotalPrice(customer.getIdCustomer(), null));
         } else {
             return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
         }
@@ -102,6 +105,9 @@ import static com.future.pms.Utils.getTotalTime;
                 && !user.getRole().equals(CUSTOMER_BANNED)) {
                 ParkingZone parkingZone = parkingZoneRepository
                     .findParkingZoneByIdParkingZone(parkingSlot.getIdParkingZone());
+                parkingSlot.setStatus(SLOT_TAKEN);
+                parkingSlotRepository.save(parkingSlot);
+
                 ParkingLevel parkingLevel =
                     parkingLevelRepository.findByIdLevel(parkingSlot.getIdLevel());
                 FcmClient fcmClient;
@@ -110,8 +116,6 @@ import static com.future.pms.Utils.getTotalTime;
                     parkingLevel.getLevelName());
 
                 System.out.println(fcm);
-                parkingSlot.setStatus(SLOT_TAKEN);
-                parkingSlotRepository.save(parkingSlot);
                 setupParkingLayout(parkingSlot, SLOT_TAKEN);
                 Booking bookingParking = new Booking();
                 bookingParking.setParkingZoneName(parkingZone.getName());
@@ -144,6 +148,7 @@ import static com.future.pms.Utils.getTotalTime;
         receipt.setAddress(parkingZone.getAddress());
         receipt.setSlotName(booking.getSlotName());
         receipt.setPrice(booking.getPrice());
+        receipt.setStatus("Completed");
         if (booking.getTotalTime() == null) {
             booking.setTotalTime(Long.toString(
                 getTotalTime(booking.getDateIn(), Calendar.getInstance().getTimeInMillis())));
@@ -175,37 +180,50 @@ import static com.future.pms.Utils.getTotalTime;
         return (String.valueOf(totalHours * price)).split("\\.")[0];
     }
 
-    @Override public ResponseEntity checkoutBooking(Principal principal) {
+    @Override public ResponseEntity checkoutBookingStepOne(Principal principal, String fcmToken)
+        throws IOException {
         Customer customer = customerRepository.findByEmail(principal.getName());
-        return checkoutBooking(customer);
+        String filename;
+        QR qr = new QR();
+        qr.setIdSlot(customer.getIdCustomer());
+        ByteArrayOutputStream bout =
+            QRCode.from(qr + fcmToken).withSize(250, 250).to(ImageType.PNG).stream();
+        filename = customer.getIdCustomer() + ".png";
+        filename = amazonClient.convertMultiPartToFileQR(bout, filename);
+        Booking bookingExist =
+            bookingRepository.findBookingByIdUserAndDateOut(customer.getIdCustomer(), null);
+        if (bookingExist != null) {
+            return new ResponseEntity<>(filename, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @Override public ResponseEntity checkoutBookingSA(String id) {
         Booking booking = bookingRepository.findBookingByIdBooking(id);
         Customer customer = customerRepository.findByIdCustomer(booking.getIdUser());
-        return checkoutBooking(customer);
+        checkoutBooking(customer);
+        return ResponseEntity.ok().body(booking);
     }
 
-    private ResponseEntity checkoutBooking(Customer customer) {
-        Booking bookingExist = bookingRepository.findBookingByIdBooking(
-            bookingRepository.findBookingByIdUserAndDateOut(customer.getIdCustomer(), null)
-                .getIdBooking());
-        if (null != bookingExist) {
-            ParkingSlot parkingSlot = parkingSlotRepository.findByIdSlot(bookingExist.getIdSlot());
-            if (SLOT_TAKEN.equals(parkingSlot.getStatus()) || SLOT_TAKEN
-                .equals(parkingSlot.getStatus().substring(parkingSlot.getStatus().length() - 1))) {
-                bookingCheckoutSetup(bookingExist, parkingSlot, parkingSlotRepository,
+    private void checkoutBooking(Customer customer) {
+        Booking ongoingBooking =
+            bookingRepository.findBookingByIdUserAndTotalPrice(customer.getIdCustomer(), null);
+        if (null != ongoingBooking) {
+            ParkingSlot parkingSlot =
+                parkingSlotRepository.findByIdSlot(ongoingBooking.getIdSlot());
+            if (SLOT_TAKEN.equals(parkingSlot.getStatus())) {
+                bookingCheckoutSetup(ongoingBooking, parkingSlot, parkingSlotRepository,
                     bookingRepository);
                 setupParkingLayout(parkingSlot, SLOT_EMPTY);
-                return ResponseEntity.ok().body(bookingExist);
             }
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     void bookingCheckoutSetup(Booking bookingExist, ParkingSlot parkingSlot,
         ParkingSlotRepository parkingSlotRepository, BookingRepository bookingRepository) {
-        bookingExist.setDateOut(Calendar.getInstance().getTimeInMillis());
+        if (bookingExist.getDateOut() == null) {
+            bookingExist.setDateOut(Calendar.getInstance().getTimeInMillis());
+        }
         bookingExist.setTotalTime(
             Long.toString(getTotalTime(bookingExist.getDateIn(), bookingExist.getDateOut())));
         bookingExist.setTotalPrice(getTotalPrice(getTotalMinute(bookingExist.getTotalTime()),
@@ -222,5 +240,28 @@ import static com.future.pms.Utils.getTotalTime;
 
     @Override public ResponseEntity findBookingById(String id) {
         return ResponseEntity.ok(bookingRepository.findBookingByIdBooking(id));
+    }
+
+    @Override public ResponseEntity checkoutBookingStepTwo(Principal principal, String fcmToken,
+        String idCustomer) throws JSONException {
+        ParkingZone parkingZone =
+            parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
+        Customer customer = customerRepository.findByIdCustomer(idCustomer);
+        Booking bookingExist = bookingRepository.findBookingByIdUserAndTotalPrice(idCustomer, null);
+        if (bookingExist != null && parkingZone.getIdParkingZone()
+            .equals(bookingExist.getIdParkingZone())) {
+            checkoutBooking(customer);
+            String bookingId = bookingExist.getIdBooking();
+            bookingExist = bookingRepository.findBookingByIdBooking(bookingId);
+            if (fcmToken != null) {
+                FcmClient fcmClient;
+                fcmClient = new FcmClient();
+                fcmClient.sendPushNotificationCheckoutBooking(fcmToken,
+                    bookingExist.getParkingZoneName(), bookingExist.getIdBooking());
+            }
+            return ResponseEntity.ok().body(bookingExist);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 }

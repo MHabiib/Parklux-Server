@@ -139,6 +139,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         assertThat(responseEntity).isNotNull();
 
         Mockito.verify(userRepository).findByEmail(USER.getEmail());
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void updateUserEmailAlreadyRegistered() {
@@ -166,6 +167,10 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = userServiceImpl.updateUser(USER, principal);
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(userRepository, Mockito.times(3)).findByEmail(USER.getEmail());
+        Mockito.verify(userRepository).save(USER);
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void updateUserFromList() {
@@ -176,7 +181,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
         assertThat(responseEntity).isNotNull();
 
+        Mockito.verify(userRepository).findByIdUser(ID);
         Mockito.verify(userRepository).findByEmail(USER.getEmail());
+        Mockito.verify(userRepository).save(USER);
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void updateUserFromListEmailNotNull() {
@@ -188,7 +196,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
         assertThat(responseEntity).isNotNull();
 
+        Mockito.verify(userRepository).findByIdUser(ID);
         Mockito.verify(userRepository).findByEmail(USER.getEmail());
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void updateUserFromListEmailNotNullExist() {
@@ -200,7 +210,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
         assertThat(responseEntity).isNotNull();
 
+        Mockito.verify(userRepository).findByIdUser(ID);
         Mockito.verify(userRepository).findByEmail(USER.getEmail());
+        Mockito.verify(userRepository).save(USER);
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void getUserSA() {
@@ -211,6 +224,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         assertThat(responseEntity).isNotNull();
 
         Mockito.verify(userRepository, Mockito.times(2)).findByIdUser(ID);
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void getUserSANull() {
@@ -221,6 +235,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         assertThat(responseEntity).isNotNull();
 
         Mockito.verify(userRepository).findByIdUser(ID);
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void deleteSuperAdmin() {
@@ -235,6 +250,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
         Mockito.verify(userRepository).findByIdUser(ID);
         Mockito.verify(userRepository).delete(USER2);
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 
     @Test public void deleteSuperAdminNull() {
@@ -245,5 +261,6 @@ import static org.assertj.core.api.Assertions.assertThat;
         assertThat(responseEntity).isNotNull();
 
         Mockito.verify(userRepository).findByIdUser(ID);
+        Mockito.verifyNoMoreInteractions(userRepository);
     }
 }

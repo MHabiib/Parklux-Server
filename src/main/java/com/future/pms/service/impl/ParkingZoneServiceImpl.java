@@ -5,10 +5,7 @@ import com.future.pms.AmazonClient;
 import com.future.pms.config.MongoTokenStore;
 import com.future.pms.model.Booking;
 import com.future.pms.model.User;
-import com.future.pms.model.parking.ParkingLevel;
-import com.future.pms.model.parking.ParkingSection;
-import com.future.pms.model.parking.ParkingSlot;
-import com.future.pms.model.parking.ParkingZone;
+import com.future.pms.model.parking.*;
 import com.future.pms.model.request.LevelDetailsRequest;
 import com.future.pms.model.request.ListLevelRequest;
 import com.future.pms.model.request.SectionDetailRequest;
@@ -122,7 +119,7 @@ import static com.future.pms.Utils.checkImageFile;
                 }
             }
         } else {
-            return new ResponseEntity<>("Slot not found !", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Section not found !", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -184,7 +181,7 @@ import static com.future.pms.Utils.checkImageFile;
                 return "(" + LETTER.get(i - 1) + "-" + ((slotAt % TOTAL_SLOT_IN_ROW) + 1) + ")";
             }
         }
-        return "x";
+        return "";
     }
 
     private String updateSlot(ParkingSection parkingSection, String status) {
@@ -232,6 +229,9 @@ import static com.future.pms.Utils.checkImageFile;
             new ObjectMapper().readValue(parkingZoneJSON, UpdateParkingZoneRequest.class);
         ParkingZone parkingZoneDetail =
             parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName());
+        if (parkingZoneDetail == null) {
+            return new ResponseEntity<>(PARKING_ZONE_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
         return updateParkingZone(parkingZone, parkingZoneDetail, principal.getName());
     }
 
@@ -240,14 +240,14 @@ import static com.future.pms.Utils.checkImageFile;
         UpdateParkingZoneRequest parkingZone =
             new ObjectMapper().readValue(parkingZoneJSON, UpdateParkingZoneRequest.class);
         ParkingZone parkingZoneDetail = parkingZoneRepository.findParkingZoneByIdParkingZone(id);
+        if (parkingZoneDetail == null) {
+            return new ResponseEntity<>(PARKING_ZONE_NOT_FOUND, HttpStatus.BAD_REQUEST);
+        }
         return updateParkingZone(parkingZone, parkingZoneDetail, parkingZoneDetail.getEmailAdmin());
     }
 
     private ResponseEntity updateParkingZone(UpdateParkingZoneRequest parkingZone,
         ParkingZone parkingZoneDetail, String emailAdmin) {
-        if (parkingZoneDetail == null) {
-            return new ResponseEntity<>(PARKING_ZONE_NOT_FOUND, HttpStatus.BAD_REQUEST);
-        }
         ParkingZone parkingZoneExist = parkingZoneRepository
             .findParkingZoneByIdParkingZone(parkingZoneDetail.getIdParkingZone());
         User user = userRepository.findByEmail(emailAdmin);
@@ -263,6 +263,10 @@ import static com.future.pms.Utils.checkImageFile;
                 parkingZoneExist.setEmailAdmin(parkingZone.getEmailAdmin());
             }
         }
+        if (0.0 != parkingZone.getLatitude()) {
+            parkingZoneExist.setLongitude(parkingZone.getLongitude());
+            parkingZoneExist.setLatitude(parkingZone.getLatitude());
+        }
         if (parkingZone.getImageUrl().equals("")) {
             parkingZone.setImageUrl(parkingZoneDetail.getImageUrl());
         }
@@ -276,6 +280,8 @@ import static com.future.pms.Utils.checkImageFile;
         parkingZoneExist.setAddress(parkingZone.getAddress());
         parkingZoneExist.setPhoneNumber(parkingZone.getPhoneNumber());
         parkingZoneExist.setImageUrl(parkingZone.getImageUrl());
+        parkingZoneExist.setLatitude(parkingZone.getLatitude());
+        parkingZoneExist.setLongitude(parkingZone.getLongitude());
         user.setEmail(parkingZone.getEmailAdmin());
         parkingZoneRepository.save(parkingZoneExist);
         userRepository.save(user);
@@ -523,5 +529,24 @@ import static com.future.pms.Utils.checkImageFile;
         } else {
             return new ResponseEntity<>("Admin not found", HttpStatus.NOT_FOUND);
         }
+    }
+
+    @Override public ResponseEntity getLatLng() {
+        List<ParkingZone> parkingZoneList =
+            parkingZoneRepository.findParkingZoneByLatitudeNotNullAndLongitudeNotLike(0.0);
+        List<ParkingZoneLatLng> parkingZoneLatLngList = new ArrayList<>();
+        for (ParkingZone parkingZone : parkingZoneList) {
+            ParkingZoneLatLng parkingZoneLatLng = new ParkingZoneLatLng();
+            parkingZoneLatLng.setName(parkingZone.getName());
+            parkingZoneLatLng.setAddress(parkingZone.getAddress());
+            parkingZoneLatLng.setPhoneNumber(parkingZone.getPhoneNumber());
+            parkingZoneLatLng.setOpenHour(parkingZone.getOpenHour());
+            parkingZoneLatLng.setPrice(parkingZone.getPrice());
+            parkingZoneLatLng.setLatitude(parkingZone.getLatitude());
+            parkingZoneLatLng.setLongitude(parkingZone.getLongitude());
+            parkingZoneLatLng.setImageUrl(parkingZone.getImageUrl());
+            parkingZoneLatLngList.add(parkingZoneLatLng);
+        }
+        return new ResponseEntity<>(parkingZoneLatLngList, HttpStatus.OK);
     }
 }

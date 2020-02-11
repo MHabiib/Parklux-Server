@@ -55,9 +55,12 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = generateQRServiceImpl.generateQR(principal, "");
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingZoneRepository).findParkingZoneByEmailAdmin(principal.getName());
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
     }
 
-    @Test public void generateQRSlotFull() throws IOException {
+    @Test public void generateQRSlotFull() throws IOException, InterruptedException {
         PARKING_SLOT.setStatus(SLOT_EMPTY);
         Mockito.when(parkingSlotRepository.findByIdSlot(ID)).thenReturn(PARKING_SLOT);
         Mockito.when(parkingZoneRepository.findParkingZoneByEmailAdmin(principal.getName()))
@@ -67,10 +70,21 @@ import static org.assertj.core.api.Assertions.assertThat;
             .thenReturn(LIST_OF_PARKING_SLOT);
         Mockito.when(parkingLevelRepository.findByIdLevel(PARKING_SLOT.getIdLevel()))
             .thenReturn(PARKING_LEVEL);
+        Mockito.when(parkingSlotRepository.findByIdSlot(PARKING_SLOT.getIdSlot()))
+            .thenReturn(PARKING_SLOT);
 
         ResponseEntity responseEntity = generateQRServiceImpl.generateQR(principal, "");
 
+        Thread.sleep(23000);
+
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingZoneRepository).findParkingZoneByEmailAdmin(principal.getName());
+        Mockito.verify(parkingLevelRepository, Mockito.times(2))
+            .findByIdLevel(PARKING_SLOT.getIdLevel());
+        Mockito.verify(parkingLevelRepository, Mockito.times(2)).save(PARKING_LEVEL);
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
+        Mockito.verifyNoMoreInteractions(parkingLevelRepository);
     }
 
     @Test public void generateQRSlotEmpty() throws IOException {
@@ -84,5 +98,11 @@ import static org.assertj.core.api.Assertions.assertThat;
         ResponseEntity responseEntity = generateQRServiceImpl.generateQR(principal, "");
 
         assertThat(responseEntity).isNotNull();
+
+        Mockito.verify(parkingZoneRepository).findParkingZoneByEmailAdmin(principal.getName());
+        Mockito.verify(parkingSlotRepository)
+            .findAllByIdParkingZoneAndStatus(PARKING_ZONE.getIdParkingZone(), SLOT_EMPTY);
+        Mockito.verifyNoMoreInteractions(parkingZoneRepository);
+        Mockito.verifyNoMoreInteractions(parkingSlotRepository);
     }
 }

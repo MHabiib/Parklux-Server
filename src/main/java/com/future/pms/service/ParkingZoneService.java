@@ -38,4 +38,6 @@ public interface ParkingZoneService {
     ResponseEntity updateParkingZonePicture(Principal principal, MultipartFile file);
 
     ResponseEntity getAdminSA(String id);
+
+    ResponseEntity getLatLng();
 }
